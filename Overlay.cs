@@ -740,6 +740,240 @@ namespace GTAVCSMM
             Activate();
             LoadSession(2);
         }
+
+        private void toolStripMenuItem7_Click(object sender, EventArgs e)
+        {
+            Activate();
+            Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oWanted }, 0);
+        }
+
+        private void toolStripMenuItem8_Click(object sender, EventArgs e)
+        {
+            Activate();
+            Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oWanted }, 1);
+        }
+
+        private void toolStripMenuItem9_Click(object sender, EventArgs e)
+        {
+            Activate();
+            Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oWanted }, 2);
+        }
+
+        private void toolStripMenuItem10_Click(object sender, EventArgs e)
+        {
+            Activate();
+            Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oWanted }, 3);
+        }
+
+        private void toolStripMenuItem11_Click(object sender, EventArgs e)
+        {
+            Activate();
+            Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oWanted }, 4);
+        }
+
+        private void toolStripMenuItem12_Click(object sender, EventArgs e)
+        {
+            Activate();
+            Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oWanted }, 5);
+        }
+
+        private void toolStripMenuItem13_Click(object sender, EventArgs e)
+        {
+            Activate();
+            Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oRunSpeed }, 0.0f);
+        }
+
+        private void toolStripMenuItem14_Click(object sender, EventArgs e)
+        {
+            Activate();
+            Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oRunSpeed }, 0.5f);
+        }
+
+        private void x10ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Activate();
+            Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oRunSpeed }, 1.0f);
+        }
+
+        private void xToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Activate();
+            Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oRunSpeed }, 1.5f);
+        }
+
+        private void toolStripMenuItem15_Click(object sender, EventArgs e)
+        {
+            Activate();
+            Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oRunSpeed }, 2.0f);
+        }
+
+        private void toolStripMenuItem16_Click(object sender, EventArgs e)
+        {
+            Activate();
+            Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oRunSpeed }, 2.5f);
+        }
+
+        private void toolStripMenuItem17_Click(object sender, EventArgs e)
+        {
+            Activate();
+            Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oRunSpeed }, 3.0f);
+        }
+
+        private void xToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            Activate();
+            Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oRunSpeed }, 3.5f);
+        }
+
+        private void toolStripMenuItem18_Click(object sender, EventArgs e)
+        {
+            Activate();
+            Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oRunSpeed }, 4.0f);
+        }
+
+        private void xToolStripMenuItem2_Click(object sender, EventArgs e)
+        {
+            Activate();
+            Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oRunSpeed }, 4.5f);
+        }
+
+        private void xToolStripMenuItem3_Click(object sender, EventArgs e)
+        {
+            Activate();
+            Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oRunSpeed }, 5.0f);
+        }
+
+        private void xToolStripMenuItem4_Click(object sender, EventArgs e)
+        {
+            Activate();
+            Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oWalkSpeed }, 0.0f);
+        }
+
+        private void xToolStripMenuItem5_Click(object sender, EventArgs e)
+        {
+            Activate();
+            Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oWalkSpeed }, 0.5f);
+        }
+
+        private void xToolStripMenuItem6_Click(object sender, EventArgs e)
+        {
+            Activate();
+            Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oWalkSpeed }, 1.0f);
+        }
+
+        private void xToolStripMenuItem7_Click(object sender, EventArgs e)
+        {
+            Activate();
+            Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oWalkSpeed }, 1.5f);
+        }
+
+        private void xToolStripMenuItem8_Click(object sender, EventArgs e)
+        {
+            Activate();
+            Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oWalkSpeed }, 2.0f);
+        }
+
+        private void xToolStripMenuItem9_Click(object sender, EventArgs e)
+        {
+            Activate();
+            Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oWalkSpeed }, 2.5f);
+        }
+
+        private void xToolStripMenuItem10_Click(object sender, EventArgs e)
+        {
+            Activate();
+            Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oWalkSpeed }, 3.0f);
+        }
+
+        private void xToolStripMenuItem11_Click(object sender, EventArgs e)
+        {
+            Activate();
+            Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oWalkSpeed }, 3.5f);
+        }
+
+        private void xToolStripMenuItem12_Click(object sender, EventArgs e)
+        {
+            Activate();
+            Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oWalkSpeed }, 4.0f);
+        }
+
+        private void xToolStripMenuItem13_Click(object sender, EventArgs e)
+        {
+            Activate();
+            Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oWalkSpeed }, 4.5f);
+        }
+
+        private void xToolStripMenuItem14_Click(object sender, EventArgs e)
+        {
+            Activate();
+            Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oWalkSpeed }, 5.0f);
+        }
+
+        private void xToolStripMenuItem15_Click(object sender, EventArgs e)
+        {
+            Activate();
+            Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oSwimSpeed }, 0.0f);
+        }
+
+        private void xToolStripMenuItem16_Click(object sender, EventArgs e)
+        {
+            Activate();
+            Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oSwimSpeed }, 0.5f);
+        }
+
+        private void xDefaultToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Activate();
+            Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oSwimSpeed }, 1.0f);
+        }
+
+        private void xToolStripMenuItem17_Click(object sender, EventArgs e)
+        {
+            Activate();
+            Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oSwimSpeed }, 1.5f);
+        }
+
+        private void xToolStripMenuItem18_Click(object sender, EventArgs e)
+        {
+            Activate();
+            Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oSwimSpeed }, 2.0f);
+        }
+
+        private void xToolStripMenuItem19_Click(object sender, EventArgs e)
+        {
+            Activate();
+            Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oSwimSpeed }, 2.5f);
+        }
+
+        private void xToolStripMenuItem20_Click(object sender, EventArgs e)
+        {
+            Activate();
+            Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oSwimSpeed }, 3.0f);
+        }
+
+        private void xToolStripMenuItem21_Click(object sender, EventArgs e)
+        {
+            Activate();
+            Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oSwimSpeed }, 3.5f);
+        }
+
+        private void xToolStripMenuItem22_Click(object sender, EventArgs e)
+        {
+            Activate();
+            Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oSwimSpeed }, 4.0f);
+        }
+
+        private void xToolStripMenuItem23_Click(object sender, EventArgs e)
+        {
+            Activate();
+            Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oSwimSpeed }, 4.5f);
+        }
+
+        private void xToolStripMenuItem24_Click(object sender, EventArgs e)
+        {
+            Activate();
+            Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oSwimSpeed }, 5.0f);
+        }
     }
     struct Location { public float x, y, z; }
 }
