@@ -99,7 +99,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="gtavcsmm.ico" />
-    <Content Include="hnet.com-image.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

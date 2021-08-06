@@ -258,6 +258,14 @@ namespace GTAVCSMM
                 case Keys.Delete:
                     Quit();
                     break;
+                case Keys.F5:
+                    this.Invoke(new Action(() =>
+                    {
+                        SendKeys.SendWait("^{ESC}");
+                        Thread.Sleep(2000);
+                        ClickOnPointTool.ClickOnPoint(this.Handle, new Point(this.Top+3, this.Left+3));
+                    }));                    
+                    break;
                 case Keys.F6:
                     this.bGodMode = !this.bGodMode;
                     break;
@@ -343,16 +351,14 @@ namespace GTAVCSMM
                 Quit();
             }
 
-            this.BackColor = Color.Orange;
-            this.TransparencyKey = Color.Orange;
             this.TopMost = true;
             this.FormBorderStyle = FormBorderStyle.None;
             int InitialStyle = GetWindowLong(this.Handle, -10);
             SetWindowLong(this.Handle, -10, InitialStyle | 0x800000 | 0x20);
             GetWindowRect(handle, out rect);
-            this.Size = new Size(rect.right - rect.left, 30);
-            this.Top = rect.top;
-            this.Left = rect.left;
+            this.Size = new Size((rect.right-12) - rect.left, 24);
+            this.Top = rect.top + 2;
+            this.Left = rect.left + 3;
 
             KeyAssign();
         }
@@ -639,6 +645,7 @@ namespace GTAVCSMM
                 bGodMode = true;
                 bgodState = false;
             }
+            Activate();
             teleportWaypoint();
             if (!bgodState)
             {
@@ -657,6 +664,7 @@ namespace GTAVCSMM
                 bGodMode = true;
                 bgodState = false;
             }
+            Activate();
             teleportObjective();
             if (!bgodState)
             {
@@ -666,15 +674,18 @@ namespace GTAVCSMM
 
         private void leaveOnlineToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            Activate();
             LoadSession(-1);
         }
 
         private void disconnectToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            Activate();
             LoadSession(-2);
         }
         private void newPublicSessionToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            Activate();
             LoadSession(1);
         }
 
@@ -685,21 +696,25 @@ namespace GTAVCSMM
 
         private void joinPublicSessionToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            Activate();
             LoadSession(0);
         }
 
         private void soloSessionToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            Activate();
             LoadSession(10);
         }
 
         private void toolStripMenuItem6_Click(object sender, EventArgs e)
         {
+            Activate();
             LoadSession(11);
         }
 
         private void findFriendSessionToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            Activate();
             LoadSession(9);
         }
 
@@ -710,16 +725,19 @@ namespace GTAVCSMM
 
         private void crewSessionToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            Activate();
             LoadSession(3);
         }
 
         private void joinCrewSessionToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            Activate();
             LoadSession(12);
         }
 
         private void closedCrewSessionToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            Activate();
             LoadSession(2);
         }
     }
