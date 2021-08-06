@@ -54,6 +54,7 @@ namespace GTAVCSMM
         private bool bUndeadOffRadar = false;
         private bool bSeatBelt = false;
         private bool bSuperJump = false;
+        private bool bDisableCollision = false;
         private bool bVehicleGodMode = false;
 
         [DllImport("user32.dll")]
@@ -209,6 +210,33 @@ namespace GTAVCSMM
                     settings.psjump = false;
                     superJumpToolStripMenuItem.Checked = false;
                     Deactivate();
+                }
+            }
+        }
+        public void pDISABLECOLLISION()
+        {
+            long paddr = Mem.ReadPointer(settings.WorldPTR, new int[] { offsets.pCPed, 0x30, 0x10, 0x20, 0x70, 0x0 });
+            long paddr2 = Mem.GetPtrAddr(paddr + 0x2C, null);
+
+            if (bDisableCollision)
+            {
+                Mem.writeFloat(paddr2, null, -1.0f);
+                if (!settings.pdiscol)
+                {
+                    Activate();
+                }
+                settings.pdiscol = true;
+
+                disableCollisionToolStripMenuItem.Checked = true;
+            }
+            else
+            {
+                if (settings.pdiscol)
+                {
+                    Mem.writeFloat(paddr2, null, 0.25f);
+                    settings.pdiscol = false;
+                    Deactivate();
+                    disableCollisionToolStripMenuItem.Checked = false;
                 }
             }
         }
@@ -388,6 +416,7 @@ namespace GTAVCSMM
             pUNDEADOFFRADAR();
             pSEATBELT();
             pSUPERJUMP();
+            pDISABLECOLLISION();
             vGODMODE();
         }
 
@@ -416,6 +445,32 @@ namespace GTAVCSMM
             Console.Beep(523, 75);
             Console.Beep(523, 75);
         }
+
+        public void LoadSession(int id)
+        {
+            if (id == -1)
+            {
+                _SG_Int(1312443 + 2, -1);
+                _SG_Int(1312443, 1);
+                Thread.Sleep(200);
+                _SG_Int(1312443, 0);
+            }
+            else if (id == -2)
+            {
+                _SG_Int(31622, 1);
+                Thread.Sleep(200);
+                _SG_Int(31622, 0);
+            }
+            else
+            {
+                _SG_Int(1312860, id);
+                _SG_Int(1312443, 1);
+                Thread.Sleep(200);
+                _SG_Int(1312443, 0);
+            }
+        }
+
+        #region Teleport part
 
         private void teleportWaypoint()
         {
@@ -538,7 +593,9 @@ namespace GTAVCSMM
                 Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCVehicle, offsets.pCNavigation, offsets.oVPositionZ }, value);
             }
         }
+        #endregion
 
+        #region Global Addresses function
         public long GA(int Index) {
             long p = settings.GlobalPTR + (8 * (Index >> 0x12 & 0x3F));
             long p_ga = Mem.ReadPointer(p, null);
@@ -569,30 +626,7 @@ namespace GTAVCSMM
         {
             Mem.Write(GA(Index), null, value);
         }
-
-        public void LoadSession(int id)
-        {
-            if(id == -1)
-            {
-                _SG_Int(1312443 + 2, -1);
-                _SG_Int(1312443, 1);
-                Thread.Sleep(200);
-                _SG_Int(1312443, 0);
-            }
-            else if (id == -2)
-            {
-                _SG_Int(31622, 1);
-                Thread.Sleep(200);
-                _SG_Int(31622, 0);
-            }
-            else
-            {
-                _SG_Int(1312860, id);
-                _SG_Int(1312443, 1);
-                Thread.Sleep(200);
-                _SG_Int(1312443, 0);
-            }
-        }
+        #endregion
 
         private void toolStripMenuItem5_Click(object sender, EventArgs e)
         {
@@ -973,6 +1007,11 @@ namespace GTAVCSMM
         {
             Activate();
             Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oSwimSpeed }, 5.0f);
+        }
+
+        private void disableCollisionToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this.bDisableCollision = !this.bDisableCollision;
         }
     }
     struct Location { public float x, y, z; }

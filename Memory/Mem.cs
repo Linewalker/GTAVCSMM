@@ -98,6 +98,10 @@ namespace GTAVCSMM.Memory
         {
             WriteProcessMemory(Proc.Handle, BasePTR, BitConverter.GetBytes(Value), 8);
         }
+        public void writeFloat(long BasePTR, int[] offset, float Value)
+        {
+            WriteProcessMemory(Proc.Handle, BasePTR, BitConverter.GetBytes(Value), 8);
+        }
 
         public bool ReadBool(long BasePTR, int[] offset) => ReadByte(BasePTR, offset) != 0x00;
         public float ReadFloat(long BasePTR, int[] offset) => BitConverter.ToSingle(ReadBytes(BasePTR, offset, 4), 0);

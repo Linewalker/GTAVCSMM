@@ -107,6 +107,7 @@ namespace GTAVCSMM
             this.xToolStripMenuItem22 = new System.Windows.Forms.ToolStripMenuItem();
             this.xToolStripMenuItem23 = new System.Windows.Forms.ToolStripMenuItem();
             this.xToolStripMenuItem24 = new System.Windows.Forms.ToolStripMenuItem();
+            this.disableCollisionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.contextMenuStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -158,7 +159,7 @@ namespace GTAVCSMM
             this.showAddressesToolStripMenuItem,
             this.toolStripMenuItem5});
             this.toolStripMenuItem2.Name = "toolStripMenuItem2";
-            this.toolStripMenuItem2.Size = new System.Drawing.Size(94, 20);
+            this.toolStripMenuItem2.Size = new System.Drawing.Size(46, 20);
             this.toolStripMenuItem2.Text = "Main";
             // 
             // toolStripMenuItem4
@@ -177,7 +178,7 @@ namespace GTAVCSMM
             // 
             this.toolStripMenuItem5.Name = "toolStripMenuItem5";
             this.toolStripMenuItem5.Size = new System.Drawing.Size(159, 22);
-            this.toolStripMenuItem5.Text = "Quit";
+            this.toolStripMenuItem5.Text = "Quit (Del)";
             this.toolStripMenuItem5.Click += new System.EventHandler(this.toolStripMenuItem5_Click);
             // 
             // sessionToolStripMenuItem
@@ -292,6 +293,7 @@ namespace GTAVCSMM
             this.seatbeltToolStripMenuItem,
             this.noRagdollToolStripMenuItem,
             this.undeadOffToolStripMenuItem,
+            this.disableCollisionToolStripMenuItem,
             this.swimSpeedToolStripMenuItem,
             this.stealthSpeedToolStripMenuItem,
             this.runSpeedToolStripMenuItem,
@@ -721,6 +723,13 @@ namespace GTAVCSMM
             this.xToolStripMenuItem24.Text = "5.0x";
             this.xToolStripMenuItem24.Click += new System.EventHandler(this.xToolStripMenuItem24_Click);
             // 
+            // disableCollisionToolStripMenuItem
+            // 
+            this.disableCollisionToolStripMenuItem.Name = "disableCollisionToolStripMenuItem";
+            this.disableCollisionToolStripMenuItem.Size = new System.Drawing.Size(170, 22);
+            this.disableCollisionToolStripMenuItem.Text = "Disable Collision";
+            this.disableCollisionToolStripMenuItem.Click += new System.EventHandler(this.disableCollisionToolStripMenuItem_Click);
+            // 
             // Overlay
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -822,6 +831,7 @@ namespace GTAVCSMM
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem10;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem11;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem12;
+        private System.Windows.Forms.ToolStripMenuItem disableCollisionToolStripMenuItem;
     }
 }
 
