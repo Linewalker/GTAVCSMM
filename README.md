@@ -1,4 +1,4 @@
-# GTACSMM
+# GTAVCSMM
 GTA5 CSharp Mod Menu
 
 Based on an idea by Nknights23 https://www.unknowncheats.me/forum/grand-theft-auto-v/463157-gta-simple-external-overlay.html
