@@ -6,6 +6,7 @@
         private string _gameName = "GTA5";
         private int _gameProcess = 0;
         private long _globalptr;
+        private long _globalptr_oldway;
         private long _worldptr;
         private long _blipptr;
         private long _replayinterfaceptr;

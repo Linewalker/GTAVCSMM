@@ -72,7 +72,6 @@ namespace Simple_GTAV_External_Trainer.Memory
             return 0;
         }
 
-
         public byte[] ReadBytes(long BasePTR, int[] offset, int Length)
         {
             byte[] Buffer = new byte[Length];
@@ -80,7 +79,8 @@ namespace Simple_GTAV_External_Trainer.Memory
             return Buffer;
         }
 
-        public void Write(long BasePTR, int[] offset, byte[] Bytes) => WriteProcessMemory(GetProcHandle(), GetPtrAddr(BaseAddress + BasePTR, offset), Bytes, Bytes.Length);
+        //public void Write(long BasePTR, int[] offset, byte[] Bytes) => WriteProcessMemory(GetProcHandle(), GetPtrAddr(BaseAddress + BasePTR, offset), Bytes, Bytes.Length);
+        public void Write(long BasePTR, int[] offset, byte[] Bytes) => WriteProcessMemory(GetProcHandle(), GetPtrAddr(BasePTR), Bytes, Bytes.Length);
 
         public void Write(long BasePTR, int[] offset, bool b) => Write(BasePTR, offset, b ? new byte[] { 0x01 } : new byte[] { 0x00 });
         public void Write(long BasePTR, int[] offset, float Value) => Write(BasePTR, offset, BitConverter.GetBytes(Value));
@@ -90,9 +90,13 @@ namespace Simple_GTAV_External_Trainer.Memory
         public void Write(long BasePTR, int[] offset, long Value) => Write(BasePTR, offset, BitConverter.GetBytes(Value));
         public void Write(long BasePTR, int[] offset, uint Value) => Write(BasePTR, offset, BitConverter.GetBytes(Value));
         public void Write(long BasePTR, int[] offset, byte Value) => Write(BasePTR, offset, new byte[] { Value });
+
+        public void writeInt(long BasePTR, int[] offset, int Value)
+        {
+            WriteProcessMemory(Proc.Handle, BasePTR, BitConverter.GetBytes(Value), 4);
+        }
+
         public bool ReadBool(long BasePTR, int[] offset) => ReadByte(BasePTR, offset) != 0x00;
-
-
         public float ReadFloat(long BasePTR, int[] offset) => BitConverter.ToSingle(ReadBytes(BasePTR, offset, 4), 0);
         public double ReadDouble(long BasePTR, int[] offset) => BitConverter.ToDouble(ReadBytes(BasePTR, offset, 8), 0);
         public int ReadInt(long BasePTR, int[] offset) => BitConverter.ToInt32(ReadBytes(BasePTR, offset, 4), 0);

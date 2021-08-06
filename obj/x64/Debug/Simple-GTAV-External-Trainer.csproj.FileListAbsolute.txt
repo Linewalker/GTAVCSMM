@@ -1,9 +1,0 @@
-C:\Users\Ralf\Documents\Simple-GTAV-External-Overlay\bin\x64\Debug\Simple-GTAV-External-Trainer.exe.config
-C:\Users\Ralf\Documents\Simple-GTAV-External-Overlay\bin\x64\Debug\Simple-GTAV-External-Trainer.exe
-C:\Users\Ralf\Documents\Simple-GTAV-External-Overlay\bin\x64\Debug\Simple-GTAV-External-Trainer.pdb
-C:\Users\Ralf\Documents\Simple-GTAV-External-Overlay\obj\x64\Debug\Simple_GTAV_External_Trainer.Properties.Resources.resources
-C:\Users\Ralf\Documents\Simple-GTAV-External-Overlay\obj\x64\Debug\Simple-GTAV-External-Trainer.csproj.GenerateResource.Cache
-C:\Users\Ralf\Documents\Simple-GTAV-External-Overlay\obj\x64\Debug\Simple-GTAV-External-Trainer.exe
-C:\Users\Ralf\Documents\Simple-GTAV-External-Overlay\obj\x64\Debug\Simple-GTAV-External-Trainer.pdb
-C:\Users\Ralf\Documents\Simple-GTAV-External-Overlay\obj\x64\Debug\Simple-GTAV-External-Trainer.csprojResolveAssemblyReference.cache
-C:\Users\Ralf\Documents\Simple-GTAV-External-Overlay\obj\x64\Debug\Simple_GTAV_External_Trainer.Overlay.resources

@@ -51,6 +51,8 @@ namespace Simple_GTAV_External_Trainer
             this.teleportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.waypointToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.objectiveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.sessionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.newPublicSessionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.contextMenuStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -84,7 +86,8 @@ namespace Simple_GTAV_External_Trainer
             this.toolStripMenuItem2,
             this.playerToolStripMenuItem,
             this.vehicleToolStripMenuItem,
-            this.teleportToolStripMenuItem});
+            this.teleportToolStripMenuItem,
+            this.sessionToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.Size = new System.Drawing.Size(838, 24);
@@ -187,7 +190,7 @@ namespace Simple_GTAV_External_Trainer
             // godModeToolStripMenuItem1
             // 
             this.godModeToolStripMenuItem1.Name = "godModeToolStripMenuItem1";
-            this.godModeToolStripMenuItem1.Size = new System.Drawing.Size(152, 22);
+            this.godModeToolStripMenuItem1.Size = new System.Drawing.Size(130, 22);
             this.godModeToolStripMenuItem1.Text = "God Mode";
             this.godModeToolStripMenuItem1.Click += new System.EventHandler(this.godModeToolStripMenuItem1_Click);
             // 
@@ -203,16 +206,31 @@ namespace Simple_GTAV_External_Trainer
             // waypointToolStripMenuItem
             // 
             this.waypointToolStripMenuItem.Name = "waypointToolStripMenuItem";
-            this.waypointToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.waypointToolStripMenuItem.Size = new System.Drawing.Size(125, 22);
             this.waypointToolStripMenuItem.Text = "Waypoint";
             this.waypointToolStripMenuItem.Click += new System.EventHandler(this.waypointToolStripMenuItem_Click);
             // 
             // objectiveToolStripMenuItem
             // 
             this.objectiveToolStripMenuItem.Name = "objectiveToolStripMenuItem";
-            this.objectiveToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.objectiveToolStripMenuItem.Size = new System.Drawing.Size(125, 22);
             this.objectiveToolStripMenuItem.Text = "Objective";
             this.objectiveToolStripMenuItem.Click += new System.EventHandler(this.objectiveToolStripMenuItem_Click);
+            // 
+            // sessionToolStripMenuItem
+            // 
+            this.sessionToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.newPublicSessionToolStripMenuItem});
+            this.sessionToolStripMenuItem.Name = "sessionToolStripMenuItem";
+            this.sessionToolStripMenuItem.Size = new System.Drawing.Size(58, 20);
+            this.sessionToolStripMenuItem.Text = "Session";
+            // 
+            // newPublicSessionToolStripMenuItem
+            // 
+            this.newPublicSessionToolStripMenuItem.Name = "newPublicSessionToolStripMenuItem";
+            this.newPublicSessionToolStripMenuItem.Size = new System.Drawing.Size(176, 22);
+            this.newPublicSessionToolStripMenuItem.Text = "New Public Session";
+            this.newPublicSessionToolStripMenuItem.Click += new System.EventHandler(this.newPublicSessionToolStripMenuItem_Click);
             // 
             // Overlay
             // 
@@ -259,6 +277,8 @@ namespace Simple_GTAV_External_Trainer
         private System.Windows.Forms.ToolStripMenuItem teleportToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem waypointToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem objectiveToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem sessionToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem newPublicSessionToolStripMenuItem;
     }
 }
 

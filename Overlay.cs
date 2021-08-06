@@ -6,6 +6,8 @@ using Simple_GTAV_External_Trainer.Memory;
 using System.Windows.Forms;
 using System.Drawing;
 using System;
+using System.Threading;
+using System.Diagnostics;
 
 namespace Simple_GTAV_External_Trainer
 {
@@ -72,12 +74,12 @@ namespace Simple_GTAV_External_Trainer
                     Activate();
                 }
                 settings.pgodm = true;
-             
+
                 godModeToolStripMenuItem.Checked = true;
             }
             else
             {
-                if(settings.pgodm)
+                if (settings.pgodm)
                 {
                     Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.oGod }, 0);
                     settings.pgodm = false;
@@ -282,10 +284,19 @@ namespace Simple_GTAV_External_Trainer
             {
                 Mem = new Mem(settings.gameName);
 
-                // GlobalPTR
-                var addr = Mem.FindPattern(pattern.GlobalPTR, pattern.GlobalPTR_Mask);
-                settings.GlobalPTR = addr + Mem.ReadInt(addr + 3, null) + 7;
+                var processes = Process.GetProcessesByName(settings.gameName);
+                foreach (var p in processes)
+                {
+                    if (p.Id > 0)
+                    {
+                        settings.gameProcess = p.Id;
+                    }
+                }
 
+                // GlobalPTR
+                long addr = Mem.FindPattern(pattern.GlobalPTR, pattern.GlobalPTR_Mask);
+                settings.GlobalPTR = addr + Mem.ReadInt(addr + 3, null) + 7;
+                
                 // WorldPTR
                 long addr2 = Mem.FindPattern(pattern.WorldPTR, pattern.WorldPTR_Mask);
                 settings.WorldPTR = addr2 + Mem.ReadInt(addr2 + 3, null) + 7;
@@ -501,6 +512,10 @@ namespace Simple_GTAV_External_Trainer
                 PlayerZ = l.z;
             }
         }
+        private void newPublicSessionToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            LoadSession(1);
+        }
 
         private Location WaypointCoords
         {
@@ -514,7 +529,7 @@ namespace Simple_GTAV_External_Trainer
                         {
                             x = Mem.ReadFloat(settings.BlipPTR + (i * 8), new int[] { 0x10 }),
                             y = Mem.ReadFloat(settings.BlipPTR + (i * 8), new int[] { 0x14 }),
-                            z = - 210F
+                            z = -210F
                         };
                     }
                 }
@@ -596,6 +611,45 @@ namespace Simple_GTAV_External_Trainer
                 Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCVehicle, offsets.pCNavigation, offsets.oPositionZ }, value);
                 Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCVehicle, offsets.pCNavigation, offsets.oVPositionZ }, value);
             }
+        }
+
+        public long GA(int Index) {
+            long p = settings.GlobalPTR + (8 * (Index >> 0x12 & 0x3F));
+            long p_ga = Mem.ReadPointer(p, null);
+            long p_ga_final = p_ga + (8 * (Index & 0x3FFFF));
+            return p_ga_final;
+        }
+        public long _GG_Int(int Index)
+        {
+            return Mem.ReadInt(GA(Index), null);
+        }
+        public float _GG_Float(int Index)
+        {
+            return Mem.ReadFloat(GA(Index), null);
+        }
+        public string _GG_String(int Index, int size)
+        {
+            return Mem.ReadString(GA(Index), null, size);
+        }
+        public void _SG_Int(int Index, int value)
+        {
+            Mem.writeInt(GA(Index), null, value);
+        }
+        public void _SG_Float(int Index, float value)
+        {
+            Mem.Write(GA(Index), null, value);
+        }
+        public void _SG_String(int Index, string value)
+        {
+            Mem.Write(GA(Index), null, value);
+        }
+
+        public void LoadSession(int id)
+        {
+            _SG_Int(1312860, id);
+            _SG_Int(1312443, 1);
+            Thread.Sleep(200);
+            _SG_Int(1312443, 0);
         }
     }
     struct Location { public float x, y, z; }
