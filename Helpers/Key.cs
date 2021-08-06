@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace GTAV_External_Trainer.Helpers
+namespace GTAVCSMM.Helpers
 {
     class Key
     {

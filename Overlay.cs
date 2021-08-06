@@ -1,15 +1,15 @@
 ﻿using System.Runtime.InteropServices;
-using GTAV_External_Trainer.Helpers;
-using Simple_GTAV_External_Trainer.Config;
-using Simple_GTAV_External_Trainer.Settings;
-using Simple_GTAV_External_Trainer.Memory;
+using GTAVCSMM.Helpers;
+using GTAVCSMM.Config;
+using GTAVCSMM.Settings;
+using GTAVCSMM.Memory;
 using System.Windows.Forms;
 using System.Drawing;
 using System;
 using System.Threading;
 using System.Diagnostics;
 
-namespace Simple_GTAV_External_Trainer
+namespace GTAVCSMM
 {
     public partial class Overlay : Form
     {

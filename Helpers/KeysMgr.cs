@@ -3,7 +3,7 @@ using System.Threading;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
-namespace GTAV_External_Trainer.Helpers
+namespace GTAVCSMM.Helpers
 {
     class KeysMgr
     {

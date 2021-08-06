@@ -1,5 +1,5 @@
 ﻿
-namespace Simple_GTAV_External_Trainer
+namespace GTAVCSMM
 {
     partial class Overlay
     {

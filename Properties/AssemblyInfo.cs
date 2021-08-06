@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Simple-GTAV-External-Trainer")]
+[assembly: AssemblyTitle("GTAV C# MM")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Simple-GTAV-External-Trainer")]
+[assembly: AssemblyProduct("GTAV C# MM")]
 [assembly: AssemblyCopyright("Copyright ©  2021")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("b727a908-c9ea-4cfa-8c2f-b209847607a4")]
+[assembly: Guid("b728a908-c9ea-4cfa-8c2f-b209847607a8")]
 
 // Version information for an assembly consists of the following four values:
 //

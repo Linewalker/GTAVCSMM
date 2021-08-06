@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Forms;
 
-namespace Simple_GTAV_External_Trainer
+namespace GTAVCSMM
 {
     static class Program
     {

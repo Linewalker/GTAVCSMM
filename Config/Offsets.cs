@@ -1,4 +1,4 @@
-﻿namespace Simple_GTAV_External_Trainer.Config
+﻿namespace GTAVCSMM.Config
 {
     class Offsets
     {

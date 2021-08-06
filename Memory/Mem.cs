@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace Simple_GTAV_External_Trainer.Memory
+namespace GTAVCSMM.Memory
 {
     class Mem
     {

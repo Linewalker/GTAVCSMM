@@ -1,4 +1,4 @@
-﻿namespace Simple_GTAV_External_Trainer.Settings
+﻿namespace GTAVCSMM.Settings
 {
     class TSettings
     {

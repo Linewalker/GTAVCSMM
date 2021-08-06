@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace GTAV_External_Trainer.Helpers
+namespace GTAVCSMM.Helpers
 {
     class Manager
     {
