@@ -7,6 +7,8 @@ With code from Complexicon https://github.com/Complexicon/BunkerMoney / https://
 
 No external DLLs needed.
 
+Players mouse release option: F5
+
 +++ Online 1.57 +++
 
 ... Code cleanup later ...
