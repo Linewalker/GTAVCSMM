@@ -53,6 +53,17 @@ namespace Simple_GTAV_External_Trainer
             this.objectiveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.sessionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.newPublicSessionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.leaveOnlineToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.disconnectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.joinPublicSessionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.soloSessionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.emptySessionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem6 = new System.Windows.Forms.ToolStripMenuItem();
+            this.findFriendSessionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.closedFriendSessionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.crewSessionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.joinCrewSessionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.closedCrewSessionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.contextMenuStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -84,10 +95,10 @@ namespace Simple_GTAV_External_Trainer
             // 
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripMenuItem2,
+            this.sessionToolStripMenuItem,
             this.playerToolStripMenuItem,
             this.vehicleToolStripMenuItem,
-            this.teleportToolStripMenuItem,
-            this.sessionToolStripMenuItem});
+            this.teleportToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.Size = new System.Drawing.Size(838, 24);
@@ -140,7 +151,7 @@ namespace Simple_GTAV_External_Trainer
             // 
             this.godModeToolStripMenuItem.Name = "godModeToolStripMenuItem";
             this.godModeToolStripMenuItem.Size = new System.Drawing.Size(170, 22);
-            this.godModeToolStripMenuItem.Text = "God Mode";
+            this.godModeToolStripMenuItem.Text = "God Mode (F6)";
             this.godModeToolStripMenuItem.Click += new System.EventHandler(this.godModeToolStripMenuItem_Click);
             // 
             // superJumpToolStripMenuItem
@@ -155,7 +166,7 @@ namespace Simple_GTAV_External_Trainer
             this.neverWantedToolStripMenuItem.Name = "neverWantedToolStripMenuItem";
             this.neverWantedToolStripMenuItem.ShowShortcutKeys = false;
             this.neverWantedToolStripMenuItem.Size = new System.Drawing.Size(170, 22);
-            this.neverWantedToolStripMenuItem.Text = "Never Wanted";
+            this.neverWantedToolStripMenuItem.Text = "Never Wanted (F7)";
             this.neverWantedToolStripMenuItem.Click += new System.EventHandler(this.neverWantedToolStripMenuItem_Click);
             // 
             // seatbeltToolStripMenuItem
@@ -206,8 +217,8 @@ namespace Simple_GTAV_External_Trainer
             // waypointToolStripMenuItem
             // 
             this.waypointToolStripMenuItem.Name = "waypointToolStripMenuItem";
-            this.waypointToolStripMenuItem.Size = new System.Drawing.Size(125, 22);
-            this.waypointToolStripMenuItem.Text = "Waypoint";
+            this.waypointToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.waypointToolStripMenuItem.Text = "Waypoint (F8)";
             this.waypointToolStripMenuItem.Click += new System.EventHandler(this.waypointToolStripMenuItem_Click);
             // 
             // objectiveToolStripMenuItem
@@ -220,7 +231,18 @@ namespace Simple_GTAV_External_Trainer
             // sessionToolStripMenuItem
             // 
             this.sessionToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.newPublicSessionToolStripMenuItem});
+            this.joinPublicSessionToolStripMenuItem,
+            this.newPublicSessionToolStripMenuItem,
+            this.soloSessionToolStripMenuItem,
+            this.leaveOnlineToolStripMenuItem,
+            this.emptySessionToolStripMenuItem,
+            this.toolStripMenuItem6,
+            this.findFriendSessionToolStripMenuItem,
+            this.closedFriendSessionToolStripMenuItem,
+            this.crewSessionToolStripMenuItem,
+            this.joinCrewSessionToolStripMenuItem,
+            this.closedCrewSessionToolStripMenuItem,
+            this.disconnectToolStripMenuItem});
             this.sessionToolStripMenuItem.Name = "sessionToolStripMenuItem";
             this.sessionToolStripMenuItem.Size = new System.Drawing.Size(58, 20);
             this.sessionToolStripMenuItem.Text = "Session";
@@ -228,9 +250,86 @@ namespace Simple_GTAV_External_Trainer
             // newPublicSessionToolStripMenuItem
             // 
             this.newPublicSessionToolStripMenuItem.Name = "newPublicSessionToolStripMenuItem";
-            this.newPublicSessionToolStripMenuItem.Size = new System.Drawing.Size(176, 22);
+            this.newPublicSessionToolStripMenuItem.Size = new System.Drawing.Size(188, 22);
             this.newPublicSessionToolStripMenuItem.Text = "New Public Session";
             this.newPublicSessionToolStripMenuItem.Click += new System.EventHandler(this.newPublicSessionToolStripMenuItem_Click);
+            // 
+            // leaveOnlineToolStripMenuItem
+            // 
+            this.leaveOnlineToolStripMenuItem.Name = "leaveOnlineToolStripMenuItem";
+            this.leaveOnlineToolStripMenuItem.Size = new System.Drawing.Size(188, 22);
+            this.leaveOnlineToolStripMenuItem.Text = "Leave Online";
+            this.leaveOnlineToolStripMenuItem.Click += new System.EventHandler(this.leaveOnlineToolStripMenuItem_Click);
+            // 
+            // disconnectToolStripMenuItem
+            // 
+            this.disconnectToolStripMenuItem.Name = "disconnectToolStripMenuItem";
+            this.disconnectToolStripMenuItem.Size = new System.Drawing.Size(188, 22);
+            this.disconnectToolStripMenuItem.Text = "Disconnect";
+            this.disconnectToolStripMenuItem.Click += new System.EventHandler(this.disconnectToolStripMenuItem_Click);
+            // 
+            // joinPublicSessionToolStripMenuItem
+            // 
+            this.joinPublicSessionToolStripMenuItem.Name = "joinPublicSessionToolStripMenuItem";
+            this.joinPublicSessionToolStripMenuItem.Size = new System.Drawing.Size(233, 22);
+            this.joinPublicSessionToolStripMenuItem.Text = "Join Public Session";
+            this.joinPublicSessionToolStripMenuItem.Click += new System.EventHandler(this.joinPublicSessionToolStripMenuItem_Click);
+            // 
+            // soloSessionToolStripMenuItem
+            // 
+            this.soloSessionToolStripMenuItem.Name = "soloSessionToolStripMenuItem";
+            this.soloSessionToolStripMenuItem.Size = new System.Drawing.Size(233, 22);
+            this.soloSessionToolStripMenuItem.Text = "Solo Session";
+            this.soloSessionToolStripMenuItem.Click += new System.EventHandler(this.soloSessionToolStripMenuItem_Click);
+            // 
+            // emptySessionToolStripMenuItem
+            // 
+            this.emptySessionToolStripMenuItem.Name = "emptySessionToolStripMenuItem";
+            this.emptySessionToolStripMenuItem.Size = new System.Drawing.Size(233, 22);
+            this.emptySessionToolStripMenuItem.Text = "Empty Session (10 Sec. Freeze)";
+            this.emptySessionToolStripMenuItem.Click += new System.EventHandler(this.emptySessionToolStripMenuItem_Click);
+            // 
+            // toolStripMenuItem6
+            // 
+            this.toolStripMenuItem6.Name = "toolStripMenuItem6";
+            this.toolStripMenuItem6.Size = new System.Drawing.Size(233, 22);
+            this.toolStripMenuItem6.Text = "Invite Only Session";
+            this.toolStripMenuItem6.Click += new System.EventHandler(this.toolStripMenuItem6_Click);
+            // 
+            // findFriendSessionToolStripMenuItem
+            // 
+            this.findFriendSessionToolStripMenuItem.Name = "findFriendSessionToolStripMenuItem";
+            this.findFriendSessionToolStripMenuItem.Size = new System.Drawing.Size(233, 22);
+            this.findFriendSessionToolStripMenuItem.Text = "Find Friend Session";
+            this.findFriendSessionToolStripMenuItem.Click += new System.EventHandler(this.findFriendSessionToolStripMenuItem_Click);
+            // 
+            // closedFriendSessionToolStripMenuItem
+            // 
+            this.closedFriendSessionToolStripMenuItem.Name = "closedFriendSessionToolStripMenuItem";
+            this.closedFriendSessionToolStripMenuItem.Size = new System.Drawing.Size(233, 22);
+            this.closedFriendSessionToolStripMenuItem.Text = "Closed Friend Session";
+            this.closedFriendSessionToolStripMenuItem.Click += new System.EventHandler(this.closedFriendSessionToolStripMenuItem_Click);
+            // 
+            // crewSessionToolStripMenuItem
+            // 
+            this.crewSessionToolStripMenuItem.Name = "crewSessionToolStripMenuItem";
+            this.crewSessionToolStripMenuItem.Size = new System.Drawing.Size(233, 22);
+            this.crewSessionToolStripMenuItem.Text = "Crew Session";
+            this.crewSessionToolStripMenuItem.Click += new System.EventHandler(this.crewSessionToolStripMenuItem_Click);
+            // 
+            // joinCrewSessionToolStripMenuItem
+            // 
+            this.joinCrewSessionToolStripMenuItem.Name = "joinCrewSessionToolStripMenuItem";
+            this.joinCrewSessionToolStripMenuItem.Size = new System.Drawing.Size(233, 22);
+            this.joinCrewSessionToolStripMenuItem.Text = "Join Crew Session";
+            this.joinCrewSessionToolStripMenuItem.Click += new System.EventHandler(this.joinCrewSessionToolStripMenuItem_Click);
+            // 
+            // closedCrewSessionToolStripMenuItem
+            // 
+            this.closedCrewSessionToolStripMenuItem.Name = "closedCrewSessionToolStripMenuItem";
+            this.closedCrewSessionToolStripMenuItem.Size = new System.Drawing.Size(233, 22);
+            this.closedCrewSessionToolStripMenuItem.Text = "Closed Crew Session";
+            this.closedCrewSessionToolStripMenuItem.Click += new System.EventHandler(this.closedCrewSessionToolStripMenuItem_Click);
             // 
             // Overlay
             // 
@@ -279,6 +378,17 @@ namespace Simple_GTAV_External_Trainer
         private System.Windows.Forms.ToolStripMenuItem objectiveToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem sessionToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem newPublicSessionToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem leaveOnlineToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem disconnectToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem joinPublicSessionToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem soloSessionToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem emptySessionToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem6;
+        private System.Windows.Forms.ToolStripMenuItem findFriendSessionToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem closedFriendSessionToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem crewSessionToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem joinCrewSessionToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem closedCrewSessionToolStripMenuItem;
     }
 }
 
