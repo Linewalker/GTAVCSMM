@@ -79,8 +79,7 @@ namespace Simple_GTAV_External_Trainer.Memory
             return Buffer;
         }
 
-        //public void Write(long BasePTR, int[] offset, byte[] Bytes) => WriteProcessMemory(GetProcHandle(), GetPtrAddr(BaseAddress + BasePTR, offset), Bytes, Bytes.Length);
-        public void Write(long BasePTR, int[] offset, byte[] Bytes) => WriteProcessMemory(GetProcHandle(), GetPtrAddr(BasePTR), Bytes, Bytes.Length);
+        public void Write(long BasePTR, int[] offset, byte[] Bytes) => WriteProcessMemory(GetProcHandle(), GetPtrAddr(BaseAddress + BasePTR, offset), Bytes, Bytes.Length);
 
         public void Write(long BasePTR, int[] offset, bool b) => Write(BasePTR, offset, b ? new byte[] { 0x01 } : new byte[] { 0x00 });
         public void Write(long BasePTR, int[] offset, float Value) => Write(BasePTR, offset, BitConverter.GetBytes(Value));
@@ -94,6 +93,10 @@ namespace Simple_GTAV_External_Trainer.Memory
         public void writeInt(long BasePTR, int[] offset, int Value)
         {
             WriteProcessMemory(Proc.Handle, BasePTR, BitConverter.GetBytes(Value), 4);
+        }
+        public void writePointer(long BasePTR, int[] offset, long Value)
+        {
+            WriteProcessMemory(Proc.Handle, BasePTR, BitConverter.GetBytes(Value), 8);
         }
 
         public bool ReadBool(long BasePTR, int[] offset) => ReadByte(BasePTR, offset) != 0x00;

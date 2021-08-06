@@ -421,82 +421,6 @@ namespace Simple_GTAV_External_Trainer
             Teleport(ObjectiveCoords);
         }
 
-        private void toolStripMenuItem5_Click(object sender, EventArgs e)
-        {
-            Close();
-        }
-
-        private void godModeToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            this.bGodMode = !this.bGodMode;
-        }
-
-        private void neverWantedToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            this.bNeverWanted = !this.bNeverWanted;
-        }
-
-        private void noRagdollToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            this.bNoRagdoll = !this.bNoRagdoll;
-        }
-
-        private void undeadOffToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            this.bUndeadOffRadar = !this.bUndeadOffRadar;
-        }
-
-        private void seatbeltToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            this.bSeatBelt = !this.bSeatBelt;
-        }
-
-        private void superJumpToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            this.bSuperJump = !this.bSuperJump;
-        }
-
-        private void godModeToolStripMenuItem1_Click(object sender, EventArgs e)
-        {
-            this.bVehicleGodMode = !this.bVehicleGodMode;
-        }
-
-        private void waypointToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            if (bGodMode)
-            {
-                bgodState = true;
-            }
-            else
-            {
-                bGodMode = true;
-                bgodState = false;
-            }
-            teleportWaypoint();
-            if (!bgodState)
-            {
-                bGodMode = false;
-            }
-        }
-
-        private void objectiveToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            if (bGodMode)
-            {
-                bgodState = true;
-            }
-            else
-            {
-                bGodMode = true;
-                bgodState = false;
-            }
-            teleportObjective();
-            if (!bgodState)
-            {
-                bGodMode = false;
-            }
-        }
-
         private void Teleport(Location l)
         {
             if (Mem.ReadInt(settings.WorldPTR, new int[] { offsets.pCPed, offsets.oInVehicle }) == 0)
@@ -511,10 +435,6 @@ namespace Simple_GTAV_External_Trainer
                 PlayerY = l.y;
                 PlayerZ = l.z;
             }
-        }
-        private void newPublicSessionToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            LoadSession(1);
         }
 
         private Location WaypointCoords
@@ -646,10 +566,161 @@ namespace Simple_GTAV_External_Trainer
 
         public void LoadSession(int id)
         {
-            _SG_Int(1312860, id);
-            _SG_Int(1312443, 1);
-            Thread.Sleep(200);
-            _SG_Int(1312443, 0);
+            if(id == -1)
+            {
+                _SG_Int(1312443 + 2, -1);
+                _SG_Int(1312443, 1);
+                Thread.Sleep(200);
+                _SG_Int(1312443, 0);
+            }
+            else if (id == -2)
+            {
+                _SG_Int(31622, 1);
+                Thread.Sleep(200);
+                _SG_Int(31622, 0);
+            }
+            else
+            {
+                _SG_Int(1312860, id);
+                _SG_Int(1312443, 1);
+                Thread.Sleep(200);
+                _SG_Int(1312443, 0);
+            }
+        }
+
+        private void toolStripMenuItem5_Click(object sender, EventArgs e)
+        {
+            Close();
+        }
+
+        private void godModeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this.bGodMode = !this.bGodMode;
+        }
+
+        private void neverWantedToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this.bNeverWanted = !this.bNeverWanted;
+        }
+
+        private void noRagdollToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this.bNoRagdoll = !this.bNoRagdoll;
+        }
+
+        private void undeadOffToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this.bUndeadOffRadar = !this.bUndeadOffRadar;
+        }
+
+        private void seatbeltToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this.bSeatBelt = !this.bSeatBelt;
+        }
+
+        private void superJumpToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this.bSuperJump = !this.bSuperJump;
+        }
+
+        private void godModeToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            this.bVehicleGodMode = !this.bVehicleGodMode;
+        }
+
+        private void waypointToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (bGodMode)
+            {
+                bgodState = true;
+            }
+            else
+            {
+                bGodMode = true;
+                bgodState = false;
+            }
+            teleportWaypoint();
+            if (!bgodState)
+            {
+                bGodMode = false;
+            }
+        }
+
+        private void objectiveToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (bGodMode)
+            {
+                bgodState = true;
+            }
+            else
+            {
+                bGodMode = true;
+                bgodState = false;
+            }
+            teleportObjective();
+            if (!bgodState)
+            {
+                bGodMode = false;
+            }
+        }
+
+        private void leaveOnlineToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            LoadSession(-1);
+        }
+
+        private void disconnectToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            LoadSession(-2);
+        }
+        private void newPublicSessionToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            LoadSession(1);
+        }
+
+        private void emptySessionToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void joinPublicSessionToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            LoadSession(0);
+        }
+
+        private void soloSessionToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            LoadSession(10);
+        }
+
+        private void toolStripMenuItem6_Click(object sender, EventArgs e)
+        {
+            LoadSession(11);
+        }
+
+        private void findFriendSessionToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            LoadSession(9);
+        }
+
+        private void closedFriendSessionToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            LoadSession(6);
+        }
+
+        private void crewSessionToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            LoadSession(3);
+        }
+
+        private void joinCrewSessionToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            LoadSession(12);
+        }
+
+        private void closedCrewSessionToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            LoadSession(2);
         }
     }
     struct Location { public float x, y, z; }
