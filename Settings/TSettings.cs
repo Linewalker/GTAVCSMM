@@ -451,6 +451,8 @@
         private bool _psbelt_last_hit = false;
         private bool _psjump = false;
         private bool _psjump_last_hit = false;
+        private bool _pdiscol = false;
+        private bool _pdiscol_last_hit = false;
         private bool _vgodm = false;
         private bool _vgodm_last_hit = false;
 
@@ -584,6 +586,28 @@
             set
             {
                 _psjump_last_hit = value;
+            }
+        }
+        public bool pdiscol
+        {
+            get
+            {
+                return _pdiscol;
+            }
+            set
+            {
+                _pdiscol = value;
+            }
+        }
+        public bool pdiscol_last_hit
+        {
+            get
+            {
+                return _pdiscol_last_hit;
+            }
+            set
+            {
+                _pdiscol_last_hit = value;
             }
         }
         public bool vgodm

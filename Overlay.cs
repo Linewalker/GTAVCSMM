@@ -8,6 +8,7 @@ using System.Drawing;
 using System;
 using System.Threading;
 using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace GTAVCSMM
 {
@@ -43,6 +44,8 @@ namespace GTAVCSMM
         Patterns pattern = new Patterns();
         TSettings settings = new TSettings();
         Mem Mem;
+        Thread _getPointer;
+        Thread _freezeGame;
 
         #endregion
 
@@ -242,79 +245,40 @@ namespace GTAVCSMM
         }
         public void vGODMODE()
         {
-            if (bVehicleGodMode)
+            long paddr = Mem.ReadPointer(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCVehicle });
+            if (paddr > 0)
             {
-                Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCVehicle, offsets.oGod }, 1);
-                if (!settings.vgodm)
+                long paddr2 = Mem.GetPtrAddr(paddr + offsets.oGod, null);
+                if (bVehicleGodMode)
                 {
-                    Activate();
-                }
-                settings.vgodm = true;
-
-                godModeToolStripMenuItem.Checked = true;
-            }
-            else
-            {
-                if (settings.vgodm)
-                {
-                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCVehicle, offsets.oGod }, 0);
-                    settings.vgodm = false;
-                    Deactivate();
-                    godModeToolStripMenuItem.Checked = false;
-                }
-            }
-        }
-        #endregion
-
-        #region KEYBINDS
-        public void KeyAssign()
-        {
-            KeysMgr keyMgr = new KeysMgr();
-            keyMgr.AddKey(Keys.Insert);     // -
-            keyMgr.AddKey(Keys.Delete);     // QUIT
-            keyMgr.AddKey(Keys.F5);         // -
-            keyMgr.AddKey(Keys.F6);         // God Mode
-            keyMgr.AddKey(Keys.F7);         // Never Wanted
-            keyMgr.AddKey(Keys.F8);         // Teleport WP
-            keyMgr.KeyDownEvent += new KeysMgr.KeyHandler(KeyDownEvent);
-        }
-
-        private void KeyDownEvent(int Id, string Name)
-        {
-            switch ((Keys)Id)
-            {
-                case Keys.Delete:
-                    Quit();
-                    break;
-                case Keys.F5:
-                    this.Invoke(new Action(() =>
+                    Mem.writeInt(paddr2, null, 1);
+                    if (!settings.vgodm)
                     {
-                        SendKeys.SendWait("^{ESC}");
-                        Thread.Sleep(2000);
-                        ClickOnPointTool.ClickOnPoint(this.Handle, new Point(this.Top+3, this.Left+3));
-                    }));                    
-                    break;
-                case Keys.F6:
-                    this.bGodMode = !this.bGodMode;
-                    break;
-                case Keys.F7:
-                    this.bNeverWanted = !this.bNeverWanted;
-                    break;
-                case Keys.F8:
-                    teleportWaypoint();
-                    break;
+                        Activate();
+                    }
+                    settings.vgodm = true;
+
+                    godModeToolStripMenuItem1.Checked = true;
+                }
+                else
+                {
+                    if (settings.vgodm)
+                    {
+                        Mem.writeInt(paddr2, null, 0);
+                        settings.vgodm = false;
+                        Deactivate();
+                        godModeToolStripMenuItem1.Checked = false;
+                    }
+                }
             }
         }
-        #endregion
-
-        #region MAIN FORM
-
-        public Overlay()
+        async Task releaseMouse()
         {
-            InitializeComponent();
+            SendKeys.SendWait("^{ESC}");
+            await Task.Delay(2000);
         }
 
-        private void Initialize(object sender, EventArgs e)
+        public void getPointer()
         {
             try
             {
@@ -332,7 +296,7 @@ namespace GTAVCSMM
                 // GlobalPTR
                 long addr = Mem.FindPattern(pattern.GlobalPTR, pattern.GlobalPTR_Mask);
                 settings.GlobalPTR = addr + Mem.ReadInt(addr + 3, null) + 7;
-                
+
                 // WorldPTR
                 long addr2 = Mem.FindPattern(pattern.WorldPTR, pattern.WorldPTR_Mask);
                 settings.WorldPTR = addr2 + Mem.ReadInt(addr2 + 3, null) + 7;
@@ -378,6 +342,122 @@ namespace GTAVCSMM
                 MessageBox.Show("GTA is not Running!", "Serious Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 Quit();
             }
+            finally
+            {
+                this.Invoke(new Action(() =>
+                {
+                    toolStripMenuItem2.Enabled = true;
+                    reInitToolStripMenuItem.Visible = true;
+                    sessionToolStripMenuItem.Visible = true;
+                    playerToolStripMenuItem.Visible = true;
+                    vehicleToolStripMenuItem.Visible = true;
+                    weaponToolStripMenuItem.Visible = true;
+                    teleportToolStripMenuItem.Visible = true;
+                    reInitToolStripMenuItem.Enabled = true;
+                    sessionToolStripMenuItem.Enabled = true;
+                    playerToolStripMenuItem.Enabled = true;
+                    vehicleToolStripMenuItem.Enabled = true;
+                    weaponToolStripMenuItem.Enabled = true;
+                    teleportToolStripMenuItem.Enabled = true;
+                }));
+                Console.WriteLine("Pointer initialized.");
+            }
+            _getPointer.Abort();
+        }
+
+        public void freezeGame()
+        {
+            Console.WriteLine("Freezing game");
+            this.Invoke(new Action(() =>
+            {
+                emptySessionToolStripMenuItem.Enabled = false;
+                toolStripMenuItem2.Enabled = false;
+                reInitToolStripMenuItem.Enabled = false;
+                sessionToolStripMenuItem.Enabled = false;
+                playerToolStripMenuItem.Enabled = false;
+                vehicleToolStripMenuItem.Enabled = false;
+                weaponToolStripMenuItem.Enabled = false;
+                teleportToolStripMenuItem.Enabled = false;
+            }));            
+            Speeder.Suspend(settings.gameProcess);
+            Thread.Sleep(10000);
+            Speeder.Resume(settings.gameProcess);
+            this.Invoke(new Action(() =>
+            {
+                emptySessionToolStripMenuItem.Enabled = true;
+                toolStripMenuItem2.Enabled = true;
+                reInitToolStripMenuItem.Enabled = true;
+                sessionToolStripMenuItem.Enabled = true;
+                playerToolStripMenuItem.Enabled = true;
+                vehicleToolStripMenuItem.Enabled = true;
+                weaponToolStripMenuItem.Enabled = true;
+                teleportToolStripMenuItem.Enabled = true;
+            }));
+            _freezeGame.Abort();
+        }
+        #endregion
+
+        #region KEYBINDS
+        public void KeyAssign()
+        {
+            KeysMgr keyMgr = new KeysMgr();
+            keyMgr.AddKey(Keys.Insert);     // -
+            keyMgr.AddKey(Keys.Delete);     // QUIT
+            keyMgr.AddKey(Keys.F5);         // -
+            keyMgr.AddKey(Keys.F6);         // God Mode
+            keyMgr.AddKey(Keys.F7);         // Never Wanted
+            keyMgr.AddKey(Keys.F8);         // Teleport WP
+            keyMgr.KeyDownEvent += new KeysMgr.KeyHandler(KeyDownEvent);
+        }
+
+        private void KeyDownEvent(int Id, string Name)
+        {
+            switch ((Keys)Id)
+            {
+                case Keys.Delete:
+                    Quit();
+                    break;
+                case Keys.F5:
+                    Task.Factory.StartNew(releaseMouse);
+                    break;
+                case Keys.F6:
+                    this.bGodMode = !this.bGodMode;
+                    break;
+                case Keys.F7:
+                    this.bNeverWanted = !this.bNeverWanted;
+                    break;
+                case Keys.F8:
+                    teleportWaypoint();
+                    break;
+            }
+        }
+        #endregion
+
+        #region MAIN FORM
+
+        public Overlay()
+        {
+            InitializeComponent();
+        }
+
+        private void Initialize(object sender, EventArgs e)
+        {
+            toolStripMenuItem2.Enabled = false;
+            reInitToolStripMenuItem.Visible = false;
+            sessionToolStripMenuItem.Visible = false;
+            playerToolStripMenuItem.Visible = false;
+            vehicleToolStripMenuItem.Visible = false;
+            weaponToolStripMenuItem.Visible = false;
+            teleportToolStripMenuItem.Visible = false;
+            reInitToolStripMenuItem.Enabled = false;
+            sessionToolStripMenuItem.Enabled = false;
+            playerToolStripMenuItem.Enabled = false;
+            vehicleToolStripMenuItem.Enabled = false;
+            weaponToolStripMenuItem.Enabled = false;
+            teleportToolStripMenuItem.Enabled = false;
+
+            _getPointer = new Thread(getPointer) { IsBackground = true };
+            _getPointer.Start();
 
             this.TopMost = true;
             this.FormBorderStyle = FormBorderStyle.None;
@@ -725,7 +805,9 @@ namespace GTAVCSMM
 
         private void emptySessionToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
+            Activate();
+            _freezeGame = new Thread(freezeGame) { IsBackground = true };
+            _freezeGame.Start();
         }
 
         private void joinPublicSessionToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1012,6 +1094,63 @@ namespace GTAVCSMM
         private void disableCollisionToolStripMenuItem_Click(object sender, EventArgs e)
         {
             this.bDisableCollision = !this.bDisableCollision;
+        }
+
+        private void fistsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Activate();
+            Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPedWeaponManager, offsets.pCWeaponInfo, offsets.oImpactType }, 2);
+        }
+
+        private void bulletToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Activate();
+            Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPedWeaponManager, offsets.pCWeaponInfo, offsets.oImpactType }, 3);
+        }
+
+        private void explosionToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Activate();
+            Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPedWeaponManager, offsets.pCWeaponInfo, offsets.oImpactType }, 5);
+        }
+
+        private void defaultToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Activate();
+            Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPedWeaponManager, offsets.pCWeaponInfo, offsets.oImpactExplosion }, -1);
+        }
+
+        private void grenadeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Activate();
+            Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPedWeaponManager, offsets.pCWeaponInfo, offsets.oImpactExplosion }, 0);
+        }
+
+        private void orbitalCannonToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Activate();
+            Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPedWeaponManager, offsets.pCWeaponInfo, offsets.oImpactExplosion }, 59);
+        }
+
+        private void reInitToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Activate();
+            toolStripMenuItem2.Enabled = false;
+            reInitToolStripMenuItem.Visible = false;
+            sessionToolStripMenuItem.Visible = false;
+            playerToolStripMenuItem.Visible = false;
+            vehicleToolStripMenuItem.Visible = false;
+            weaponToolStripMenuItem.Visible = false;
+            teleportToolStripMenuItem.Visible = false;
+            reInitToolStripMenuItem.Enabled = false;
+            sessionToolStripMenuItem.Enabled = false;
+            playerToolStripMenuItem.Enabled = false;
+            vehicleToolStripMenuItem.Enabled = false;
+            weaponToolStripMenuItem.Enabled = false;
+            teleportToolStripMenuItem.Enabled = false;
+
+            _getPointer = new Thread(getPointer) { IsBackground = true };
+            _getPointer.Start();
         }
     }
     struct Location { public float x, y, z; }

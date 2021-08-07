@@ -56,10 +56,10 @@
   <ItemGroup>
     <Compile Include="Config\Offsets.cs" />
     <Compile Include="Config\Patterns.cs" />
-    <Compile Include="Helpers\ClickOnPointTool.cs" />
     <Compile Include="Helpers\Key.cs" />
     <Compile Include="Helpers\KeysMgr.cs" />
     <Compile Include="Helpers\Manager.cs" />
+    <Compile Include="Helpers\Speeder.cs" />
     <Compile Include="Memory\Mem.cs" />
     <Compile Include="Overlay.cs">
       <SubType>Form</SubType>
