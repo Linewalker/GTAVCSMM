@@ -747,6 +747,18 @@ namespace GTAVCSMM
         {
             Mem.Write(GA(Index), null, value);
         }
+
+        public void setStat(string stat, int value)
+        {
+            long oldhash = _GG_Int(1390343 + 4);
+            long oldvalue = _GG_Int(939452 + 5526);
+            _SG_Int(1390343 + 4, (int)JOAAT.GetHashKey(stat));
+            _SG_Int(939452 + 5526, value);
+            _SG_Int(1379108 + 1139, -1);
+            Thread.Sleep(1000);
+            _SG_Int(1390343 + 4, (int)oldhash);
+            _SG_Int(939452 + 5526, (int)oldvalue);
+        }
         #endregion
 
         private void toolStripMenuItem5_Click(object sender, EventArgs e)
@@ -1518,6 +1530,12 @@ namespace GTAVCSMM
         {
             Activate();
             setRPMultipler(100.0f);
+        }
+
+        private void nightclubPopularityMaxToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            setStat("MP0_CLUB_POPULARITY", 1000);
+            setStat("MP1_CLUB_POPULARITY", 1000);
         }
     }
     struct Location { public float x, y, z; }

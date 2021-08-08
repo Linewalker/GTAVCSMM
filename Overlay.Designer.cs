@@ -176,6 +176,7 @@ namespace GTAVCSMM
             this.toolStripMenuItem48 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem49 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem50 = new System.Windows.Forms.ToolStripMenuItem();
+            this.nightclubPopularityMaxToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.contextMenuStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -1053,7 +1054,8 @@ namespace GTAVCSMM
             // 
             this.tunablesToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.rPMultiplerToolStripMenuItem,
-            this.rEPMultiplerToolStripMenuItem});
+            this.rEPMultiplerToolStripMenuItem,
+            this.nightclubPopularityMaxToolStripMenuItem});
             this.tunablesToolStripMenuItem.Name = "tunablesToolStripMenuItem";
             this.tunablesToolStripMenuItem.Size = new System.Drawing.Size(66, 20);
             this.tunablesToolStripMenuItem.Text = "Tunables";
@@ -1344,6 +1346,13 @@ namespace GTAVCSMM
             this.toolStripMenuItem50.Text = "100";
             this.toolStripMenuItem50.Click += new System.EventHandler(this.toolStripMenuItem50_Click);
             // 
+            // nightclubPopularityMaxToolStripMenuItem
+            // 
+            this.nightclubPopularityMaxToolStripMenuItem.Name = "nightclubPopularityMaxToolStripMenuItem";
+            this.nightclubPopularityMaxToolStripMenuItem.Size = new System.Drawing.Size(184, 22);
+            this.nightclubPopularityMaxToolStripMenuItem.Text = "Nightclub Popularity";
+            this.nightclubPopularityMaxToolStripMenuItem.Click += new System.EventHandler(this.nightclubPopularityMaxToolStripMenuItem_Click);
+            // 
             // Overlay
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1514,6 +1523,7 @@ namespace GTAVCSMM
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem48;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem49;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem50;
+        private System.Windows.Forms.ToolStripMenuItem nightclubPopularityMaxToolStripMenuItem;
     }
 }
 
