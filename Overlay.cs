@@ -1534,8 +1534,58 @@ namespace GTAVCSMM
 
         private void nightclubPopularityMaxToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            Activate();
             setStat("MP0_CLUB_POPULARITY", 1000);
             setStat("MP1_CLUB_POPULARITY", 1000);
+        }
+
+        private void staminaToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Activate();
+            setStat("MP0_SCRIPT_INCREASE_STAM", 100);
+            setStat("MP1_SCRIPT_INCREASE_STAM", 100);
+        }
+
+        private void strentghToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Activate();
+            setStat("MP0_SCRIPT_INCREASE_STRN", 100);
+            setStat("MP1_SCRIPT_INCREASE_STRN", 100);
+        }
+
+        private void lungCapacityToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Activate();
+            setStat("MP0_SCRIPT_INCREASE_LUNG", 100);
+            setStat("MP1_SCRIPT_INCREASE_LUNG", 100);
+        }
+
+        private void drivingToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Activate();
+            setStat("MP0_SCRIPT_INCREASE_DRIV", 100);
+            setStat("MP1_SCRIPT_INCREASE_DRIV", 100);
+        }
+
+        private void flyingToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Activate();
+            setStat("MP0_SCRIPT_INCREASE_FLY", 100);
+            setStat("MP1_SCRIPT_INCREASE_FLY", 100);
+        }
+
+        private void shootingToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Activate();
+            setStat("MP0_SCRIPT_INCREASE_SHO", 100);
+            setStat("MP1_SCRIPT_INCREASE_SHO", 100);
+        }
+
+        private void stealthToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Activate();
+            setStat("MP0_SCRIPT_INCREASE_STL", 100);
+            setStat("MP1_SCRIPT_INCREASE_STL", 100);
         }
     }
     struct Location { public float x, y, z; }
