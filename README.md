@@ -11,4 +11,6 @@ Players mouse release option: F5
 
 +++ Online 1.57 +++
 
+Donations: https://www.paypal.me/linewalker85
+
 ... Code cleanup later ...
