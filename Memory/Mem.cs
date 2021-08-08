@@ -79,6 +79,13 @@ namespace GTAVCSMM.Memory
             return Buffer;
         }
 
+        public byte[] ReadBytes_new(long BasePTR, int[] offset, int Length)
+        {
+            byte[] Buffer = new byte[Length];
+            ReadProcessMemory(GetProcHandle(), BasePTR, Buffer, Length);
+            return Buffer;
+        }
+
         public void Write(long BasePTR, int[] offset, byte[] Bytes) => WriteProcessMemory(GetProcHandle(), GetPtrAddr(BaseAddress + BasePTR, offset), Bytes, Bytes.Length);
 
         public void Write(long BasePTR, int[] offset, bool b) => Write(BasePTR, offset, b ? new byte[] { 0x01 } : new byte[] { 0x00 });
@@ -111,6 +118,7 @@ namespace GTAVCSMM.Memory
         public string ReadString(long BasePTR, int[] offset, int size) => new ASCIIEncoding().GetString(ReadBytes(BasePTR, offset, size));
         public long ReadPointer(long BasePTR, int[] offset) => BitConverter.ToInt64(ReadBytes(BasePTR, offset, 8), 0);
         public byte ReadByte(long BasePTR, int[] offset) => ReadBytes(BasePTR, offset, 1)[0];
+        public string ReadStr(long BasePTR, int[] offset, int size) => new ASCIIEncoding().GetString(ReadBytes_new(BasePTR, offset, size));
 
     }
 }

@@ -353,12 +353,14 @@ namespace GTAVCSMM
                     vehicleToolStripMenuItem.Visible = true;
                     weaponToolStripMenuItem.Visible = true;
                     teleportToolStripMenuItem.Visible = true;
+                    tunablesToolStripMenuItem.Visible = true;
                     reInitToolStripMenuItem.Enabled = true;
                     sessionToolStripMenuItem.Enabled = true;
                     playerToolStripMenuItem.Enabled = true;
                     vehicleToolStripMenuItem.Enabled = true;
                     weaponToolStripMenuItem.Enabled = true;
                     teleportToolStripMenuItem.Enabled = true;
+                    tunablesToolStripMenuItem.Enabled = true;
                 }));
                 Console.WriteLine("Pointer initialized.");
             }
@@ -378,6 +380,7 @@ namespace GTAVCSMM
                 vehicleToolStripMenuItem.Enabled = false;
                 weaponToolStripMenuItem.Enabled = false;
                 teleportToolStripMenuItem.Enabled = false;
+                tunablesToolStripMenuItem.Enabled = false;
             }));            
             Speeder.Suspend(settings.gameProcess);
             Thread.Sleep(10000);
@@ -392,6 +395,7 @@ namespace GTAVCSMM
                 vehicleToolStripMenuItem.Enabled = true;
                 weaponToolStripMenuItem.Enabled = true;
                 teleportToolStripMenuItem.Enabled = true;
+                tunablesToolStripMenuItem.Enabled = true;
             }));
             _freezeGame.Abort();
         }
@@ -449,12 +453,16 @@ namespace GTAVCSMM
             vehicleToolStripMenuItem.Visible = false;
             weaponToolStripMenuItem.Visible = false;
             teleportToolStripMenuItem.Visible = false;
+            tunablesToolStripMenuItem.Visible = false;
+            onlineServicesToolStripMenuItem.Visible = false;
             reInitToolStripMenuItem.Enabled = false;
             sessionToolStripMenuItem.Enabled = false;
             playerToolStripMenuItem.Enabled = false;
             vehicleToolStripMenuItem.Enabled = false;
             weaponToolStripMenuItem.Enabled = false;
             teleportToolStripMenuItem.Enabled = false;
+            tunablesToolStripMenuItem.Enabled = false;
+            onlineServicesToolStripMenuItem.Enabled = false;
 
             _getPointer = new Thread(getPointer) { IsBackground = true };
             _getPointer.Start();
@@ -560,6 +568,39 @@ namespace GTAVCSMM
         private void teleportObjective()
         {
             Teleport(ObjectiveCoords);
+        }
+
+        private void getLuckyWheelPrice(int price)
+        {
+            Console.WriteLine("Get Lucky Wheel Price");
+            long p = 0;
+            long p2 = 0;
+            int i;
+
+            for (i = 1; i <= 52; i++)
+            {
+                string pPointer = "casino_lucky_wheel";
+                int pSize = pPointer.Length;
+                p = Mem.ReadPointer(settings.LocalScriptsPTR, new int[] { i * 0x08 });
+                p2 = Mem.GetPtrAddr(p + 0xD0, null);
+                string pS = Mem.ReadString(settings.LocalScriptsPTR, new int[] { i * 0x08, 0xD0 }, pSize);
+                if (pS == pPointer)
+                {
+                    //Mem.Write(settings.LocalScriptsPTR, new int[] { i * 0x08, 0xD0, 0x150 }, price);
+                    break;
+                }
+            }
+            Console.WriteLine(p2.ToString("X8"));
+        }
+
+        public void setRPMultipler(float m)
+        {
+            _SG_Float(262145 + 1, m);
+        }
+
+        public void setREPMultipler(float m)
+        {
+            _SG_Float(262145 + 31118, m);
         }
 
         private void Teleport(Location l)
@@ -700,7 +741,7 @@ namespace GTAVCSMM
         }
         public void _SG_Float(int Index, float value)
         {
-            Mem.Write(GA(Index), null, value);
+            Mem.writeFloat(GA(Index), null, value);
         }
         public void _SG_String(int Index, string value)
         {
@@ -1142,15 +1183,341 @@ namespace GTAVCSMM
             vehicleToolStripMenuItem.Visible = false;
             weaponToolStripMenuItem.Visible = false;
             teleportToolStripMenuItem.Visible = false;
+            tunablesToolStripMenuItem.Visible = false;
             reInitToolStripMenuItem.Enabled = false;
             sessionToolStripMenuItem.Enabled = false;
             playerToolStripMenuItem.Enabled = false;
             vehicleToolStripMenuItem.Enabled = false;
             weaponToolStripMenuItem.Enabled = false;
             teleportToolStripMenuItem.Enabled = false;
+            tunablesToolStripMenuItem.Enabled = false;
 
             _getPointer = new Thread(getPointer) { IsBackground = true };
             _getPointer.Start();
+        }
+
+        private void clothing1ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Activate();
+            getLuckyWheelPrice(0);
+        }
+
+        private void rPToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Activate();
+            getLuckyWheelPrice(1);
+        }
+
+        private void cashToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Activate();
+            getLuckyWheelPrice(2);
+        }
+
+        private void chipsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Activate();
+            getLuckyWheelPrice(3);
+        }
+
+        private void discountToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Activate();
+            getLuckyWheelPrice(4);
+        }
+
+        private void rPToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            Activate();
+            getLuckyWheelPrice(5);
+        }
+
+        private void cashToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            Activate();
+            getLuckyWheelPrice(6);
+        }
+
+        private void chipsToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            Activate();
+            getLuckyWheelPrice(7);
+        }
+
+        private void clothing2ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Activate();
+            getLuckyWheelPrice(8);
+        }
+
+        private void rPToolStripMenuItem2_Click(object sender, EventArgs e)
+        {
+            Activate();
+            getLuckyWheelPrice(9);
+        }
+
+        private void chipsToolStripMenuItem2_Click(object sender, EventArgs e)
+        {
+            Activate();
+            getLuckyWheelPrice(10);
+        }
+
+        private void mysteryPrizeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Activate();
+            getLuckyWheelPrice(11);
+        }
+
+        private void clothing3ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Activate();
+            getLuckyWheelPrice(12);
+        }
+
+        private void rPToolStripMenuItem3_Click(object sender, EventArgs e)
+        {
+            Activate();
+            getLuckyWheelPrice(13);
+        }
+
+        private void cashToolStripMenuItem2_Click(object sender, EventArgs e)
+        {
+            Activate();
+            getLuckyWheelPrice(14);
+        }
+
+        private void chipsToolStripMenuItem3_Click(object sender, EventArgs e)
+        {
+            Activate();
+            getLuckyWheelPrice(15);
+        }
+
+        private void clothing4ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Activate();
+            getLuckyWheelPrice(16);
+        }
+
+        private void rPToolStripMenuItem4_Click(object sender, EventArgs e)
+        {
+            Activate();
+            getLuckyWheelPrice(17);
+        }
+
+        private void podiumVehicleToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Activate();
+            getLuckyWheelPrice(18);
+        }
+
+        private void cashToolStripMenuItem3_Click(object sender, EventArgs e)
+        {
+            Activate();
+            getLuckyWheelPrice(19);
+        }
+
+        private void toolStripMenuItem4_Click(object sender, EventArgs e)
+        {
+            Activate();
+            setREPMultipler(1.0f);
+        }
+
+        private void toolStripMenuItem19_Click(object sender, EventArgs e)
+        {
+            Activate();
+            setREPMultipler(2.0f);
+        }
+
+        private void toolStripMenuItem20_Click(object sender, EventArgs e)
+        {
+            Activate();
+            setREPMultipler(3.0f);
+        }
+
+        private void toolStripMenuItem21_Click(object sender, EventArgs e)
+        {
+            Activate();
+            setREPMultipler(5.0f);
+        }
+
+        private void toolStripMenuItem22_Click(object sender, EventArgs e)
+        {
+            Activate();
+            setREPMultipler(10.0f);
+        }
+
+        private void toolStripMenuItem23_Click(object sender, EventArgs e)
+        {
+            Activate();
+            setREPMultipler(15.0f);
+        }
+
+        private void toolStripMenuItem24_Click(object sender, EventArgs e)
+        {
+            Activate();
+            setREPMultipler(20.0f);
+        }
+
+        private void toolStripMenuItem25_Click(object sender, EventArgs e)
+        {
+            Activate();
+            setREPMultipler(25.0f);
+        }
+
+        private void toolStripMenuItem26_Click(object sender, EventArgs e)
+        {
+            Activate();
+            setREPMultipler(30.0f);
+        }
+
+        private void toolStripMenuItem27_Click(object sender, EventArgs e)
+        {
+            Activate();
+            setREPMultipler(35.0f);
+        }
+
+        private void toolStripMenuItem28_Click(object sender, EventArgs e)
+        {
+            Activate();
+            setREPMultipler(40.0f);
+        }
+
+        private void toolStripMenuItem29_Click(object sender, EventArgs e)
+        {
+            Activate();
+            setREPMultipler(50.0f);
+        }
+
+        private void toolStripMenuItem30_Click(object sender, EventArgs e)
+        {
+            Activate();
+            setREPMultipler(100.0f);
+        }
+
+        private void toolStripMenuItem31_Click(object sender, EventArgs e)
+        {
+            Activate();
+            setREPMultipler(200.0f);
+        }
+
+        private void toolStripMenuItem32_Click(object sender, EventArgs e)
+        {
+            Activate();
+            setREPMultipler(300.0f);
+        }
+
+        private void toolStripMenuItem33_Click(object sender, EventArgs e)
+        {
+            Activate();
+            setREPMultipler(500.0f);
+        }
+
+        private void toolStripMenuItem34_Click(object sender, EventArgs e)
+        {
+            Activate();
+            setREPMultipler(1000.0f);
+        }
+
+        private void toolStripMenuItem35_Click(object sender, EventArgs e)
+        {
+            Activate();
+            setREPMultipler(2000.0f);
+        }
+
+        private void toolStripMenuItem36_Click(object sender, EventArgs e)
+        {
+            Activate();
+            setREPMultipler(3000.0f);
+        }
+
+        private void toolStripMenuItem37_Click(object sender, EventArgs e)
+        {
+            Activate();
+            setREPMultipler(5000.0f);
+        }
+
+        private void toolStripMenuItem38_Click(object sender, EventArgs e)
+        {
+            Activate();
+            setREPMultipler(10000.0f);
+        }
+
+        private void defaultToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            Activate();
+            setRPMultipler(1.0f);
+        }
+
+        private void toolStripMenuItem39_Click(object sender, EventArgs e)
+        {
+            Activate();
+            setRPMultipler(2.0f);
+        }
+
+        private void toolStripMenuItem40_Click(object sender, EventArgs e)
+        {
+            Activate();
+            setRPMultipler(3.0f);
+        }
+
+        private void toolStripMenuItem41_Click(object sender, EventArgs e)
+        {
+            Activate();
+            setRPMultipler(5.0f);
+        }
+
+        private void toolStripMenuItem42_Click(object sender, EventArgs e)
+        {
+            Activate();
+            setRPMultipler(10.0f);
+        }
+
+        private void toolStripMenuItem43_Click(object sender, EventArgs e)
+        {
+            Activate();
+            setRPMultipler(15.0f);
+        }
+
+        private void toolStripMenuItem44_Click(object sender, EventArgs e)
+        {
+            Activate();
+            setRPMultipler(20.0f);
+        }
+
+        private void toolStripMenuItem45_Click(object sender, EventArgs e)
+        {
+            Activate();
+            setRPMultipler(25.0f);
+        }
+
+        private void toolStripMenuItem46_Click(object sender, EventArgs e)
+        {
+            Activate();
+            setRPMultipler(30.0f);
+        }
+
+        private void toolStripMenuItem47_Click(object sender, EventArgs e)
+        {
+            Activate();
+            setRPMultipler(35.0f);
+        }
+
+        private void toolStripMenuItem48_Click(object sender, EventArgs e)
+        {
+            Activate();
+            setRPMultipler(40.0f);
+        }
+
+        private void toolStripMenuItem49_Click(object sender, EventArgs e)
+        {
+            Activate();
+            setRPMultipler(50.0f);
+        }
+
+        private void toolStripMenuItem50_Click(object sender, EventArgs e)
+        {
+            Activate();
+            setRPMultipler(100.0f);
         }
     }
     struct Location { public float x, y, z; }
