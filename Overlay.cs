@@ -1587,6 +1587,24 @@ namespace GTAVCSMM
             setStat("MP0_SCRIPT_INCREASE_STL", 100);
             setStat("MP1_SCRIPT_INCREASE_STL", 100);
         }
+
+        private void toolStripMenuItem51_Click(object sender, EventArgs e)
+        {
+            Activate();
+            setREPMultipler(20000.0f);
+        }
+
+        private void toolStripMenuItem52_Click(object sender, EventArgs e)
+        {
+            Activate();
+            setREPMultipler(30000.0f);
+        }
+
+        private void toolStripMenuItem53_Click(object sender, EventArgs e)
+        {
+            Activate();
+            setREPMultipler(50000.0f);
+        }
     }
     struct Location { public float x, y, z; }
 }
