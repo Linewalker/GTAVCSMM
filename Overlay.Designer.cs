@@ -157,10 +157,6 @@ namespace GTAVCSMM
             this.toolStripMenuItem32 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem33 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem34 = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripMenuItem35 = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripMenuItem36 = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripMenuItem37 = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripMenuItem38 = new System.Windows.Forms.ToolStripMenuItem();
             this.nightclubPopularityMaxToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.onlineServicesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.casinoServicesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -185,9 +181,6 @@ namespace GTAVCSMM
             this.rPToolStripMenuItem4 = new System.Windows.Forms.ToolStripMenuItem();
             this.podiumVehicleToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.cashToolStripMenuItem3 = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripMenuItem51 = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripMenuItem52 = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripMenuItem53 = new System.Windows.Forms.ToolStripMenuItem();
             this.contextMenuStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -1082,14 +1075,7 @@ namespace GTAVCSMM
             this.toolStripMenuItem31,
             this.toolStripMenuItem32,
             this.toolStripMenuItem33,
-            this.toolStripMenuItem34,
-            this.toolStripMenuItem35,
-            this.toolStripMenuItem36,
-            this.toolStripMenuItem37,
-            this.toolStripMenuItem38,
-            this.toolStripMenuItem51,
-            this.toolStripMenuItem52,
-            this.toolStripMenuItem53});
+            this.toolStripMenuItem34});
             this.rEPMultiplerToolStripMenuItem.Name = "rEPMultiplerToolStripMenuItem";
             this.rEPMultiplerToolStripMenuItem.Size = new System.Drawing.Size(184, 22);
             this.rEPMultiplerToolStripMenuItem.Text = "REP Multipler";
@@ -1212,34 +1198,6 @@ namespace GTAVCSMM
             this.toolStripMenuItem34.Size = new System.Drawing.Size(152, 22);
             this.toolStripMenuItem34.Text = "1000";
             this.toolStripMenuItem34.Click += new System.EventHandler(this.toolStripMenuItem34_Click);
-            // 
-            // toolStripMenuItem35
-            // 
-            this.toolStripMenuItem35.Name = "toolStripMenuItem35";
-            this.toolStripMenuItem35.Size = new System.Drawing.Size(152, 22);
-            this.toolStripMenuItem35.Text = "2000";
-            this.toolStripMenuItem35.Click += new System.EventHandler(this.toolStripMenuItem35_Click);
-            // 
-            // toolStripMenuItem36
-            // 
-            this.toolStripMenuItem36.Name = "toolStripMenuItem36";
-            this.toolStripMenuItem36.Size = new System.Drawing.Size(152, 22);
-            this.toolStripMenuItem36.Text = "3000";
-            this.toolStripMenuItem36.Click += new System.EventHandler(this.toolStripMenuItem36_Click);
-            // 
-            // toolStripMenuItem37
-            // 
-            this.toolStripMenuItem37.Name = "toolStripMenuItem37";
-            this.toolStripMenuItem37.Size = new System.Drawing.Size(152, 22);
-            this.toolStripMenuItem37.Text = "5000";
-            this.toolStripMenuItem37.Click += new System.EventHandler(this.toolStripMenuItem37_Click);
-            // 
-            // toolStripMenuItem38
-            // 
-            this.toolStripMenuItem38.Name = "toolStripMenuItem38";
-            this.toolStripMenuItem38.Size = new System.Drawing.Size(152, 22);
-            this.toolStripMenuItem38.Text = "10000";
-            this.toolStripMenuItem38.Click += new System.EventHandler(this.toolStripMenuItem38_Click);
             // 
             // nightclubPopularityMaxToolStripMenuItem
             // 
@@ -1431,27 +1389,6 @@ namespace GTAVCSMM
             this.cashToolStripMenuItem3.Text = "$50,000 Cash";
             this.cashToolStripMenuItem3.Click += new System.EventHandler(this.cashToolStripMenuItem3_Click);
             // 
-            // toolStripMenuItem51
-            // 
-            this.toolStripMenuItem51.Name = "toolStripMenuItem51";
-            this.toolStripMenuItem51.Size = new System.Drawing.Size(152, 22);
-            this.toolStripMenuItem51.Text = "20000";
-            this.toolStripMenuItem51.Click += new System.EventHandler(this.toolStripMenuItem51_Click);
-            // 
-            // toolStripMenuItem52
-            // 
-            this.toolStripMenuItem52.Name = "toolStripMenuItem52";
-            this.toolStripMenuItem52.Size = new System.Drawing.Size(152, 22);
-            this.toolStripMenuItem52.Text = "30000";
-            this.toolStripMenuItem52.Click += new System.EventHandler(this.toolStripMenuItem52_Click);
-            // 
-            // toolStripMenuItem53
-            // 
-            this.toolStripMenuItem53.Name = "toolStripMenuItem53";
-            this.toolStripMenuItem53.Size = new System.Drawing.Size(152, 22);
-            this.toolStripMenuItem53.Text = "50000";
-            this.toolStripMenuItem53.Click += new System.EventHandler(this.toolStripMenuItem53_Click);
-            // 
             // Overlay
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1604,10 +1541,6 @@ namespace GTAVCSMM
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem32;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem33;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem34;
-        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem35;
-        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem36;
-        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem37;
-        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem38;
         private System.Windows.Forms.ToolStripMenuItem rPMultiplerToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem defaultToolStripMenuItem1;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem39;
@@ -1631,9 +1564,6 @@ namespace GTAVCSMM
         private System.Windows.Forms.ToolStripMenuItem flyingToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem shootingToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem stealthToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem51;
-        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem52;
-        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem53;
     }
 }
 

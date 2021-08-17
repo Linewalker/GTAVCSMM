@@ -600,7 +600,10 @@ namespace GTAVCSMM
 
         public void setREPMultipler(float m)
         {
-            _SG_Float(262145 + 31118, m);
+            _SG_Float(262145 + 31118, m); // Street Race
+            _SG_Float(262145 + 31119, m); // Pursuit Race
+            _SG_Float(262145 + 31120, m); // Scramble
+            _SG_Float(262145 + 31121, m); // Head 2 Head
         }
 
         private void Teleport(Location l)
@@ -1428,30 +1431,6 @@ namespace GTAVCSMM
         {
             Activate();
             setREPMultipler(1000.0f);
-        }
-
-        private void toolStripMenuItem35_Click(object sender, EventArgs e)
-        {
-            Activate();
-            setREPMultipler(2000.0f);
-        }
-
-        private void toolStripMenuItem36_Click(object sender, EventArgs e)
-        {
-            Activate();
-            setREPMultipler(3000.0f);
-        }
-
-        private void toolStripMenuItem37_Click(object sender, EventArgs e)
-        {
-            Activate();
-            setREPMultipler(5000.0f);
-        }
-
-        private void toolStripMenuItem38_Click(object sender, EventArgs e)
-        {
-            Activate();
-            setREPMultipler(10000.0f);
         }
 
         private void defaultToolStripMenuItem1_Click(object sender, EventArgs e)
