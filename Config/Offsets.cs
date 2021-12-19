@@ -142,9 +142,9 @@
         private int _oRagdoll = 0x10B8; // int 32:false 1/0:true
         private int _pCPlayerInfo = 0x10C8;
         private int _pCPedWeaponManager = 0x10D8;
-        private int _oSeatbelt = 0x140C; // byte 55:false 56:true
-        private int _oInVehicle = 0x1477; // int 16:false 0:true
-        private int _pedArmor = 0x14E0; // not working what
+        private int _oSeatbelt = 0x145C; // byte 55:false 56:true
+        private int _oInVehicle = 0x1618; // int 16:false 0:true (perhaps 0xE52)
+        private int _pedArmor = 0x1530; // not working what
 
         public int oEntityType
         {

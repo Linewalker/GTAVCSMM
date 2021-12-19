@@ -181,6 +181,8 @@ namespace GTAVCSMM
             this.rPToolStripMenuItem4 = new System.Windows.Forms.ToolStripMenuItem();
             this.podiumVehicleToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.cashToolStripMenuItem3 = new System.Windows.Forms.ToolStripMenuItem();
+            this.bunkerServicesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.bunkerMoneyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.contextMenuStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -1209,7 +1211,8 @@ namespace GTAVCSMM
             // onlineServicesToolStripMenuItem
             // 
             this.onlineServicesToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.casinoServicesToolStripMenuItem});
+            this.casinoServicesToolStripMenuItem,
+            this.bunkerServicesToolStripMenuItem});
             this.onlineServicesToolStripMenuItem.Name = "onlineServicesToolStripMenuItem";
             this.onlineServicesToolStripMenuItem.Size = new System.Drawing.Size(99, 20);
             this.onlineServicesToolStripMenuItem.Text = "Online Services";
@@ -1219,7 +1222,7 @@ namespace GTAVCSMM
             this.casinoServicesToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.getLuckyWheelPriceToolStripMenuItem});
             this.casinoServicesToolStripMenuItem.Name = "casinoServicesToolStripMenuItem";
-            this.casinoServicesToolStripMenuItem.Size = new System.Drawing.Size(155, 22);
+            this.casinoServicesToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
             this.casinoServicesToolStripMenuItem.Text = "Casino Services";
             // 
             // getLuckyWheelPriceToolStripMenuItem
@@ -1388,6 +1391,21 @@ namespace GTAVCSMM
             this.cashToolStripMenuItem3.Size = new System.Drawing.Size(156, 22);
             this.cashToolStripMenuItem3.Text = "$50,000 Cash";
             this.cashToolStripMenuItem3.Click += new System.EventHandler(this.cashToolStripMenuItem3_Click);
+            // 
+            // bunkerServicesToolStripMenuItem
+            // 
+            this.bunkerServicesToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.bunkerMoneyToolStripMenuItem});
+            this.bunkerServicesToolStripMenuItem.Name = "bunkerServicesToolStripMenuItem";
+            this.bunkerServicesToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
+            this.bunkerServicesToolStripMenuItem.Text = "Bunker Services";
+            // 
+            // bunkerMoneyToolStripMenuItem
+            // 
+            this.bunkerMoneyToolStripMenuItem.Name = "bunkerMoneyToolStripMenuItem";
+            this.bunkerMoneyToolStripMenuItem.Size = new System.Drawing.Size(151, 22);
+            this.bunkerMoneyToolStripMenuItem.Text = "Bunker Money";
+            this.bunkerMoneyToolStripMenuItem.Click += new System.EventHandler(this.bunkerMoneyToolStripMenuItem_Click);
             // 
             // Overlay
             // 
@@ -1564,6 +1582,8 @@ namespace GTAVCSMM
         private System.Windows.Forms.ToolStripMenuItem flyingToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem shootingToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem stealthToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem bunkerServicesToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem bunkerMoneyToolStripMenuItem;
     }
 }
 

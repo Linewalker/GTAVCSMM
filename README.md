@@ -9,7 +9,7 @@ No external DLLs needed.
 
 Players mouse release option: F5
 
-+++ Online 1.57 +++
++++ Online pre 1.58 +++
 
 Donations: https://www.paypal.me/linewalker85
 

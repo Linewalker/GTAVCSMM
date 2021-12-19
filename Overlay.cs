@@ -538,23 +538,23 @@ namespace GTAVCSMM
         {
             if (id == -1)
             {
-                _SG_Int(1312443 + 2, -1);
-                _SG_Int(1312443, 1);
+                _SG_Int(1574587 + 2, -1);
+                _SG_Int(1574587, 1);
                 Thread.Sleep(200);
-                _SG_Int(1312443, 0);
+                _SG_Int(1574587, 0);
             }
             else if (id == -2)
             {
-                _SG_Int(31622, 1);
+                _SG_Int(1574587 + 2, 1);
                 Thread.Sleep(200);
-                _SG_Int(31622, 0);
+                _SG_Int(1574587, 0);
             }
             else
             {
-                _SG_Int(1312860, id);
-                _SG_Int(1312443, 1);
+                _SG_Int(1575004, id);
+                _SG_Int(1574587, 1);
                 Thread.Sleep(200);
-                _SG_Int(1312443, 0);
+                _SG_Int(1574587, 0);
             }
         }
 
@@ -761,6 +761,18 @@ namespace GTAVCSMM
             Thread.Sleep(1000);
             _SG_Int(1390343 + 4, (int)oldhash);
             _SG_Int(939452 + 5526, (int)oldvalue);
+        }
+        
+        public void bunkerMoney(int myMoney, int value)
+        {
+            int money_in_bunker = value;
+            int total_cargo = Mem.ReadInt(settings.GlobalPTR-128, new int[] { 1180, 0x37D0 });
+            int money = myMoney * total_cargo / money_in_bunker;
+            Mem.Write(settings.GlobalPTR - 128, new int[] { 1180, 0x3F78 }, money);
+            int time_remaining = Mem.ReadInt(settings.GlobalPTR - 128, new int[] { 1180, 2568 });
+            int time_deliver = Mem.ReadInt(settings.GlobalPTR - 128, new int[] { 1180, 3810 });
+            int mission_time = time_deliver - (time_remaining - 1000);
+            Mem.Write(settings.GlobalPTR - 128, new int[] { 1180, 3810 }, mission_time);
         }
         #endregion
 
@@ -1567,22 +1579,9 @@ namespace GTAVCSMM
             setStat("MP1_SCRIPT_INCREASE_STL", 100);
         }
 
-        private void toolStripMenuItem51_Click(object sender, EventArgs e)
+        private void bunkerMoneyToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Activate();
-            setREPMultipler(20000.0f);
-        }
-
-        private void toolStripMenuItem52_Click(object sender, EventArgs e)
-        {
-            Activate();
-            setREPMultipler(30000.0f);
-        }
-
-        private void toolStripMenuItem53_Click(object sender, EventArgs e)
-        {
-            Activate();
-            setREPMultipler(50000.0f);
+            bunkerMoney(2041000, 195000);
         }
     }
     struct Location { public float x, y, z; }
