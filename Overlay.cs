@@ -472,9 +472,16 @@ namespace GTAVCSMM
             int InitialStyle = GetWindowLong(this.Handle, -10);
             SetWindowLong(this.Handle, -10, InitialStyle | 0x800000 | 0x20);
             GetWindowRect(handle, out rect);
+            this.Top = rect.top + 20;
+            this.Left = rect.left + 30;
+            /*
+            int InitialStyle = GetWindowLong(this.Handle, -10);
+            SetWindowLong(this.Handle, -10, InitialStyle | 0x800000 | 0x20);
+            GetWindowRect(handle, out rect);
             this.Size = new Size((rect.right-12) - rect.left, 24);
             this.Top = rect.top + 2;
             this.Left = rect.left + 3;
+            */
 
             KeyAssign();
         }
@@ -503,9 +510,13 @@ namespace GTAVCSMM
             pNORAGDOLL();
             pUNDEADOFFRADAR();
             pSEATBELT();
-            pSUPERJUMP();
             pDISABLECOLLISION();
             vGODMODE();
+        }
+
+        private void fastTimer_Tick(object sender, EventArgs e)
+        {
+            pSUPERJUMP();
         }
 
         #endregion
@@ -1582,6 +1593,13 @@ namespace GTAVCSMM
         private void bunkerMoneyToolStripMenuItem_Click(object sender, EventArgs e)
         {
             bunkerMoney(2041000, 195000);
+        }
+
+        private void longRangeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Activate();
+            Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPedWeaponManager, offsets.pCWeaponInfo, offsets.oRange }, 250F);
+            Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPedWeaponManager, offsets.pCWeaponInfo, offsets.oLockRange }, 250F);
         }
     }
     struct Location { public float x, y, z; }
