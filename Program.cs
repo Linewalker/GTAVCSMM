@@ -802,7 +802,6 @@ namespace GTAVCSMM
                     break;
             }
             listBx.SelectedIndex = 0;
-            listBx.Focus();
         }
 
         public static void runitem(int mainMenulevel, int menulevel, int menuItem)
@@ -1355,14 +1354,17 @@ namespace GTAVCSMM
                 }
                 else if ((Keys)vkCode == Keys.NumPad0)
                 {
-                    if (menuMainLvl <= 0)
+                    if (!isHidden)
                     {
-                        isHidden = true;
-                        ShowWindow(formHandle, SW_HIDE);
-                    }
-                    else
-                    {
-                        runSingleItem();
+                        if (menuMainLvl <= 0)
+                        {
+                            isHidden = true;
+                            ShowWindow(formHandle, SW_HIDE);
+                        }
+                        else
+                        {
+                            runSingleItem();
+                        }
                     }
                 }
                 else if ((Keys)vkCode == Keys.NumPad5)
@@ -1371,19 +1373,31 @@ namespace GTAVCSMM
                 }
                 else if ((Keys)vkCode == Keys.Up || (Keys)vkCode == Keys.Down || (Keys)vkCode == Keys.Left || (Keys)vkCode == Keys.Right)
                 {
-                    return (IntPtr)1;
+                    if (!isHidden)
+                    {
+                        return (IntPtr)1;
+                    }
                 }
                 else if ((Keys)vkCode == Keys.NumPad2)
                 {
-                    mainlistdown();
+                    if (!isHidden)
+                    {
+                        mainlistdown();
+                    }
                 }
                 else if ((Keys)vkCode == Keys.NumPad8)
                 {
-                    mainlistup();
+                    if (!isHidden)
+                    {
+                        mainlistup();
+                    }
                 }
                 else if ((Keys)vkCode == Keys.Delete)
                 {
-                    Quit();
+                    if (!isHidden)
+                    {
+                        Quit();
+                    }
                 }
             }
             return CallNextHookEx(_hookID, nCode, wParam, lParam);
@@ -1620,14 +1634,14 @@ namespace GTAVCSMM
 
         public static void setStat(string stat, int value)
         {
-            long oldhash = _GG_Int(1390343 + 4);
-            long oldvalue = _GG_Int(939452 + 5526);
-            _SG_Int(1390343 + 4, (int)JOAAT.GetHashKey(stat));
-            _SG_Int(939452 + 5526, value);
-            _SG_Int(1379108 + 1139, -1);
+            long oldhash = _GG_Int(1655444 + 4);
+            long oldvalue = _GG_Int(1020252 + 5526);
+            _SG_Int(1655444 + 4, (int)JOAAT.GetHashKey(stat));
+            _SG_Int(1020252 + 5526, value);
+            _SG_Int(1644209 + 1139, -1);
             Thread.Sleep(1000);
-            _SG_Int(1390343 + 4, (int)oldhash);
-            _SG_Int(939452 + 5526, (int)oldvalue);
+            _SG_Int(1655444 + 4, (int)oldhash);
+            _SG_Int(1020252 + 5526, (int)oldvalue);
         }
 
         /*
