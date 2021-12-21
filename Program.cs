@@ -1,4 +1,9 @@
-﻿using System;
+﻿using GTAVCSMM.Config;
+using GTAVCSMM.Helpers;
+using GTAVCSMM.Memory;
+using GTAVCSMM.Settings;
+using System;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Forms;
@@ -7,9 +12,412 @@ namespace GTAVCSMM
 {
     static class Program
     {
-        [DllImport("user32.dll")]
+        private const int WH_KEYBOARD_LL = 13;
+        private const int WM_KEYDOWN = 0x0100;
+        private static LowLevelKeyboardProc _proc = HookCallback;
+        private static IntPtr _hookID = IntPtr.Zero;
+        const int SW_HIDE = 0;
+
+        [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        private static extern IntPtr SetWindowsHookEx(int idHook,
+        LowLevelKeyboardProc lpfn, IntPtr hMod, uint dwThreadId);
+
+        [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        static extern bool SetForegroundWindow(IntPtr hWnd);
+        private static extern bool UnhookWindowsHookEx(IntPtr hhk);
+
+        [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        private static extern IntPtr CallNextHookEx(IntPtr hhk, int nCode,
+            IntPtr wParam, IntPtr lParam);
+
+        [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        private static extern IntPtr GetModuleHandle(string lpModuleName);
+
+        [DllImport("user32.dll")]
+        static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+
+        private static bool isHidden = false;
+        private static IntPtr formHandle;
+
+        private static int menuMainLvl = 0;
+        private static int LastMenuMainLvl = 0;
+        private static int menuLvl = 0;
+        private static int LastMenuLvl = 0;
+        private static int menuItm = 0;
+        private static int LastMenuItm = 0;
+        private static Form mainForm = new Form();
+        private static ListBox listBx = new ListBox();
+        private static Label label1 = new Label();
+        private static Label label2 = new Label();
+        private static string lastNavigation = string.Empty;
+
+        #region WINDOW SETUP
+
+        public const string WINDOW_NAME = "Grand Theft Auto V";
+        public static IntPtr handle = FindWindow(null, WINDOW_NAME);
+
+        public static RECT rect;
+
+        public struct RECT
+        {
+            public int left, top, right, bottom;
+        }
+
+        [DllImport("user32.dll", SetLastError = true)]
+        static extern IntPtr FindWindow(string IpClassName, string IpWindowName);
+
+        [DllImport("user32.dll")]
+        static extern int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
+
+        [DllImport("user32.dll", SetLastError = true)]
+        static extern int GetWindowLong(IntPtr hWnd, int nIndex);
+
+        [DllImport("user32.dll")]
+        public static extern bool GetWindowRect(IntPtr hwnd, out RECT IpRect);
+
+        public static Offsets offsets = new Offsets();
+        public static Addresses addresses = new Addresses();
+        public static Patterns pattern = new Patterns();
+        public static TSettings settings = new TSettings();
+        public static Mem Mem;
+        public static Thread _getPointer;
+        public static Thread _freezeGame;
+
+        public static System.Windows.Forms.Timer ProcessTimer = new System.Windows.Forms.Timer();
+        public static System.Windows.Forms.Timer MemoryTimer = new System.Windows.Forms.Timer();
+        public static System.Windows.Forms.Timer fastTimer = new System.Windows.Forms.Timer();
+
+        #endregion
+
+        #region PROCESS INFO
+        private static bool bGodMode = false;
+        private static bool bgodState = false;
+        private static bool bNeverWanted = false;
+        private static bool bNoRagdoll = false;
+        private static bool bUndeadOffRadar = false;
+        private static bool bSeatBelt = false;
+        private static bool bSuperJump = false;
+        private static bool bDisableCollision = false;
+        private static bool bVehicleGodMode = false;
+
+        [DllImport("user32.dll")]
+        static extern short GetAsyncKeyState(System.Windows.Forms.Keys vKey);
+
+        [DllImport("user32.dll")]
+        public static extern void mouse_event(int a, int b, int c, int d, int damnIwonderifpeopleactuallyreadsthis);
+        #endregion
+
+        #region METHODS
+        public static void pGODMODE()
+        {
+            if (bGodMode)
+            {
+                Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.oGod }, 1);
+                if (!settings.pgodm)
+                {
+                    Activate();
+                }
+                settings.pgodm = true;
+            }
+            else
+            {
+                if (settings.pgodm)
+                {
+                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.oGod }, 0);
+                    settings.pgodm = false;
+                    Deactivate();
+                }
+            }
+        }
+
+        public static void pNEVERWANTED()
+        {
+            if (bNeverWanted)
+            {
+                Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oWanted }, 0);
+                if (!settings.pnwanted)
+                {
+                    Activate();
+                }
+                settings.pnwanted = true;
+            }
+            else
+            {
+                if (settings.pnwanted)
+                {
+                    settings.pnwanted = false;
+                    Deactivate();
+                }
+            }
+        }
+
+        public static void pNORAGDOLL()
+        {
+            if (bNoRagdoll)
+            {
+                Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.oRagdoll }, 1);
+                if (!settings.pnragdoll)
+                {
+                    Activate();
+                }
+                settings.pnragdoll = true;
+            }
+            else
+            {
+                if (settings.pnragdoll)
+                {
+                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.oRagdoll }, 32);
+                    settings.pnragdoll = false;
+                    Deactivate();
+                }
+            }
+        }
+
+        public static void pUNDEADOFFRADAR()
+        {
+            if (bUndeadOffRadar)
+            {
+                Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.oHealthMax }, 0);
+                if (!settings.puoffradar)
+                {
+                    Activate();
+                }
+                settings.puoffradar = true;
+            }
+            else
+            {
+                if (settings.puoffradar)
+                {
+                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.oHealthMax }, 328f);
+                    settings.puoffradar = false;
+                    Deactivate();
+                }
+            }
+        }
+
+        public static void pSEATBELT()
+        {
+            if (bSeatBelt)
+            {
+                Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.oSeatbelt }, -55);
+                if (!settings.psbelt)
+                {
+                    Activate();
+                }
+                settings.psbelt = true;
+            }
+            else
+            {
+                if (settings.psbelt)
+                {
+                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.oSeatbelt }, -56);
+                    settings.psbelt = false;
+                    Deactivate();
+                }
+            }
+        }
+
+        public static void pSUPERJUMP()
+        {
+            if (bSuperJump)
+            {
+                Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oFrameFlags }, 64);
+                if (!settings.psjump)
+                {
+                    Activate();
+                }
+                settings.psjump = true;
+            }
+            else
+            {
+                if (settings.psjump)
+                {
+                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oFrameFlags }, 0);
+                    settings.psjump = false;
+                    Deactivate();
+                }
+            }
+        }
+        public static void pDISABLECOLLISION()
+        {
+            long paddr = Mem.ReadPointer(settings.WorldPTR, new int[] { offsets.pCPed, 0x30, 0x10, 0x20, 0x70, 0x0 });
+            long paddr2 = Mem.GetPtrAddr(paddr + 0x2C, null);
+
+            if (bDisableCollision)
+            {
+                Mem.writeFloat(paddr2, null, -1.0f);
+                if (!settings.pdiscol)
+                {
+                    Activate();
+                }
+                settings.pdiscol = true;
+            }
+            else
+            {
+                if (settings.pdiscol)
+                {
+                    Mem.writeFloat(paddr2, null, 0.25f);
+                    settings.pdiscol = false;
+                    Deactivate();
+                }
+            }
+        }
+        public static void vGODMODE()
+        {
+            long paddr = Mem.ReadPointer(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCVehicle });
+            if (paddr > 0)
+            {
+                long paddr2 = Mem.GetPtrAddr(paddr + offsets.oGod, null);
+                if (bVehicleGodMode)
+                {
+                    Mem.writeInt(paddr2, null, 1);
+                    if (!settings.vgodm)
+                    {
+                        Activate();
+                    }
+                    settings.vgodm = true;
+                }
+                else
+                {
+                    if (settings.vgodm)
+                    {
+                        Mem.writeInt(paddr2, null, 0);
+                        settings.vgodm = false;
+                        Deactivate();
+                    }
+                }
+            }
+        }
+
+        public static void getPointer()
+        {
+            try
+            {
+                Mem = new Mem(settings.gameName);
+
+                var processes = Process.GetProcessesByName(settings.gameName);
+                foreach (var p in processes)
+                {
+                    if (p.Id > 0)
+                    {
+                        settings.gameProcess = p.Id;
+                    }
+                }
+
+                // GlobalPTR
+                long addr = Mem.FindPattern(pattern.GlobalPTR, pattern.GlobalPTR_Mask);
+                settings.GlobalPTR = addr + Mem.ReadInt(addr + 3, null) + 7;
+
+                // WorldPTR
+                long addr2 = Mem.FindPattern(pattern.WorldPTR, pattern.WorldPTR_Mask);
+                settings.WorldPTR = addr2 + Mem.ReadInt(addr2 + 3, null) + 7;
+
+                // BlipPTR
+                long addr3 = Mem.FindPattern(pattern.BlipPTR, pattern.BlipPTR_Mask);
+                settings.BlipPTR = addr3 + Mem.ReadInt(addr3 + 3, null) + 7;
+
+                // ReplayInterfacePTR
+                long addr4 = Mem.FindPattern(pattern.ReplayInterfacePTR, pattern.ReplayInterfacePTR_Mask);
+                settings.ReplayInterfacePTR = addr4 + Mem.ReadInt(addr4 + 3, null) + 7;
+
+                // LocalScriptsPTR
+                long addr5 = Mem.FindPattern(pattern.LocalScriptsPTR, pattern.LocalScriptsPTR_Mask);
+                settings.LocalScriptsPTR = addr5 + Mem.ReadInt(addr5 + 3, null) + 7;
+
+                // PlayerCountPTR
+                long addr6 = Mem.FindPattern(pattern.PlayerCountPTR, pattern.PlayerCountPTR_Mask);
+                settings.PlayerCountPTR = addr6 + Mem.ReadInt(addr6 + 3, null) + 7;
+
+                // PickupDataPTR
+                long addr7 = Mem.FindPattern(pattern.PickupDataPTR, pattern.PickupDataPTR_Mask);
+                settings.PickupDataPTR = addr7 + Mem.ReadInt(addr7 + 3, null) + 7;
+
+                // WeatherADDR
+                long addr8 = Mem.FindPattern(pattern.WeatherADDR, pattern.WeatherADDR_Mask);
+                settings.WeatherADDR = addr8 + Mem.ReadInt(addr8 + 6, null) + 10;
+
+                // SettingsPTR
+                long addr9 = Mem.FindPattern(pattern.SettingsPTR, pattern.SettingsPTR_Mask);
+                settings.SettingsPTR = addr9 + Mem.ReadInt(addr9 + 3, null) - Convert.ToInt64("0x89", 16);
+
+                // AimCPedPTR
+                long addr10 = Mem.FindPattern(pattern.AimCPedPTR, pattern.AimCPedPTR_Mask);
+                settings.AimCPedPTR = addr10 + Mem.ReadInt(addr10 + 3, null) + 7;
+
+                // FriendlistPTR
+                long addr11 = Mem.FindPattern(pattern.FriendlistPTR, pattern.FriendlistPTR_Mask);
+                settings.FriendlistPTR = addr11 + Mem.ReadInt(addr11 + 3, null) + 7;
+            }
+            catch
+            {
+                MessageBox.Show("GTA is not Running!", "Serious Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Quit();
+            }
+            _getPointer.Abort();
+        }
+
+        public static void freezeGame()
+        {
+            Console.WriteLine("Freezing game");
+            Speeder.Suspend(settings.gameProcess);
+            Thread.Sleep(10000);
+            Speeder.Resume(settings.gameProcess);
+            _freezeGame.Abort();
+        }
+        #endregion
+
+
+        #region TIMERS
+
+        private static void ProcessTimer_Tick(object sender, EventArgs e)
+        {
+
+        }
+
+        private static void MemoryTimer_Tick(object sender, EventArgs e)
+        {
+            pGODMODE();
+            pNEVERWANTED();
+            pNORAGDOLL();
+            pUNDEADOFFRADAR();
+            pSEATBELT();
+            pDISABLECOLLISION();
+            vGODMODE();
+        }
+
+        private static void fastTimer_Tick(object sender, EventArgs e)
+        {
+            pSUPERJUMP();
+        }
+
+        #endregion
+
+        private static void Quit()
+        {
+            Environment.Exit(0);
+        }
+
+        //audio response to actions
+        public static void Activate()
+        {
+            Console.Beep(523, 75);
+            Console.Beep(587, 75);
+            Console.Beep(700, 75);
+        }
+
+        public static void Deactivate()
+        {
+            Console.Beep(700, 75);
+            Console.Beep(587, 75);
+            Console.Beep(523, 75);
+        }
+
+        public static void Toggle()
+        {
+            Console.Beep(523, 75);
+            Console.Beep(523, 75);
+            Console.Beep(523, 75);
+        }
 
         /// <summary>
         /// The main entry point for the application.
@@ -22,12 +430,1228 @@ namespace GTAVCSMM
 
             if (createdNew)
             {
-                   Application.EnableVisualStyles();
-                    Application.SetCompatibleTextRenderingDefault(false);
-                    Application.Run(new Overlay());
-                    
-             }
+                    _getPointer = new Thread(getPointer) { IsBackground = true };
+                    _getPointer.Start();
+
+                    // 
+                    // listBx
+                    // 
+                    listBx.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(128)))));
+                    listBx.BorderStyle = System.Windows.Forms.BorderStyle.None;
+                    listBx.Font = new System.Drawing.Font("Arial", 13.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+                    listBx.FormattingEnabled = true;
+                    listBx.ItemHeight = 24;
+                    listBx.Location = new System.Drawing.Point(6, 50);
+                    listBx.Margin = new System.Windows.Forms.Padding(10);
+                    listBx.MaximumSize = new System.Drawing.Size(290, 500);
+                    listBx.Name = "listBox1";
+                    listBx.Size = new System.Drawing.Size(290, 480);
+                    listBx.TabIndex = 0;
+
+                    // 
+                    // label1
+                    // 
+                    label1.AutoSize = true;
+                    label1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(128)))));
+                    label1.Font = new System.Drawing.Font("Arial Black", 18F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+                    label1.Location = new System.Drawing.Point(1, 9);
+                    label1.Name = "label1";
+                    label1.Size = new System.Drawing.Size(168, 33);
+                    label1.TabIndex = 1;
+                    label1.Text = "GTAVCSMM";
+                    // 
+                    // label2
+                    // 
+                    label2.AutoSize = true;
+                    label2.Font = new System.Drawing.Font("Arial", 15.75F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Italic))), System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+                    label2.Location = new System.Drawing.Point(162, 16);
+                    label2.Name = "label2";
+                    label2.Size = new System.Drawing.Size(65, 24);
+                    label2.TabIndex = 2;
+                    label2.Text = "o1.58";
+                    // 
+                    // fastTimer
+                    // 
+                    fastTimer.Enabled = true;
+                    fastTimer.Interval = 1;
+                    fastTimer.Tick += new System.EventHandler(fastTimer_Tick);
+                    // 
+                    // ProcessTimer
+                    // 
+                    ProcessTimer.Enabled = true;
+                    ProcessTimer.Interval = 100;
+                    ProcessTimer.Tick += new System.EventHandler(ProcessTimer_Tick);
+                    // 
+                    // MemoryTimer
+                    // 
+                    MemoryTimer.Enabled = true;
+                    MemoryTimer.Interval = 100;
+                    MemoryTimer.Tick += new System.EventHandler(MemoryTimer_Tick);
+                    // 
+                    // Form1
+                    // 
+                    mainForm.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+                    mainForm.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+                    mainForm.AutoSize = true;
+                    mainForm.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+                    mainForm.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(128)))));
+                    mainForm.ClientSize = new System.Drawing.Size(207, 116);
+                    mainForm.Controls.Add(label2);
+                    mainForm.Controls.Add(label1);
+                    mainForm.Controls.Add(listBx);
+                    mainForm.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
+                    mainForm.KeyPreview = true;
+                    mainForm.Name = "Form1";
+                    mainForm.Opacity = 0.8D;
+                    mainForm.ShowIcon = false;
+                    mainForm.ShowInTaskbar = false;
+                    mainForm.Text = "GTAVCSMM";
+                    mainForm.TopMost = true;
+
+                    formHandle = mainForm.Handle;
+                    listboxStyle();
+                    listboxFill(0, 0);
+                    _hookID = SetHook(_proc);
+
+                    mainForm.FormBorderStyle = FormBorderStyle.None;
+                    int InitialStyle = GetWindowLong(mainForm.Handle, -10);
+                    SetWindowLong(mainForm.Handle, -10, InitialStyle | 0x800000 | 0x20);
+                    GetWindowRect(handle, out rect);
+                    mainForm.Top = rect.top - 20;
+                    mainForm.Left = rect.left + 30;
+
+                    mainForm.Show();
+
+                    Application.EnableVisualStyles();
+                    Application.Run();
+
+                }
         }
 
-    }
+        public static void listboxStyle()
+        {
+        }
+
+        public static void listboxFill(int mainMenulevel, int menulevel)
+        {
+            listBx.Items.Clear();
+            switch (mainMenulevel)
+            {
+                case 0:
+                    /*
+                     * Mainlevel 0
+                     */
+                    listBx.Items.Add("Main \t\t\t ►");       // 0,0
+                    listBx.Items.Add("Session \t\t\t ►");    // 0,1
+                    listBx.Items.Add("Player \t\t\t ►");     // 0,2
+                    listBx.Items.Add("Vehicle \t\t\t ►");    // 0,3
+                    listBx.Items.Add("Weapon \t\t\t ►");     // 0,4
+                    listBx.Items.Add("Teleport \t\t\t ►");   // 0,5
+                    listBx.Items.Add("Tunables \t\t\t ►");   // 0,6
+
+                    menuMainLvl = 0;
+                    menuLvl = 0;
+
+                    LastMenuMainLvl = 0;
+                    LastMenuLvl = 0;
+                    LastMenuItm = 0;
+                    break;
+
+                case 1:
+                    switch (menulevel)
+                    {
+                        case 0:
+                            listBx.Items.Add("Re-Init");
+                            listBx.Items.Add("Quit (Del)");
+
+                            menuMainLvl = 1;
+                            menuLvl = 0;
+
+                            LastMenuMainLvl = 0;
+                            LastMenuLvl = 1;
+                            LastMenuItm = 0;
+                            break;
+
+                        case 1:
+                            listBx.Items.Add("Join Public Session");
+                            listBx.Items.Add("New Public Session");
+                            listBx.Items.Add("Solo Session");
+                            listBx.Items.Add("Leave Online");
+                            listBx.Items.Add("Empty Session (10 Sec. Freeze)");
+                            listBx.Items.Add("Invite Only Session");
+                            listBx.Items.Add("Find Friend Session");
+                            listBx.Items.Add("Closed Friend Session");
+                            listBx.Items.Add("Crew Session");
+                            listBx.Items.Add("Join Crew Session");
+                            listBx.Items.Add("Closed Crew Session");
+                            /*
+                            listBx.Items.Add("Disconnect");
+                            */
+
+                            menuMainLvl = 1;
+                            menuLvl = 1;
+
+                            LastMenuMainLvl = 0;
+                            LastMenuLvl = 1;
+                            LastMenuItm = 1;
+                            break;
+
+                        case 2:
+                            listBx.Items.Add("God Mode (F6)");
+                            listBx.Items.Add("Super Jump");
+                            listBx.Items.Add("Never Wanted (F7)");
+                            listBx.Items.Add("Seatbelt");
+                            listBx.Items.Add("No Ragdoll");
+                            listBx.Items.Add("Undead Off-Radar");
+                            listBx.Items.Add("Disable Collision");
+                            listBx.Items.Add("Skills \t\t\t ►");
+                            listBx.Items.Add("Swim Speed \t\t ►");
+                            listBx.Items.Add("Stealth Speed \t\t ►");
+                            listBx.Items.Add("Run Speed \t\t ►");
+                            listBx.Items.Add("Wanted Level \t\t ►");
+
+                            menuMainLvl = 1;
+                            menuLvl = 2;
+
+                            LastMenuMainLvl = 0;
+                            LastMenuLvl = 1;
+                            LastMenuItm = 2;
+                            break;
+
+                        case 3:
+                            listBx.Items.Add("God Mode");
+
+                            menuMainLvl = 1;
+                            menuLvl = 3;
+
+                            LastMenuMainLvl = 0;
+                            LastMenuLvl = 1;
+                            LastMenuItm = 3;
+                            break;
+
+                        case 4:
+                            listBx.Items.Add("Impact Type \t\t ►");
+                            listBx.Items.Add("Impact Explosion \t\t ►");
+                            listBx.Items.Add("Long Range");
+
+                            menuMainLvl = 1;
+                            menuLvl = 4;
+
+                            LastMenuMainLvl = 0;
+                            LastMenuLvl = 1;
+                            LastMenuItm = 4;
+                            break;
+
+                        case 5:
+                            listBx.Items.Add("Waypoint (F8)");
+                            listBx.Items.Add("Objective");
+
+                            menuMainLvl = 1;
+                            menuLvl = 5;
+
+                            LastMenuMainLvl = 0;
+                            LastMenuLvl = 1;
+                            LastMenuItm = 5;
+                            break;
+
+                        case 6:
+                            listBx.Items.Add("RP Multipler \t\t ►");
+                            listBx.Items.Add("REP Multipler \t\t ►");
+                            listBx.Items.Add("Nightclub Popularity");
+
+                            menuMainLvl = 1;
+                            menuLvl = 6;
+
+                            LastMenuMainLvl = 0;
+                            LastMenuLvl = 1;
+                            LastMenuItm = 6;
+                            break;
+                    }
+                    break;
+
+                case 2:
+                    switch (menulevel)
+                    {
+                        case 7:
+                            listBx.Items.Add("Stamina");
+                            listBx.Items.Add("Strength");
+                            listBx.Items.Add("Lung Capacity");
+                            listBx.Items.Add("Driving");
+                            listBx.Items.Add("Flying");
+                            listBx.Items.Add("Shooting");
+                            listBx.Items.Add("Stealth");
+
+                            menuMainLvl = 2;
+                            menuLvl = 7;
+
+                            LastMenuMainLvl = 1;
+                            LastMenuLvl = 2;
+                            LastMenuItm = 7;
+                            break;
+
+                        case 8:
+                            listBx.Items.Add("Swim Speed = 0.0");
+                            listBx.Items.Add("Swim Speed = 0.5");
+                            listBx.Items.Add("Swim Speed = 1.0 (Default)");
+                            listBx.Items.Add("Swim Speed = 1.5");
+                            listBx.Items.Add("Swim Speed = 2.0");
+                            listBx.Items.Add("Swim Speed = 2.5");
+                            listBx.Items.Add("Swim Speed = 3.0");
+                            listBx.Items.Add("Swim Speed = 3.5");
+                            listBx.Items.Add("Swim Speed = 4.0");
+                            listBx.Items.Add("Swim Speed = 4.5");
+                            listBx.Items.Add("Swim Speed = 5.0");
+
+                            menuMainLvl = 2;
+                            menuLvl = 8;
+
+                            LastMenuMainLvl = 1;
+                            LastMenuLvl = 2;
+                            LastMenuItm = 8;
+                            break;
+
+                        case 9:
+                            listBx.Items.Add("Stealth Speed = 0.0");
+                            listBx.Items.Add("Stealth Speed = 0.5");
+                            listBx.Items.Add("Stealth Speed = 1.0 (Default)");
+                            listBx.Items.Add("Stealth Speed = 1.5");
+                            listBx.Items.Add("Stealth Speed = 2.0");
+                            listBx.Items.Add("Stealth Speed = 2.5");
+                            listBx.Items.Add("Stealth Speed = 3.0");
+                            listBx.Items.Add("Stealth Speed = 3.5");
+                            listBx.Items.Add("Stealth Speed = 4.0");
+                            listBx.Items.Add("Stealth Speed = 4.5");
+                            listBx.Items.Add("Stealth Speed = 5.0");
+
+                            menuMainLvl = 2;
+                            menuLvl = 9;
+
+                            LastMenuMainLvl = 1;
+                            LastMenuLvl = 2;
+                            LastMenuItm = 9;
+                            break;
+
+                        case 10:
+                            listBx.Items.Add("Run Speed = 0.0");
+                            listBx.Items.Add("Run Speed = 0.5");
+                            listBx.Items.Add("Run Speed = 1.0 (Default)");
+                            listBx.Items.Add("Run Speed = 1.5");
+                            listBx.Items.Add("Run Speed = 2.0");
+                            listBx.Items.Add("Run Speed = 2.5");
+                            listBx.Items.Add("Run Speed = 3.0");
+                            listBx.Items.Add("Run Speed = 3.5");
+                            listBx.Items.Add("Run Speed = 4.0");
+                            listBx.Items.Add("Run Speed = 4.5");
+                            listBx.Items.Add("Run Speed = 5.0");
+
+                            menuMainLvl = 2;
+                            menuLvl = 10;
+
+                            LastMenuMainLvl = 1;
+                            LastMenuLvl = 2;
+                            LastMenuItm = 10;
+                            break;
+
+                        case 11:
+                            listBx.Items.Add("Wanted Level = 0");
+                            listBx.Items.Add("Wanted Level = 1");
+                            listBx.Items.Add("Wanted Level = 2");
+                            listBx.Items.Add("Wanted Level = 3");
+                            listBx.Items.Add("Wanted Level = 4");
+                            listBx.Items.Add("Wanted Level = 5");
+
+                            menuMainLvl = 2;
+                            menuLvl = 11;
+
+                            LastMenuMainLvl = 1;
+                            LastMenuLvl = 2;
+                            LastMenuItm = 11;
+                            break;
+                    }
+                    break;
+
+                case 4:
+                    switch (menulevel)
+                    {
+                        case 0:
+                            listBx.Items.Add("Fists");
+                            listBx.Items.Add("Bullet");
+                            listBx.Items.Add("Explosion");
+
+                            menuMainLvl = 4;
+                            menuLvl = 0;
+
+                            LastMenuMainLvl = 1;
+                            LastMenuLvl = 4;
+                            LastMenuItm = 0;
+                            break;
+
+                        case 1:
+                            listBx.Items.Add("Default");
+                            listBx.Items.Add("Grenade");
+                            listBx.Items.Add("Orbital Cannon");
+
+                            menuMainLvl = 4;
+                            menuLvl = 1;
+
+                            LastMenuMainLvl = 1;
+                            LastMenuLvl = 4;
+                            LastMenuItm = 1;
+                            break;
+                    }
+                    break;
+            }
+            listBx.SelectedIndex = 0;
+            listBx.Focus();
+        }
+
+        public static void runitem(int mainMenulevel, int menulevel, int menuItem)
+        {
+            Console.WriteLine("Command to run: " + mainMenulevel + " " + menulevel + " " + menuItem);
+            switch (mainMenulevel)
+            {
+                case 0:
+                    switch (menulevel)
+                    {
+                        case 0:
+                            switch (menuItem)
+                            {
+                                case 0:
+                                    listboxFill(1, 0);
+                                    break;
+                                case 1:
+                                    listboxFill(1, 1);
+                                    break;
+                                case 2:
+                                    listboxFill(1, 2);
+                                    break;
+                                case 3:
+                                    listboxFill(1, 3);
+                                    break;
+                                case 4:
+                                    listboxFill(1, 4);
+                                    break;
+                                case 5:
+                                    listboxFill(1, 5);
+                                    break;
+                                case 6:
+                                    listboxFill(1, 6);
+                                    break;
+                            }
+                            break;
+                    }
+                    break;
+
+                case 1:
+                    switch (menulevel)
+                    {
+                        case 0:
+                            switch (menuItem)
+                            {
+                                case 0:
+                                    // Re-Init
+                                    Console.WriteLine("Nothing to do");
+                                    break;
+                                case 1:
+                                    Quit();
+                                    break;
+                            }
+                            break;
+                        case 1:
+                            switch (menuItem)
+                            {
+                                case 0:
+                                    Activate();
+                                    LoadSession(0);
+                                    break;
+                                case 1:
+                                    Activate();
+                                    LoadSession(1);
+                                    break;
+                                case 2:
+                                    Activate();
+                                    LoadSession(10);
+                                    break;
+                                case 3:
+                                    Activate();
+                                    LoadSession(-1);
+                                    break;
+                                case 4:
+                                    Activate();
+                                    _freezeGame = new Thread(freezeGame) { IsBackground = true };
+                                    _freezeGame.Start();
+                                    break;
+                                case 5:
+                                    Activate();
+                                    LoadSession(11);
+                                    break;
+                                case 6:
+                                    Activate();
+                                    LoadSession(9);
+                                    break;
+                                case 7:
+                                    Activate();
+                                    LoadSession(6);
+                                    break;
+                                case 8:
+                                    Activate();
+                                    LoadSession(3);
+                                    break;
+                                case 9:
+                                    Activate();
+                                    LoadSession(12);
+                                    break;
+                                case 10:
+                                    Activate();
+                                    LoadSession(2);
+                                    break;
+                                    /*
+                                case 11:
+                                    Activate();
+                                    LoadSession(-2);
+                                    break;
+                                    */
+                            }
+                            break;
+                        case 2:
+                            switch (menuItem)
+                            {
+                                case 0:
+                                    bGodMode = !bGodMode;
+                                    break;
+                                case 1:
+                                    bSuperJump = !bSuperJump;
+                                    break;
+                                case 2:
+                                    bNeverWanted = !bNeverWanted;
+                                    break;
+                                case 3:
+                                    bSeatBelt = !bSeatBelt;
+                                    break;
+                                case 4:
+                                    bNoRagdoll = !bNoRagdoll;
+                                    break;
+                                case 5:
+                                    bUndeadOffRadar = !bUndeadOffRadar;
+                                    break;
+                                case 6:
+                                    bDisableCollision = !bDisableCollision;
+                                    break;
+                                case 7:
+                                    listboxFill(2, 7);
+                                    break;
+                                case 8:
+                                    listboxFill(2, 8);
+                                    break;
+                                case 9:
+                                    listboxFill(2, 9);
+                                    break;
+                                case 10:
+                                    listboxFill(2, 10);
+                                    break;
+                                case 11:
+                                    listboxFill(2, 11);
+                                    break;
+                            }
+                            break;
+                        case 3:
+                            switch (menuItem)
+                            {
+                                case 0:
+                                    bVehicleGodMode = !bVehicleGodMode;
+                                    break;
+                            }
+                            break;
+                        case 4:
+                            switch (menuItem)
+                            {
+                                case 0:
+                                    listboxFill(4, 0);
+                                    break;
+                                case 1:
+                                    listboxFill(4, 1);
+                                    break;
+                                case 2:
+                                    Activate();
+                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPedWeaponManager, offsets.pCWeaponInfo, offsets.oRange }, 250F);
+                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPedWeaponManager, offsets.pCWeaponInfo, offsets.oLockRange }, 250F);
+                                    break;
+                            }
+                            break;
+                        case 5:
+                            switch (menuItem)
+                            {
+                                case 0:
+                                    if (bGodMode)
+                                    {
+                                        bgodState = true;
+                                    }
+                                    else
+                                    {
+                                        bGodMode = true;
+                                        bgodState = false;
+                                    }
+                                    Activate();
+                                    teleportWaypoint();
+                                    if (!bgodState)
+                                    {
+                                        bGodMode = false;
+                                    }
+                                    break;
+                                case 1:
+                                    if (bGodMode)
+                                    {
+                                        bgodState = true;
+                                    }
+                                    else
+                                    {
+                                        bGodMode = true;
+                                        bgodState = false;
+                                    }
+                                    Activate();
+                                    teleportObjective();
+                                    if (!bgodState)
+                                    {
+                                        bGodMode = false;
+                                    }
+                                    break;
+                            }
+                            break;
+
+                    }
+                    break;
+                case 2:
+                    switch (menulevel)
+                    {
+                        case 7:
+                            switch (menuItem)
+                            {
+                                case 0:
+                                    Activate();
+                                    setStat("MP0_SCRIPT_INCREASE_STAM", 100);
+                                    setStat("MP1_SCRIPT_INCREASE_STAM", 100);
+                                    break;
+                                case 1:
+                                    Activate();
+                                    setStat("MP0_SCRIPT_INCREASE_STRN", 100);
+                                    setStat("MP1_SCRIPT_INCREASE_STRN", 100);
+                                    break;
+                                case 2:
+                                    Activate();
+                                    setStat("MP0_SCRIPT_INCREASE_LUNG", 100);
+                                    setStat("MP1_SCRIPT_INCREASE_LUNG", 100);
+                                    break;
+                                case 3:
+                                    Activate();
+                                    setStat("MP0_SCRIPT_INCREASE_DRIV", 100);
+                                    setStat("MP1_SCRIPT_INCREASE_DRIV", 100);
+                                    break;
+                                case 4:
+                                    Activate();
+                                    setStat("MP0_SCRIPT_INCREASE_FLY", 100);
+                                    setStat("MP1_SCRIPT_INCREASE_FLY", 100);
+                                    break;
+                                case 5:
+                                    Activate();
+                                    setStat("MP0_SCRIPT_INCREASE_SHO", 100);
+                                    setStat("MP1_SCRIPT_INCREASE_SHO", 100);
+                                    break;
+                                case 6:
+                                    Activate();
+                                    setStat("MP0_SCRIPT_INCREASE_STL", 100);
+                                    setStat("MP1_SCRIPT_INCREASE_STL", 100);
+                                    break;
+                            }
+                            break;
+
+                        case 8:
+                            switch (menuItem)
+                            {
+                                case 0:
+                                    Activate();
+                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oSwimSpeed }, 0.0f);
+                                    break;
+                                case 1:
+                                    Activate();
+                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oSwimSpeed }, 0.5f);
+                                    break;
+                                case 2:
+                                    Activate();
+                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oSwimSpeed }, 1.0f);
+                                    break;
+                                case 3:
+                                    Activate();
+                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oSwimSpeed }, 1.5f);
+                                    break;
+                                case 4:
+                                    Activate();
+                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oSwimSpeed }, 2.0f);
+                                    break;
+                                case 5:
+                                    Activate();
+                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oSwimSpeed }, 2.5f);
+                                    break;
+                                case 6:
+                                    Activate();
+                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oSwimSpeed }, 3.0f);
+                                    break;
+                                case 7:
+                                    Activate();
+                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oSwimSpeed }, 3.5f);
+                                    break;
+                                case 8:
+                                    Activate();
+                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oSwimSpeed }, 4.0f);
+                                    break;
+                                case 9:
+                                    Activate();
+                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oSwimSpeed }, 4.5f);
+                                    break;
+                                case 10:
+                                    Activate();
+                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oSwimSpeed }, 5.0f);
+                                    break;
+                            }
+                            break;
+
+                        case 9:
+                            switch (menuItem)
+                            {
+                                case 0:
+                                    Activate();
+                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oWalkSpeed }, 0.0f);
+                                    break;
+                                case 1:
+                                    Activate();
+                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oWalkSpeed }, 0.5f);
+                                    break;
+                                case 2:
+                                    Activate();
+                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oWalkSpeed }, 1.0f);
+                                    break;
+                                case 3:
+                                    Activate();
+                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oWalkSpeed }, 1.5f);
+                                    break;
+                                case 4:
+                                    Activate();
+                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oWalkSpeed }, 2.0f);
+                                    break;
+                                case 5:
+                                    Activate();
+                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oWalkSpeed }, 2.5f);
+                                    break;
+                                case 6:
+                                    Activate();
+                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oWalkSpeed }, 3.0f);
+                                    break;
+                                case 7:
+                                    Activate();
+                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oWalkSpeed }, 3.5f);
+                                    break;
+                                case 8:
+                                    Activate();
+                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oWalkSpeed }, 4.0f);
+                                    break;
+                                case 9:
+                                    Activate();
+                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oWalkSpeed }, 4.5f);
+                                    break;
+                                case 10:
+                                    Activate();
+                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oWalkSpeed }, 5.0f);
+                                    break;
+                            }
+                            break;
+
+                        case 10:
+                            switch (menuItem)
+                            {
+                                case 0:
+                                    Activate();
+                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oRunSpeed }, 0.0f);
+                                    break;
+                                case 1:
+                                    Activate();
+                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oRunSpeed }, 0.5f);
+                                    break;
+                                case 2:
+                                    Activate();
+                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oRunSpeed }, 1.0f);
+                                    break;
+                                case 3:
+                                    Activate();
+                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oRunSpeed }, 1.5f);
+                                    break;
+                                case 4:
+                                    Activate();
+                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oRunSpeed }, 2.0f);
+                                    break;
+                                case 5:
+                                    Activate();
+                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oRunSpeed }, 2.5f);
+                                    break;
+                                case 6:
+                                    Activate();
+                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oRunSpeed }, 3.0f);
+                                    break;
+                                case 7:
+                                    Activate();
+                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oRunSpeed }, 3.5f);
+                                    break;
+                                case 8:
+                                    Activate();
+                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oRunSpeed }, 4.0f);
+                                    break;
+                                case 9:
+                                    Activate();
+                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oRunSpeed }, 4.5f);
+                                    break;
+                                case 10:
+                                    Activate();
+                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oRunSpeed }, 5.0f);
+                                    break;
+                            }
+                            break;
+
+                        case 11:
+                            switch (menuItem)
+                            {
+                                case 0:
+                                    Activate();
+                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oWanted }, 0);
+                                    break;
+                                case 1:
+                                    Activate();
+                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oWanted }, 1);
+                                    break;
+                                case 2:
+                                    Activate();
+                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oWanted }, 2);
+                                    break;
+                                case 3:
+                                    Activate();
+                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oWanted }, 3);
+                                    break;
+                                case 4:
+                                    Activate();
+                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oWanted }, 4);
+                                    break;
+                                case 5:
+                                    Activate();
+                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oWanted }, 5);
+                                    break;
+                            }
+                            break;
+                    }
+                    break;
+
+                case 4:
+                    switch (menulevel)
+                    {
+                        case 0:
+                            switch (menuItem)
+                            {
+                                case 0:
+                                    Activate();
+                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPedWeaponManager, offsets.pCWeaponInfo, offsets.oImpactType }, 2);
+                                    break;
+                                case 1:
+                                    Activate();
+                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPedWeaponManager, offsets.pCWeaponInfo, offsets.oImpactType }, 3);
+                                    break;
+                                case 2:
+                                    Activate();
+                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPedWeaponManager, offsets.pCWeaponInfo, offsets.oImpactType }, 5);
+                                    break;
+                            }
+                            break;
+
+                        case 1:
+                            switch (menuItem)
+                            {
+                                case 0:
+                                    Activate();
+                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPedWeaponManager, offsets.pCWeaponInfo, offsets.oImpactExplosion }, -1);
+                                    break;
+                                case 1:
+                                    Activate();
+                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPedWeaponManager, offsets.pCWeaponInfo, offsets.oImpactExplosion }, 0);
+                                    break;
+                                case 2:
+                                    Activate();
+                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPedWeaponManager, offsets.pCWeaponInfo, offsets.oImpactExplosion }, 59);
+                                    break;
+                            }
+                            break;
+                    }
+                    break;
+            }
+
+        }
+
+        public static void runSingleItem()
+        {
+            Console.WriteLine("Command to run backward: " + LastMenuMainLvl + " " + LastMenuLvl + " " + LastMenuItm);
+            int oldMenuItm = LastMenuItm;
+            listboxFill(LastMenuMainLvl, LastMenuLvl);
+            listBx.SelectedIndex = oldMenuItm;
+        }
+
+        private static void mainlistup()
+        {
+            if (listBx.SelectedIndex > 0)
+            {
+                listBx.SelectedIndex = listBx.SelectedIndex - 1;
+                menuItm = listBx.SelectedIndex;
+            }
+        }
+
+        private static void mainlistdown()
+        {
+            if (listBx.SelectedIndex < listBx.Items.Count - 1)
+            {
+                listBx.SelectedIndex = listBx.SelectedIndex + 1;
+                menuItm = listBx.SelectedIndex;
+            }
+        }
+
+        public static void showHideOverlay()
+        {
+            if (!isHidden)
+            {
+                isHidden = true;
+                ShowWindow(formHandle, SW_HIDE);
+            }
+            else
+            {
+                isHidden = false;
+                ShowWindow(formHandle, 1);
+            }
+        }
+
+        private static IntPtr SetHook(LowLevelKeyboardProc proc)
+        {
+            using (Process curProcess = Process.GetCurrentProcess())
+            using (ProcessModule curModule = curProcess.MainModule)
+            {
+                return SetWindowsHookEx(WH_KEYBOARD_LL, proc,
+                    GetModuleHandle(curModule.ModuleName), 0);
+            }
+        }
+
+        private delegate IntPtr LowLevelKeyboardProc(
+            int nCode, IntPtr wParam, IntPtr lParam);
+
+        private static IntPtr HookCallback(
+            int nCode, IntPtr wParam, IntPtr lParam)
+        {
+            if (nCode >= 0 && wParam == (IntPtr)WM_KEYDOWN)
+            {
+                int vkCode = Marshal.ReadInt32(lParam);
+                if ((Keys)vkCode == Keys.F5)
+                {
+                    showHideOverlay();
+                }
+                else if ((Keys)vkCode == Keys.NumPad0)
+                {
+                    if (menuMainLvl <= 0)
+                    {
+                        isHidden = true;
+                        ShowWindow(formHandle, SW_HIDE);
+                    }
+                    else
+                    {
+                        runSingleItem();
+                    }
+                }
+                else if ((Keys)vkCode == Keys.NumPad5)
+                {
+                    runitem(menuMainLvl, menuLvl, listBx.SelectedIndex);
+                }
+                else if ((Keys)vkCode == Keys.Up || (Keys)vkCode == Keys.Down || (Keys)vkCode == Keys.Left || (Keys)vkCode == Keys.Right)
+                {
+                    return (IntPtr)1;
+                }
+                else if ((Keys)vkCode == Keys.NumPad2)
+                {
+                    mainlistdown();
+                }
+                else if ((Keys)vkCode == Keys.NumPad8)
+                {
+                    mainlistup();
+                }
+                else if ((Keys)vkCode == Keys.Delete)
+                {
+                    Quit();
+                }
+            }
+            return CallNextHookEx(_hookID, nCode, wParam, lParam);
+        }
+
+        public static void LoadSession(int id)
+        {
+            if (id == -1)
+            {
+                _SG_Int(1574587 + 2, -1);
+                _SG_Int(1574587, 1);
+                Thread.Sleep(200);
+                _SG_Int(1574587, 0);
+            }
+            else if (id == -2)
+            {
+                _SG_Int(1574587 + 2, 1);
+                Thread.Sleep(200);
+                _SG_Int(1574587, 0);
+            }
+            else
+            {
+                _SG_Int(1575004, id);
+                _SG_Int(1574587, 1);
+                Thread.Sleep(200);
+                _SG_Int(1574587, 0);
+            }
+        }
+
+        #region Teleport part
+
+        private static void teleportWaypoint()
+        {
+            Teleport(WaypointCoords);
+        }
+
+        private static void teleportObjective()
+        {
+            Teleport(ObjectiveCoords);
+        }
+
+        private static void getLuckyWheelPrice(int price)
+        {
+            Console.WriteLine("Get Lucky Wheel Price");
+            long p = 0;
+            long p2 = 0;
+            int i;
+
+            for (i = 1; i <= 52; i++)
+            {
+                string pPointer = "casino_lucky_wheel";
+                int pSize = pPointer.Length;
+                p = Mem.ReadPointer(settings.LocalScriptsPTR, new int[] { i * 0x08 });
+                p2 = Mem.GetPtrAddr(p + 0xD0, null);
+                string pS = Mem.ReadString(settings.LocalScriptsPTR, new int[] { i * 0x08, 0xD0 }, pSize);
+                if (pS == pPointer)
+                {
+                    //Mem.Write(settings.LocalScriptsPTR, new int[] { i * 0x08, 0xD0, 0x150 }, price);
+                    break;
+                }
+            }
+            Console.WriteLine(p2.ToString("X8"));
+        }
+
+        public static void setRPMultipler(float m)
+        {
+            /*
+             * 1 2 3 5 10 15 20 25 30 35 40 50 100
+             * Activate();
+            setRPMultipler(100.0f);
+            */
+            _SG_Float(262145 + 1, m);
+        }
+
+        public static void setREPMultipler(float m)
+        {
+            /*
+             * 1 2 3 5 10 15 20 25 30 35 40 50 100 200 300 500 1000
+            Activate();
+            setREPMultipler(15.0f);
+            */
+            _SG_Float(262145 + 31118, m); // Street Race
+            _SG_Float(262145 + 31119, m); // Pursuit Race
+            _SG_Float(262145 + 31120, m); // Scramble
+            _SG_Float(262145 + 31121, m); // Head 2 Head
+        }
+
+        private static void Teleport(Location l)
+        {
+            if (Mem.ReadInt(settings.WorldPTR, new int[] { offsets.pCPed, offsets.oInVehicle }) == 0)
+            {
+                CarX = l.x;
+                CarY = l.y;
+                CarZ = l.z;
+            }
+            else
+            {
+                PlayerX = l.x;
+                PlayerY = l.y;
+                PlayerZ = l.z;
+            }
+        }
+
+        private static Location WaypointCoords
+        {
+            get
+            {
+                for (int i = 2000; i > 1; i--)
+                {
+                    if (Mem.ReadInt(settings.BlipPTR + (i * 8), new int[] { 0x48 }) == 84 && Mem.ReadInt(settings.BlipPTR + (i * 8), new int[] { 0x40 }) == 8)
+                    {
+                        return new Location
+                        {
+                            x = Mem.ReadFloat(settings.BlipPTR + (i * 8), new int[] { 0x10 }),
+                            y = Mem.ReadFloat(settings.BlipPTR + (i * 8), new int[] { 0x14 }),
+                            z = -210F
+                        };
+                    }
+                }
+                return new Location { x = PlayerX, y = PlayerY, z = PlayerZ };
+            }
+        }
+
+        private static Location ObjectiveCoords
+        {
+            get
+            {
+                for (int i = 2000; i > 1; i--)
+                {
+                    int objDetect = Mem.ReadInt(settings.BlipPTR + (i * 8), new int[] { 0x48 });
+                    if (Mem.ReadInt(settings.BlipPTR + (i * 8), new int[] { 0x40 }) == 1 && ((objDetect == 1) || (objDetect == 66) || (objDetect == 60)))
+                    {
+                        return new Location
+                        {
+                            x = Mem.ReadFloat(settings.BlipPTR + (i * 8), new int[] { 0x10 }),
+                            y = Mem.ReadFloat(settings.BlipPTR + (i * 8), new int[] { 0x14 }),
+                            z = Mem.ReadFloat(settings.BlipPTR + (i * 8), new int[] { 0x18 }) + 10F
+                        };
+                    }
+                }
+                return new Location { x = PlayerX, y = PlayerY, z = PlayerZ };
+            }
+        }
+
+        public static float PlayerX
+        {
+            get { return Mem.ReadFloat(settings.WorldPTR, new int[] { offsets.pCPed, offsets.oRotation, offsets.oPositionX }); }
+            set
+            {
+                Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.oRotation, offsets.oPositionX }, value);
+                Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.oVisualX }, value);
+            }
+        }
+        public static float PlayerY
+        {
+            get { return Mem.ReadFloat(settings.WorldPTR, new int[] { offsets.pCPed, offsets.oRotation, offsets.oPositionX }); }
+            set
+            {
+                Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.oRotation, offsets.oPositionY }, value);
+                Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.oVisualY }, value);
+            }
+        }
+        public static float PlayerZ
+        {
+            get { return Mem.ReadFloat(settings.WorldPTR, new int[] { offsets.pCPed, offsets.oRotation, offsets.oPositionX }); }
+            set
+            {
+                Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.oRotation, offsets.oPositionZ }, value);
+                Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.oVisualZ }, value);
+            }
+        }
+
+        public static float CarX
+        {
+            get { return Mem.ReadFloat(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCVehicle, offsets.pCNavigation, offsets.oPositionX }); }
+            set
+            {
+                Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCVehicle, offsets.pCNavigation, offsets.oPositionX }, value);
+                Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCVehicle, offsets.pCNavigation, offsets.oVPositionX }, value);
+            }
+        }
+        public static float CarY
+        {
+            get { return Mem.ReadFloat(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCVehicle, offsets.pCNavigation, offsets.oPositionY }); }
+            set
+            {
+                Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCVehicle, offsets.pCNavigation, offsets.oPositionY }, value);
+                Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCVehicle, offsets.pCNavigation, offsets.oVPositionY }, value);
+            }
+        }
+        public static float CarZ
+        {
+            get { return Mem.ReadFloat(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCVehicle, offsets.pCNavigation, offsets.oPositionZ }); }
+            set
+            {
+                Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCVehicle, offsets.pCNavigation, offsets.oPositionZ }, value);
+                Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCVehicle, offsets.pCNavigation, offsets.oVPositionZ }, value);
+            }
+        }
+        #endregion
+
+        #region Global Addresses function
+        public static long GA(int Index)
+        {
+            long p = settings.GlobalPTR + (8 * (Index >> 0x12 & 0x3F));
+            long p_ga = Mem.ReadPointer(p, null);
+            long p_ga_final = p_ga + (8 * (Index & 0x3FFFF));
+            return p_ga_final;
+        }
+        public static long _GG_Int(int Index)
+        {
+            return Mem.ReadInt(GA(Index), null);
+        }
+        public static float _GG_Float(int Index)
+        {
+            return Mem.ReadFloat(GA(Index), null);
+        }
+        public static string _GG_String(int Index, int size)
+        {
+            return Mem.ReadString(GA(Index), null, size);
+        }
+        public static void _SG_Int(int Index, int value)
+        {
+            Mem.writeInt(GA(Index), null, value);
+        }
+        public static void _SG_Float(int Index, float value)
+        {
+            Mem.writeFloat(GA(Index), null, value);
+        }
+        public static void _SG_String(int Index, string value)
+        {
+            Mem.Write(GA(Index), null, value);
+        }
+
+        public static void setStat(string stat, int value)
+        {
+            long oldhash = _GG_Int(1390343 + 4);
+            long oldvalue = _GG_Int(939452 + 5526);
+            _SG_Int(1390343 + 4, (int)JOAAT.GetHashKey(stat));
+            _SG_Int(939452 + 5526, value);
+            _SG_Int(1379108 + 1139, -1);
+            Thread.Sleep(1000);
+            _SG_Int(1390343 + 4, (int)oldhash);
+            _SG_Int(939452 + 5526, (int)oldvalue);
+        }
+
+        /*
+        public static void bunkerMoney(int myMoney, int value)
+        {
+            int money_in_bunker = value;
+            int total_cargo = Mem.ReadInt(settings.GlobalPTR - 128, new int[] { 1180, 0x37D0 });
+            int money = myMoney * total_cargo / money_in_bunker;
+            Mem.Write(settings.GlobalPTR - 128, new int[] { 1180, 0x3F78 }, money);
+            int time_remaining = Mem.ReadInt(settings.GlobalPTR - 128, new int[] { 1180, 2568 });
+            int time_deliver = Mem.ReadInt(settings.GlobalPTR - 128, new int[] { 1180, 3810 });
+            int mission_time = time_deliver - (time_remaining - 1000);
+            Mem.Write(settings.GlobalPTR - 128, new int[] { 1180, 3810 }, mission_time);
+        }
+        */
+            #endregion
+
+        }
+        struct Location { public float x, y, z; }
+
+    /*
+     * Nightclub
+     * Activate();
+     * setStat("MP0_CLUB_POPULARITY", 1000);
+     * setStat("MP1_CLUB_POPULARITY", 1000);
+     */
 }
