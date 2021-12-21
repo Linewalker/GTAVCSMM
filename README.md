@@ -7,7 +7,7 @@ With code from Complexicon https://github.com/Complexicon/BunkerMoney / https://
 
 No external DLLs needed.
 
-New overlay menu. Navigate with Numpad: 8 Up, 2 Down, 5 Enter, 0 Back
+New overlay menu. Navigate with Numpad: 8 Up, 2 Down, 5 Enter, 0 Back. Show/Hide: F5, quit: Del
 
 +++ Online pre 1.58 +++
 
