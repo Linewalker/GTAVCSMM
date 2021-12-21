@@ -800,6 +800,61 @@ namespace GTAVCSMM
                             break;
                     }
                     break;
+
+                case 6:
+                    switch (menulevel)
+                    {
+                        case 0:
+                            listBx.Items.Add("RP x 1.0");
+                            listBx.Items.Add("RP x 2.0");
+                            listBx.Items.Add("RP x 3.0");
+                            listBx.Items.Add("RP x 5.0");
+                            listBx.Items.Add("RP x 10.0");
+                            listBx.Items.Add("RP x 15.0");
+                            listBx.Items.Add("RP x 20.0");
+                            listBx.Items.Add("RP x 25.0");
+                            listBx.Items.Add("RP x 30.0");
+                            listBx.Items.Add("RP x 35.0");
+                            listBx.Items.Add("RP x 40.0");
+                            listBx.Items.Add("RP x 50.0");
+                            listBx.Items.Add("RP x 100.0");
+
+                            menuMainLvl = 6;
+                            menuLvl = 0;
+
+                            LastMenuMainLvl = 1;
+                            LastMenuLvl = 6;
+                            LastMenuItm = 0;
+                            break;
+
+                        case 1:
+                            listBx.Items.Add("REP x 1.0");
+                            listBx.Items.Add("REP x 2.0");
+                            listBx.Items.Add("REP x 3.0");
+                            listBx.Items.Add("REP x 5.0");
+                            listBx.Items.Add("REP x 10.0");
+                            listBx.Items.Add("REP x 15.0");
+                            listBx.Items.Add("REP x 20.0");
+                            listBx.Items.Add("REP x 25.0");
+                            listBx.Items.Add("REP x 30.0");
+                            listBx.Items.Add("REP x 35.0");
+                            listBx.Items.Add("REP x 40.0");
+                            listBx.Items.Add("REP x 50.0");
+                            listBx.Items.Add("REP x 100.0");
+                            listBx.Items.Add("REP x 200.0");
+                            listBx.Items.Add("REP x 300.0");
+                            listBx.Items.Add("REP x 500.0");
+                            listBx.Items.Add("REP x 1000.0");
+
+                            menuMainLvl = 6;
+                            menuLvl = 1;
+
+                            LastMenuMainLvl = 1;
+                            LastMenuLvl = 6;
+                            LastMenuItm = 1;
+                            break;
+                    }
+                    break;
             }
             listBx.SelectedIndex = 0;
         }
@@ -1013,6 +1068,22 @@ namespace GTAVCSMM
                                     {
                                         bGodMode = false;
                                     }
+                                    break;
+                            }
+                            break;
+                        case 6:
+                            switch (menuItem)
+                            {
+                                case 0:
+                                    listboxFill(6, 0);
+                                    break;
+                                case 1:
+                                    listboxFill(6, 1);
+                                    break;
+                                case 2:
+                                    Activate();
+                                    setStat("MP0_CLUB_POPULARITY", 1000);
+                                    setStat("MP1_CLUB_POPULARITY", 1000);
                                     break;
                             }
                             break;
@@ -1285,6 +1356,143 @@ namespace GTAVCSMM
                             break;
                     }
                     break;
+
+                case 6:
+                    switch (menulevel)
+                    {
+                        case 0:
+                            switch (menuItem)
+                            {
+                                case 0:
+                                    Activate();
+                                    setRPMultipler(1.0f);
+                                    break;
+                                case 1:
+                                    Activate();
+                                    setRPMultipler(2.0f);
+                                    break;
+                                case 2:
+                                    Activate();
+                                    setRPMultipler(3.0f);
+                                    break;
+                                case 3:
+                                    Activate();
+                                    setRPMultipler(5.0f);
+                                    break;
+                                case 4:
+                                    Activate();
+                                    setRPMultipler(10.0f);
+                                    break;
+                                case 5:
+                                    Activate();
+                                    setRPMultipler(15.0f);
+                                    break;
+                                case 6:
+                                    Activate();
+                                    setRPMultipler(20.0f);
+                                    break;
+                                case 7:
+                                    Activate();
+                                    setRPMultipler(25.0f);
+                                    break;
+                                case 8:
+                                    Activate();
+                                    setRPMultipler(30.0f);
+                                    break;
+                                case 9:
+                                    Activate();
+                                    setRPMultipler(35.0f);
+                                    break;
+                                case 10:
+                                    Activate();
+                                    setRPMultipler(40.0f);
+                                    break;
+                                case 11:
+                                    Activate();
+                                    setRPMultipler(50.0f);
+                                    break;
+                                case 12:
+                                    Activate();
+                                    setRPMultipler(100.0f);
+                                    break;
+                            }
+                            break;
+
+                        case 1:
+                            switch (menuItem)
+                            {
+                                case 0:
+                                    Activate();
+                                    setREPMultipler(1.0f);
+                                    break;
+                                case 1:
+                                    Activate();
+                                    setREPMultipler(2.0f);
+                                    break;
+                                case 2:
+                                    Activate();
+                                    setREPMultipler(3.0f);
+                                    break;
+                                case 3:
+                                    Activate();
+                                    setREPMultipler(5.0f);
+                                    break;
+                                case 4:
+                                    Activate();
+                                    setREPMultipler(10.0f);
+                                    break;
+                                case 5:
+                                    Activate();
+                                    setREPMultipler(15.0f);
+                                    break;
+                                case 6:
+                                    Activate();
+                                    setREPMultipler(20.0f);
+                                    break;
+                                case 7:
+                                    Activate();
+                                    setREPMultipler(25.0f);
+                                    break;
+                                case 8:
+                                    Activate();
+                                    setREPMultipler(30.0f);
+                                    break;
+                                case 9:
+                                    Activate();
+                                    setREPMultipler(35.0f);
+                                    break;
+                                case 10:
+                                    Activate();
+                                    setREPMultipler(40.0f);
+                                    break;
+                                case 11:
+                                    Activate();
+                                    setREPMultipler(50.0f);
+                                    break;
+                                case 12:
+                                    Activate();
+                                    setREPMultipler(100.0f);
+                                    break;
+                                case 13:
+                                    Activate();
+                                    setREPMultipler(200.0f);
+                                    break;
+                                case 14:
+                                    Activate();
+                                    setREPMultipler(300.0f);
+                                    break;
+                                case 15:
+                                    Activate();
+                                    setREPMultipler(500.0f);
+                                    break;
+                                case 16:
+                                    Activate();
+                                    setREPMultipler(1000.0f);
+                                    break;
+                            }
+                            break;
+                    }
+                    break;
             }
 
         }
@@ -1441,7 +1649,8 @@ namespace GTAVCSMM
 
         private static void getLuckyWheelPrice(int price)
         {
-            Console.WriteLine("Get Lucky Wheel Price");
+            /*
+             * Console.WriteLine("Get Lucky Wheel Price");
             long p = 0;
             long p2 = 0;
             int i;
@@ -1460,25 +1669,16 @@ namespace GTAVCSMM
                 }
             }
             Console.WriteLine(p2.ToString("X8"));
+            */
         }
 
         public static void setRPMultipler(float m)
         {
-            /*
-             * 1 2 3 5 10 15 20 25 30 35 40 50 100
-             * Activate();
-            setRPMultipler(100.0f);
-            */
             _SG_Float(262145 + 1, m);
         }
 
         public static void setREPMultipler(float m)
         {
-            /*
-             * 1 2 3 5 10 15 20 25 30 35 40 50 100 200 300 500 1000
-            Activate();
-            setREPMultipler(15.0f);
-            */
             _SG_Float(262145 + 31118, m); // Street Race
             _SG_Float(262145 + 31119, m); // Pursuit Race
             _SG_Float(262145 + 31120, m); // Scramble
@@ -1661,11 +1861,4 @@ namespace GTAVCSMM
 
         }
         struct Location { public float x, y, z; }
-
-    /*
-     * Nightclub
-     * Activate();
-     * setStat("MP0_CLUB_POPULARITY", 1000);
-     * setStat("MP1_CLUB_POPULARITY", 1000);
-     */
 }
