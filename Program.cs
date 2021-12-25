@@ -101,6 +101,8 @@ namespace GTAVCSMM
         private static bool bDisableCollision = false;
         private static bool bVehicleGodMode = false;
         private static int frameFlagCount = 0;
+        private static bool bGetCasinoPrice = false;
+        private static int casinoPrice = 0;
 
         [DllImport("user32.dll")]
         static extern short GetAsyncKeyState(System.Windows.Forms.Keys vKey);
@@ -316,6 +318,13 @@ namespace GTAVCSMM
                 }
             }
         }
+        public static void cPRICE()
+        {
+            if (bGetCasinoPrice)
+            {
+                getLuckyWheelPrice(casinoPrice);
+            }
+        }
 
         public static void getPointer()
         {
@@ -424,6 +433,7 @@ namespace GTAVCSMM
         {
             pSUPERJUMP();
             pEXPLOSIVEAMMO();
+            cPRICE();
         }
 
         #endregion
@@ -2175,75 +2185,93 @@ namespace GTAVCSMM
                             {
                                 case 0:
                                     Activate();
-                                    getLuckyWheelPrice(1);
+                                    casinoPrice = 1;
+                                    bGetCasinoPrice = !bGetCasinoPrice;
                                     break;
                                 case 1:
                                     Activate();
-                                    getLuckyWheelPrice(2);
+                                    casinoPrice = 2;
+                                    bGetCasinoPrice = !bGetCasinoPrice;
                                     break;
                                 case 2:
                                     Activate();
-                                    getLuckyWheelPrice(3);
+                                    casinoPrice = 3;
+                                    bGetCasinoPrice = !bGetCasinoPrice;
                                     break;
                                 case 3:
                                     Activate();
-                                    getLuckyWheelPrice(4);
+                                    casinoPrice = 4;
+                                    bGetCasinoPrice = !bGetCasinoPrice;
                                     break;
                                 case 4:
                                     Activate();
-                                    getLuckyWheelPrice(5);
+                                    casinoPrice = 5;
+                                    bGetCasinoPrice = !bGetCasinoPrice;
                                     break;
                                 case 5:
                                     Activate();
-                                    getLuckyWheelPrice(6);
+                                    casinoPrice = 6;
+                                    bGetCasinoPrice = !bGetCasinoPrice;
                                     break;
                                 case 6:
                                     Activate();
-                                    getLuckyWheelPrice(7);
+                                    casinoPrice = 7;
+                                    bGetCasinoPrice = !bGetCasinoPrice;
                                     break;
                                 case 7:
                                     Activate();
-                                    getLuckyWheelPrice(8);
+                                    casinoPrice = 8;
+                                    bGetCasinoPrice = !bGetCasinoPrice;
                                     break;
                                 case 8:
                                     Activate();
-                                    getLuckyWheelPrice(9);
+                                    casinoPrice = 9;
+                                    bGetCasinoPrice = !bGetCasinoPrice;
                                     break;
                                 case 9:
                                     Activate();
-                                    getLuckyWheelPrice(10);
+                                    casinoPrice = 10;
+                                    bGetCasinoPrice = !bGetCasinoPrice;
                                     break;
                                 case 10:
                                     Activate();
-                                    getLuckyWheelPrice(11);
+                                    casinoPrice = 11;
+                                    bGetCasinoPrice = !bGetCasinoPrice;
                                     break;
                                 case 11:
                                     Activate();
-                                    getLuckyWheelPrice(12);
+                                    casinoPrice = 12;
+                                    bGetCasinoPrice = !bGetCasinoPrice;
                                     break;
                                 case 12:
                                     Activate();
-                                    getLuckyWheelPrice(13);
+                                    casinoPrice = 13;
+                                    bGetCasinoPrice = !bGetCasinoPrice;
                                     break;
                                 case 13:
                                     Activate();
-                                    getLuckyWheelPrice(14);
+                                    casinoPrice = 14;
+                                    bGetCasinoPrice = !bGetCasinoPrice;
                                     break;
                                 case 14:
                                     Activate();
-                                    getLuckyWheelPrice(15);
+                                    casinoPrice = 15;
+                                    bGetCasinoPrice = !bGetCasinoPrice;
                                     break;
                                 case 15:
                                     Activate();
-                                    getLuckyWheelPrice(16);
+                                    casinoPrice = 16;
+                                    bGetCasinoPrice = !bGetCasinoPrice;
                                     break;
                                 case 16:
                                     Activate();
-                                    getLuckyWheelPrice(17);
+                                    casinoPrice = 17;
+                                    bGetCasinoPrice = !bGetCasinoPrice;
                                     break;
                                 case 17:
                                     Activate();
-                                    getLuckyWheelPrice(18);
+                                    casinoPrice = 18;
+                                    bGetCasinoPrice = !bGetCasinoPrice;
                                     break;
                             }
                             break;
