@@ -1,0 +1,30 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GTAVCSMM", "GTAVCSMM.csproj", "{B727A908-C9EA-4CFA-8C2F-B209847607A4}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|x64 = Debug|x64
+		Release|Any CPU = Release|Any CPU
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B727A908-C9EA-4CFA-8C2F-B209847607A4}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{B727A908-C9EA-4CFA-8C2F-B209847607A4}.Debug|Any CPU.Build.0 = Debug|x64
+		{B727A908-C9EA-4CFA-8C2F-B209847607A4}.Debug|x64.ActiveCfg = Debug|x64
+		{B727A908-C9EA-4CFA-8C2F-B209847607A4}.Debug|x64.Build.0 = Debug|x64
+		{B727A908-C9EA-4CFA-8C2F-B209847607A4}.Release|Any CPU.ActiveCfg = Release|x64
+		{B727A908-C9EA-4CFA-8C2F-B209847607A4}.Release|x64.ActiveCfg = Release|x64
+		{B727A908-C9EA-4CFA-8C2F-B209847607A4}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {1A9868FA-81ED-4632-83D7-1937FB01B5BC}
+	EndGlobalSection
+EndGlobal
