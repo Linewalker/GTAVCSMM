@@ -81,7 +81,6 @@ namespace GTAVCSMM
         public static Patterns pattern = new Patterns();
         public static TSettings settings = new TSettings();
         public static Mem Mem;
-        public static Thread _getPointer;
         public static Thread _freezeGame;
 
         public static System.Windows.Forms.Timer ProcessTimer = new System.Windows.Forms.Timer();
@@ -333,56 +332,63 @@ namespace GTAVCSMM
                     }
                 }
 
-                // GlobalPTR
-                long addr = Mem.FindPattern(pattern.GlobalPTR, pattern.GlobalPTR_Mask);
-                settings.GlobalPTR = addr + Mem.ReadInt(addr + 3, null) + 7;
+                if (settings.gameProcess > 0)
+                {
+                    // GlobalPTR
+                    long addr = Mem.FindPattern(pattern.GlobalPTR, pattern.GlobalPTR_Mask);
+                    settings.GlobalPTR = addr + Mem.ReadInt(addr + 3, null) + 7;
 
-                // WorldPTR
-                long addr2 = Mem.FindPattern(pattern.WorldPTR, pattern.WorldPTR_Mask);
-                settings.WorldPTR = addr2 + Mem.ReadInt(addr2 + 3, null) + 7;
+                    // WorldPTR
+                    long addr2 = Mem.FindPattern(pattern.WorldPTR, pattern.WorldPTR_Mask);
+                    settings.WorldPTR = addr2 + Mem.ReadInt(addr2 + 3, null) + 7;
 
-                // BlipPTR
-                long addr3 = Mem.FindPattern(pattern.BlipPTR, pattern.BlipPTR_Mask);
-                settings.BlipPTR = addr3 + Mem.ReadInt(addr3 + 3, null) + 7;
+                    // BlipPTR
+                    long addr3 = Mem.FindPattern(pattern.BlipPTR, pattern.BlipPTR_Mask);
+                    settings.BlipPTR = addr3 + Mem.ReadInt(addr3 + 3, null) + 7;
 
-                // ReplayInterfacePTR
-                long addr4 = Mem.FindPattern(pattern.ReplayInterfacePTR, pattern.ReplayInterfacePTR_Mask);
-                settings.ReplayInterfacePTR = addr4 + Mem.ReadInt(addr4 + 3, null) + 7;
+                    // ReplayInterfacePTR
+                    long addr4 = Mem.FindPattern(pattern.ReplayInterfacePTR, pattern.ReplayInterfacePTR_Mask);
+                    settings.ReplayInterfacePTR = addr4 + Mem.ReadInt(addr4 + 3, null) + 7;
 
-                // LocalScriptsPTR
-                long addr5 = Mem.FindPattern(pattern.LocalScriptsPTR, pattern.LocalScriptsPTR_Mask);
-                settings.LocalScriptsPTR = addr5 + Mem.ReadInt(addr5 + 3, null) + 7;
+                    // LocalScriptsPTR
+                    long addr5 = Mem.FindPattern(pattern.LocalScriptsPTR, pattern.LocalScriptsPTR_Mask);
+                    settings.LocalScriptsPTR = addr5 + Mem.ReadInt(addr5 + 3, null) + 7;
 
-                // PlayerCountPTR
-                long addr6 = Mem.FindPattern(pattern.PlayerCountPTR, pattern.PlayerCountPTR_Mask);
-                settings.PlayerCountPTR = addr6 + Mem.ReadInt(addr6 + 3, null) + 7;
+                    // PlayerCountPTR
+                    long addr6 = Mem.FindPattern(pattern.PlayerCountPTR, pattern.PlayerCountPTR_Mask);
+                    settings.PlayerCountPTR = addr6 + Mem.ReadInt(addr6 + 3, null) + 7;
 
-                // PickupDataPTR
-                long addr7 = Mem.FindPattern(pattern.PickupDataPTR, pattern.PickupDataPTR_Mask);
-                settings.PickupDataPTR = addr7 + Mem.ReadInt(addr7 + 3, null) + 7;
+                    // PickupDataPTR
+                    long addr7 = Mem.FindPattern(pattern.PickupDataPTR, pattern.PickupDataPTR_Mask);
+                    settings.PickupDataPTR = addr7 + Mem.ReadInt(addr7 + 3, null) + 7;
 
-                // WeatherADDR
-                long addr8 = Mem.FindPattern(pattern.WeatherADDR, pattern.WeatherADDR_Mask);
-                settings.WeatherADDR = addr8 + Mem.ReadInt(addr8 + 6, null) + 10;
+                    // WeatherADDR
+                    long addr8 = Mem.FindPattern(pattern.WeatherADDR, pattern.WeatherADDR_Mask);
+                    settings.WeatherADDR = addr8 + Mem.ReadInt(addr8 + 6, null) + 10;
 
-                // SettingsPTR
-                long addr9 = Mem.FindPattern(pattern.SettingsPTR, pattern.SettingsPTR_Mask);
-                settings.SettingsPTR = addr9 + Mem.ReadInt(addr9 + 3, null) - Convert.ToInt64("0x89", 16);
+                    // SettingsPTR
+                    long addr9 = Mem.FindPattern(pattern.SettingsPTR, pattern.SettingsPTR_Mask);
+                    settings.SettingsPTR = addr9 + Mem.ReadInt(addr9 + 3, null) - Convert.ToInt64("0x89", 16);
 
-                // AimCPedPTR
-                long addr10 = Mem.FindPattern(pattern.AimCPedPTR, pattern.AimCPedPTR_Mask);
-                settings.AimCPedPTR = addr10 + Mem.ReadInt(addr10 + 3, null) + 7;
+                    // AimCPedPTR
+                    long addr10 = Mem.FindPattern(pattern.AimCPedPTR, pattern.AimCPedPTR_Mask);
+                    settings.AimCPedPTR = addr10 + Mem.ReadInt(addr10 + 3, null) + 7;
 
-                // FriendlistPTR
-                long addr11 = Mem.FindPattern(pattern.FriendlistPTR, pattern.FriendlistPTR_Mask);
-                settings.FriendlistPTR = addr11 + Mem.ReadInt(addr11 + 3, null) + 7;
+                    // FriendlistPTR
+                    long addr11 = Mem.FindPattern(pattern.FriendlistPTR, pattern.FriendlistPTR_Mask);
+                    settings.FriendlistPTR = addr11 + Mem.ReadInt(addr11 + 3, null) + 7;
+                }
+                else
+                {
+                    MessageBox.Show("GTA is not Running!", "Serious Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    Quit();
+                }
             }
             catch
             {
                 MessageBox.Show("GTA is not Running!", "Serious Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 Quit();
             }
-            _getPointer.Abort();
         }
 
         public static void freezeGame()
@@ -458,104 +464,111 @@ namespace GTAVCSMM
             bool createdNew = true;
             using (Mutex mutex = new Mutex(true, "GTA5TrainerCS", out createdNew))
 
-            if (createdNew)
-            {
-                    _getPointer = new Thread(getPointer) { IsBackground = true };
-                    _getPointer.Start();
+                if (createdNew)
+                {
+                    createMainForm();
+                    listBx.Items.Add("Getting game pointers.");
+                    listBx.Enabled = false;
 
-                    // 
-                    // listBx
-                    // 
-                    listBx.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(128)))));
-                    listBx.BorderStyle = System.Windows.Forms.BorderStyle.None;
-                    listBx.Font = new System.Drawing.Font("Arial", 13.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-                    listBx.FormattingEnabled = true;
-                    listBx.ItemHeight = 24;
-                    listBx.Location = new System.Drawing.Point(6, 50);
-                    listBx.Margin = new System.Windows.Forms.Padding(10);
-                    listBx.MaximumSize = new System.Drawing.Size(290, 500);
-                    listBx.Name = "listBox1";
-                    listBx.Size = new System.Drawing.Size(290, 480);
-                    listBx.TabIndex = 0;
+                    getPointer();
 
-                    // 
-                    // label1
-                    // 
-                    label1.AutoSize = true;
-                    label1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(128)))));
-                    label1.Font = new System.Drawing.Font("Arial Black", 18F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-                    label1.Location = new System.Drawing.Point(1, 9);
-                    label1.Name = "label1";
-                    label1.Size = new System.Drawing.Size(168, 33);
-                    label1.TabIndex = 1;
-                    label1.Text = "GTAVCSMM";
-                    // 
-                    // label2
-                    // 
-                    label2.AutoSize = true;
-                    label2.Font = new System.Drawing.Font("Arial", 15.75F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Italic))), System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-                    label2.Location = new System.Drawing.Point(162, 16);
-                    label2.Name = "label2";
-                    label2.Size = new System.Drawing.Size(65, 24);
-                    label2.TabIndex = 2;
-                    label2.Text = "o1.58";
-                    // 
-                    // fastTimer
-                    // 
-                    fastTimer.Enabled = true;
-                    fastTimer.Interval = 1;
-                    fastTimer.Tick += new System.EventHandler(fastTimer_Tick);
-                    // 
-                    // ProcessTimer
-                    // 
-                    ProcessTimer.Enabled = true;
-                    ProcessTimer.Interval = 100;
-                    ProcessTimer.Tick += new System.EventHandler(ProcessTimer_Tick);
-                    // 
-                    // MemoryTimer
-                    // 
-                    MemoryTimer.Enabled = true;
-                    MemoryTimer.Interval = 100;
-                    MemoryTimer.Tick += new System.EventHandler(MemoryTimer_Tick);
-                    // 
-                    // Form1
-                    // 
-                    mainForm.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-                    mainForm.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-                    mainForm.AutoSize = true;
-                    mainForm.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-                    mainForm.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(128)))));
-                    mainForm.ClientSize = new System.Drawing.Size(207, 116);
-                    mainForm.Controls.Add(label2);
-                    mainForm.Controls.Add(label1);
-                    mainForm.Controls.Add(listBx);
-                    mainForm.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
-                    mainForm.KeyPreview = true;
-                    mainForm.Name = "Form1";
-                    mainForm.Opacity = 0.8D;
-                    mainForm.ShowIcon = false;
-                    mainForm.ShowInTaskbar = false;
-                    mainForm.Text = "GTAVCSMM";
-                    mainForm.TopMost = true;
-
-                    formHandle = mainForm.Handle;
                     listboxStyle();
                     listboxFill(0, 0);
-                    _hookID = SetHook(_proc);
+                    fastTimer.Enabled = true;
+                    ProcessTimer.Enabled = true;
+                    MemoryTimer.Enabled = true;
+                    listBx.Enabled = true;
 
-                    mainForm.FormBorderStyle = FormBorderStyle.None;
-                    int InitialStyle = GetWindowLong(mainForm.Handle, -10);
-                    SetWindowLong(mainForm.Handle, -10, InitialStyle | 0x800000 | 0x20);
-                    GetWindowRect(handle, out rect);
-                    mainForm.Top = rect.top - 20;
-                    mainForm.Left = rect.left + 30;
-
-                    mainForm.Show();
-
-                    Application.EnableVisualStyles();
                     Application.Run();
 
                 }
+        }
+
+        public static void createMainForm()
+        {
+            // 
+            // listBx
+            // 
+            listBx.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(128)))));
+            listBx.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            listBx.Font = new System.Drawing.Font("Arial", 13.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            listBx.FormattingEnabled = true;
+            listBx.ItemHeight = 24;
+            listBx.Location = new System.Drawing.Point(6, 50);
+            listBx.Margin = new System.Windows.Forms.Padding(10);
+            listBx.MaximumSize = new System.Drawing.Size(290, 500);
+            listBx.Name = "listBox1";
+            listBx.Size = new System.Drawing.Size(290, 480);
+            listBx.TabIndex = 0;
+
+            // 
+            // label1
+            // 
+            label1.AutoSize = true;
+            label1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(128)))));
+            label1.Font = new System.Drawing.Font("Arial Black", 18F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            label1.Location = new System.Drawing.Point(1, 9);
+            label1.Name = "label1";
+            label1.Size = new System.Drawing.Size(168, 33);
+            label1.TabIndex = 1;
+            label1.Text = "GTAVCSMM";
+            // 
+            // label2
+            // 
+            label2.AutoSize = true;
+            label2.Font = new System.Drawing.Font("Arial", 15.75F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Italic))), System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            label2.Location = new System.Drawing.Point(162, 16);
+            label2.Name = "label2";
+            label2.Size = new System.Drawing.Size(65, 24);
+            label2.TabIndex = 2;
+            label2.Text = "o1.58";
+            // 
+            // fastTimer
+            // 
+            fastTimer.Interval = 1;
+            fastTimer.Tick += new System.EventHandler(fastTimer_Tick);
+            // 
+            // ProcessTimer
+            // 
+            ProcessTimer.Interval = 100;
+            ProcessTimer.Tick += new System.EventHandler(ProcessTimer_Tick);
+            // 
+            // MemoryTimer
+            // 
+            MemoryTimer.Interval = 100;
+            MemoryTimer.Tick += new System.EventHandler(MemoryTimer_Tick);
+            // 
+            // Form1
+            // 
+            mainForm.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            mainForm.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            mainForm.AutoSize = true;
+            mainForm.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            mainForm.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(128)))));
+            mainForm.ClientSize = new System.Drawing.Size(207, 116);
+            mainForm.Controls.Add(label2);
+            mainForm.Controls.Add(label1);
+            mainForm.Controls.Add(listBx);
+            mainForm.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
+            mainForm.KeyPreview = true;
+            mainForm.Name = "Form1";
+            mainForm.Opacity = 0.8D;
+            mainForm.ShowIcon = false;
+            mainForm.ShowInTaskbar = false;
+            mainForm.Text = "GTAVCSMM";
+            mainForm.TopMost = true;
+
+            formHandle = mainForm.Handle;
+            _hookID = SetHook(_proc);
+
+            mainForm.FormBorderStyle = FormBorderStyle.None;
+            int InitialStyle = GetWindowLong(mainForm.Handle, -10);
+            SetWindowLong(mainForm.Handle, -10, InitialStyle | 0x800000 | 0x20);
+            GetWindowRect(handle, out rect);
+            mainForm.Top = rect.top - 20;
+            mainForm.Left = rect.left + 30;
+
+            mainForm.Show();
         }
 
         public static void listboxStyle()
@@ -700,6 +713,7 @@ namespace GTAVCSMM
 
                         case 7:
                             listBx.Items.Add("Get Lucky Wheel Price \t ►");
+                            listBx.Items.Add("Trigger Nightclub Production \t ►");
 
                             menuMainLvl = 1;
                             menuLvl = 7;
@@ -928,6 +942,23 @@ namespace GTAVCSMM
                             LastMenuMainLvl = 1;
                             LastMenuLvl = 7;
                             LastMenuItm = 0;
+                            break;
+
+                        case 1:
+                            listBx.Items.Add("South American Imports");
+                            listBx.Items.Add("Pharmaceutical Research");
+                            listBx.Items.Add("Organic Produce");
+                            listBx.Items.Add("Printing and Copying");
+                            listBx.Items.Add("Cash Creation");
+                            listBx.Items.Add("Sporting Goods");
+                            listBx.Items.Add("Cargo and Shipments");
+
+                            menuMainLvl = 7;
+                            menuLvl = 1;
+
+                            LastMenuMainLvl = 1;
+                            LastMenuLvl = 7;
+                            LastMenuItm = 1;
                             break;
                     }
                     break;
@@ -1175,6 +1206,9 @@ namespace GTAVCSMM
                             {
                                 case 0:
                                     listboxFill(7, 0);
+                                    break;
+                                case 1:
+                                    listboxFill(7, 1);
                                     break;
                             }
                             break;
@@ -2019,6 +2053,39 @@ namespace GTAVCSMM
                                     break;
                             }
                             break;
+                        case 1:
+                            switch (menuItem)
+                            {
+                                case 0:
+                                    Activate();
+                                    _SG_Int(262145 + 24135, 1); // South American Imports (14400000)
+                                    break;
+                                case 1:
+                                    Activate();
+                                    _SG_Int(262145 + 24136, 1); // Pharmaceutical Research (7200000)
+                                    break;
+                                case 2:
+                                    Activate();
+                                    _SG_Int(262145 + 24137, 1); // Organic Produce (2400000)
+                                    break;
+                                case 3:
+                                    Activate();
+                                    _SG_Int(262145 + 24138, 1); // Printing and Copying (1800000)
+                                    break;
+                                case 4:
+                                    Activate();
+                                    _SG_Int(262145 + 24139, 1); // Cash Creation (3600000)
+                                    break;
+                                case 5:
+                                    Activate();
+                                    _SG_Int(262145 + 24134, 1); // Sporting Goods (4800000)
+                                    break;
+                                case 6:
+                                    Activate();
+                                    _SG_Int(262145 + 24140, 1); // Cargo and Shipments (8400000)
+                                    break;
+                            }
+                            break;
                     }
                     break;
             }
@@ -2269,14 +2336,14 @@ namespace GTAVCSMM
                         z = Mem.ReadFloat(blip, new int[] { 0x18 })
                     };
 
-                    if(color.Contains(blipColor))
+                    if (color.Contains(blipColor))
                     {
-                            tempLocation = new Location
-                            {
-                                x = Mem.ReadFloat(blip, new int[] { 0x10 }),
-                                y = Mem.ReadFloat(blip, new int[] { 0x14 }),
-                                z = Mem.ReadFloat(blip, new int[] { 0x18 })
-                            };
+                        tempLocation = new Location
+                        {
+                            x = Mem.ReadFloat(blip, new int[] { 0x10 }),
+                            y = Mem.ReadFloat(blip, new int[] { 0x14 }),
+                            z = Mem.ReadFloat(blip, new int[] { 0x18 })
+                        };
                     }
                 }
             }
@@ -2403,5 +2470,5 @@ namespace GTAVCSMM
         #endregion
 
     }
-        struct Location { public float x, y, z; }
+    struct Location { public float x, y, z; }
 }
