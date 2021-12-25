@@ -830,23 +830,32 @@ namespace GTAVCSMM
                     switch (menulevel)
                     {
                         case 2:
-                            listBx.Items.Add("Nightclub");
-                            listBx.Items.Add("Arcade");
-                            listBx.Items.Add("Office");
-                            listBx.Items.Add("Bunker");
-                            listBx.Items.Add("Facility");
-                            listBx.Items.Add("Hangar");
-                            listBx.Items.Add("Yacht");
-                            listBx.Items.Add("Kosatka");
-                            listBx.Items.Add("Sell Vehicles & Cargo");
-                            listBx.Items.Add("MC Clubhouse");
-                            listBx.Items.Add("Meth Lab");
-                            listBx.Items.Add("Cocaine Lockup");
-                            listBx.Items.Add("Weed Farm");
-                            listBx.Items.Add("Counterfeit Cash");
-                            listBx.Items.Add("Document Forgery");
-                            listBx.Items.Add("Casino");
-                            listBx.Items.Add("LS Car Meet");
+                            listBx.Items.Add("Nightclub");              // 0
+                            listBx.Items.Add("Arcade");                 // 1
+                            listBx.Items.Add("Office");                 // 2
+                            listBx.Items.Add("Bunker");                 // 3
+                            listBx.Items.Add("Facility");               // 4
+                            listBx.Items.Add("Hangar");                 // 5
+                            listBx.Items.Add("Yacht");                  // 6
+                            listBx.Items.Add("Kosatka");                // 4
+                            listBx.Items.Add("Sell Vehicles & Cargo");  // 8
+                            listBx.Items.Add("Goods Warehouse");        // 9
+                            listBx.Items.Add("Auto Warehouse");         // 10
+                            listBx.Items.Add("MC Clubhouse");           // 11
+                            listBx.Items.Add("Meth Lab");               // 12
+                            listBx.Items.Add("Cocaine Lockup");         // 13
+                            listBx.Items.Add("Weed Farm");              // 14
+                            listBx.Items.Add("Counterfeit Cash");       // 15
+                            listBx.Items.Add("Document Forgery");       // 16
+                            listBx.Items.Add("Casino");                 // 17
+                            listBx.Items.Add("LS Car Meet");            // 18
+                            listBx.Items.Add("Auto Shop Property");     // 19
+                            listBx.Items.Add("Agency (F. Clinton)");    // 20
+                            listBx.Items.Add("Music Locker");           // 21
+                            listBx.Items.Add("Arena Workshop");         // 22
+                            listBx.Items.Add("Cayo Perico");            // 23
+                            listBx.Items.Add("Flight School");          // 24
+                            listBx.Items.Add("Masks (Vespucci Beach)"); // 25
 
                             menuMainLvl = 5;
                             menuLvl = 1;
@@ -1663,11 +1672,6 @@ namespace GTAVCSMM
                                     tpIdArray = new int[] { 64, 427, 478, 423, 501, 556 };
                                     tpColArray = new int[] { 2, 3 };
                                     teleportBlip(tpIdArray, tpColArray, 2);
-
-                                    /*
-                                    Location loc = new Location { x = 721.968f, y = -821.941f, z = 25.153f };
-                                    Teleport(loc);
-                                    */
                                     if (!bgodState)
                                     {
                                         bGodMode = false;
@@ -1685,7 +1689,7 @@ namespace GTAVCSMM
                                         bGodMode = true;
                                         bgodState = false;
                                     }
-                                    tpIdArray = new int[] { 492 };
+                                    tpIdArray = new int[] { 473 };
                                     tpColArray = new int[] { };
                                     teleportBlip(tpIdArray, tpColArray);
                                     if (!bgodState)
@@ -1705,7 +1709,7 @@ namespace GTAVCSMM
                                         bGodMode = true;
                                         bgodState = false;
                                     }
-                                    tpIdArray = new int[] { 499 };
+                                    tpIdArray = new int[] { 524 };
                                     tpColArray = new int[] { };
                                     teleportBlip(tpIdArray, tpColArray);
                                     if (!bgodState)
@@ -1725,7 +1729,7 @@ namespace GTAVCSMM
                                         bGodMode = true;
                                         bgodState = false;
                                     }
-                                    tpIdArray = new int[] { 497 };
+                                    tpIdArray = new int[] { 492 };
                                     tpColArray = new int[] { };
                                     teleportBlip(tpIdArray, tpColArray);
                                     if (!bgodState)
@@ -1745,7 +1749,7 @@ namespace GTAVCSMM
                                         bGodMode = true;
                                         bgodState = false;
                                     }
-                                    tpIdArray = new int[] { 496 };
+                                    tpIdArray = new int[] { 499 };
                                     tpColArray = new int[] { };
                                     teleportBlip(tpIdArray, tpColArray);
                                     if (!bgodState)
@@ -1765,7 +1769,7 @@ namespace GTAVCSMM
                                         bGodMode = true;
                                         bgodState = false;
                                     }
-                                    tpIdArray = new int[] { 500 };
+                                    tpIdArray = new int[] { 497 };
                                     tpColArray = new int[] { };
                                     teleportBlip(tpIdArray, tpColArray);
                                     if (!bgodState)
@@ -1785,7 +1789,7 @@ namespace GTAVCSMM
                                         bGodMode = true;
                                         bgodState = false;
                                     }
-                                    tpIdArray = new int[] { 498 };
+                                    tpIdArray = new int[] { 496 };
                                     tpColArray = new int[] { };
                                     teleportBlip(tpIdArray, tpColArray);
                                     if (!bgodState)
@@ -1805,8 +1809,9 @@ namespace GTAVCSMM
                                         bGodMode = true;
                                         bgodState = false;
                                     }
-                                    Location loc = new Location { x = 918.2499f, y = 50.25024f, z = 80.89696f };
-                                    Teleport(loc);
+                                    tpIdArray = new int[] { 500 };
+                                    tpColArray = new int[] { };
+                                    teleportBlip(tpIdArray, tpColArray);
                                     if (!bgodState)
                                     {
                                         bGodMode = false;
@@ -1824,8 +1829,197 @@ namespace GTAVCSMM
                                         bGodMode = true;
                                         bgodState = false;
                                     }
-                                    loc = new Location { x = 777f, y = -1876f, z = 29.29654f };
-                                    Teleport(loc);
+                                    tpIdArray = new int[] { 498 };
+                                    tpColArray = new int[] { };
+                                    teleportBlip(tpIdArray, tpColArray);
+                                    if (!bgodState)
+                                    {
+                                        bGodMode = false;
+                                    }
+                                    break;
+                                case 17:
+                                    Activate();
+
+                                    if (bGodMode)
+                                    {
+                                        bgodState = true;
+                                    }
+                                    else
+                                    {
+                                        bGodMode = true;
+                                        bgodState = false;
+                                    }
+                                    /*
+                                        Location loc = new Location { x = 918.2499f, y = 50.25024f, z = 80.89696f };
+                                        Teleport(loc);
+                                    */
+                                    tpIdArray = new int[] { 679 };
+                                    tpColArray = new int[] { };
+                                    teleportBlip(tpIdArray, tpColArray);
+                                    if (!bgodState)
+                                    {
+                                        bGodMode = false;
+                                    }
+                                    break;
+                                case 18:
+                                    Activate();
+
+                                    if (bGodMode)
+                                    {
+                                        bgodState = true;
+                                    }
+                                    else
+                                    {
+                                        bGodMode = true;
+                                        bgodState = false;
+                                    }
+                                    /*
+                                        loc = new Location { x = 777f, y = -1876f, z = 29.29654f };
+                                        Teleport(loc);
+                                    */
+                                    tpIdArray = new int[] { 777 };
+                                    tpColArray = new int[] { };
+                                    teleportBlip(tpIdArray, tpColArray);
+                                    if (!bgodState)
+                                    {
+                                        bGodMode = false;
+                                    }
+                                    break;
+                                case 19:
+                                    Activate();
+
+                                    if (bGodMode)
+                                    {
+                                        bgodState = true;
+                                    }
+                                    else
+                                    {
+                                        bGodMode = true;
+                                        bgodState = false;
+                                    }
+                                    tpIdArray = new int[] { 779 };
+                                    tpColArray = new int[] { };
+                                    teleportBlip(tpIdArray, tpColArray);
+                                    if (!bgodState)
+                                    {
+                                        bGodMode = false;
+                                    }
+                                    break;
+                                case 20:
+                                    Activate();
+
+                                    if (bGodMode)
+                                    {
+                                        bgodState = true;
+                                    }
+                                    else
+                                    {
+                                        bGodMode = true;
+                                        bgodState = false;
+                                    }
+                                    tpIdArray = new int[] { 826 };
+                                    tpColArray = new int[] { };
+                                    teleportBlip(tpIdArray, tpColArray);
+                                    if (!bgodState)
+                                    {
+                                        bGodMode = false;
+                                    }
+                                    break;
+                                case 21:
+                                    Activate();
+
+                                    if (bGodMode)
+                                    {
+                                        bgodState = true;
+                                    }
+                                    else
+                                    {
+                                        bGodMode = true;
+                                        bgodState = false;
+                                    }
+                                    tpIdArray = new int[] { 136 };
+                                    tpColArray = new int[] { };
+                                    teleportBlip(tpIdArray, tpColArray);
+                                    if (!bgodState)
+                                    {
+                                        bGodMode = false;
+                                    }
+                                    break;
+                                case 22:
+                                    Activate();
+
+                                    if (bGodMode)
+                                    {
+                                        bgodState = true;
+                                    }
+                                    else
+                                    {
+                                        bGodMode = true;
+                                        bgodState = false;
+                                    }
+                                    tpIdArray = new int[] { 643 };
+                                    tpColArray = new int[] { };
+                                    teleportBlip(tpIdArray, tpColArray);
+                                    if (!bgodState)
+                                    {
+                                        bGodMode = false;
+                                    }
+                                    break;
+                                case 23:
+                                    Activate();
+
+                                    if (bGodMode)
+                                    {
+                                        bgodState = true;
+                                    }
+                                    else
+                                    {
+                                        bGodMode = true;
+                                        bgodState = false;
+                                    }
+                                    tpIdArray = new int[] { 766 };
+                                    tpColArray = new int[] { };
+                                    teleportBlip(tpIdArray, tpColArray);
+                                    if (!bgodState)
+                                    {
+                                        bGodMode = false;
+                                    }
+                                    break;
+                                case 24:
+                                    Activate();
+
+                                    if (bGodMode)
+                                    {
+                                        bgodState = true;
+                                    }
+                                    else
+                                    {
+                                        bGodMode = true;
+                                        bgodState = false;
+                                    }
+                                    tpIdArray = new int[] { 90 };
+                                    tpColArray = new int[] { };
+                                    teleportBlip(tpIdArray, tpColArray);
+                                    if (!bgodState)
+                                    {
+                                        bGodMode = false;
+                                    }
+                                    break;
+                                case 25:
+                                    Activate();
+
+                                    if (bGodMode)
+                                    {
+                                        bgodState = true;
+                                    }
+                                    else
+                                    {
+                                        bGodMode = true;
+                                        bgodState = false;
+                                    }
+                                    tpIdArray = new int[] { 362 };
+                                    tpColArray = new int[] { };
+                                    teleportBlip(tpIdArray, tpColArray);
                                     if (!bgodState)
                                     {
                                         bGodMode = false;
@@ -2292,7 +2486,14 @@ namespace GTAVCSMM
                 z = tmpLoc.z + height + 3
             };
             Console.WriteLine("New location: " + returnLoc.x + ", " + returnLoc.y + ", " + returnLoc.z);
-            Teleport(tmpLoc);
+            if (returnLoc.x != 0 && returnLoc.y != 0)
+            {
+                Teleport(tmpLoc);
+            }
+            else
+            {
+                Console.WriteLine("No TP, wrong coords (x, y).");
+            }
         }
 
         private static Location WaypointCoords
@@ -2327,7 +2528,7 @@ namespace GTAVCSMM
                 long blip = settings.BlipPTR + (i * 8);
                 int blipId = Mem.ReadInt(blip, new int[] { 0x40 });
                 int blipColor = Mem.ReadInt(blip, new int[] { 0x48 });
-                if (id.Contains(blipId))
+                if (id != null && id.Contains(blipId))
                 {
                     tempLocation = new Location
                     {
@@ -2336,7 +2537,7 @@ namespace GTAVCSMM
                         z = Mem.ReadFloat(blip, new int[] { 0x18 })
                     };
 
-                    if (color.Contains(blipColor))
+                    if (color != null && color.Contains(blipColor))
                     {
                         tempLocation = new Location
                         {
