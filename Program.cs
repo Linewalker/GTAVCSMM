@@ -4,6 +4,7 @@ using GTAVCSMM.Memory;
 using GTAVCSMM.Settings;
 using System;
 using System.Diagnostics;
+using System.Drawing;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -724,6 +725,8 @@ namespace GTAVCSMM
                         case 7:
                             listBx.Items.Add("Get Lucky Wheel Price \t ►");
                             listBx.Items.Add("Trigger Nightclub Production \t ►");
+                            listBx.Items.Add("Quick Car Spawn \t\t ►");
+                            listBx.Items.Add("Manual Car Spawn \t\t ►");
 
                             menuMainLvl = 1;
                             menuLvl = 7;
@@ -979,6 +982,24 @@ namespace GTAVCSMM
                             LastMenuLvl = 7;
                             LastMenuItm = 1;
                             break;
+
+                        case 2:
+                            listBx.Items.Add("ZR380");
+                            listBx.Items.Add("Deluxo");
+                            listBx.Items.Add("Opressor2");
+                            listBx.Items.Add("Vigilante");
+                            listBx.Items.Add("Toreador");
+                            listBx.Items.Add("Future Brutus");
+                            listBx.Items.Add("Future Dominator");
+                            listBx.Items.Add("Future Imperator");
+
+                            menuMainLvl = 7;
+                            menuLvl = 2;
+
+                            LastMenuMainLvl = 1;
+                            LastMenuLvl = 7;
+                            LastMenuItm = 2;
+                            break;
                     }
                     break;
             }
@@ -1230,6 +1251,21 @@ namespace GTAVCSMM
                                     break;
                                 case 1:
                                     listboxFill(7, 1);
+                                    break;
+                                case 2:
+                                    listboxFill(7, 2);
+                                    break;
+                                case 3:
+                                    new Thread(() =>
+                                    {
+                                        Thread.CurrentThread.IsBackground = true;
+                                        string promptValue = ShowDialog("Enter the name like \"opressor2\" without the quotes.", "Enter car name!");
+                                        if (promptValue != "")
+                                        {
+                                            Activate();
+                                            carSpawn(promptValue, 0);
+                                        }
+                                    }).Start();
                                     break;
                             }
                             break;
@@ -2310,6 +2346,43 @@ namespace GTAVCSMM
                                     break;
                             }
                             break;
+                        case 2:
+                            switch (menuItem)
+                            {
+                                case 0:
+                                    Activate();
+                                    carSpawn("zr380", 0);
+                                    break;
+                                case 1:
+                                    Activate();
+                                    carSpawn("Deluxo", 0);
+                                    break;
+                                case 2:
+                                    Activate();
+                                    carSpawn("oppressor2", 0);
+                                    break;
+                                case 3:
+                                    Activate();
+                                    carSpawn("vigilante", 0);
+                                    break;
+                                case 4:
+                                    Activate();
+                                    carSpawn("Toreador", 0);
+                                    break;
+                                case 5:
+                                    Activate();
+                                    carSpawn("brutus2", 0);
+                                    break;
+                                case 6:
+                                    Activate();
+                                    carSpawn("dominator5", 0);
+                                    break;
+                                case 7:
+                                    Activate();
+                                    carSpawn("imperator2", 0);
+                                    break;
+                            }
+                            break;
                     }
                     break;
             }
@@ -2642,6 +2715,10 @@ namespace GTAVCSMM
         {
             Mem.writeInt(GA(Index), null, value);
         }
+        public static void _SG_UInt(int Index, uint value)
+        {
+            Mem.writeUInt(GA(Index), null, value);
+        }
         public static void _SG_Float(int Index, float value)
         {
             Mem.writeFloat(GA(Index), null, value);
@@ -2679,6 +2756,116 @@ namespace GTAVCSMM
             return 0;
         }
         #endregion
+
+        public static void carSpawn(string Hash, int pegasus = 0)
+        {
+            string model = Hash.ToLower();
+            float ped_heading = Mem.ReadFloat(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCNavigation, offsets.oHeading });
+            float ped_heading2 = Mem.ReadFloat(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCNavigation, offsets.oHeading2 });
+            Console.WriteLine(ped_heading + " " + ped_heading2);
+            float spawner_x = PlayerX;
+            float spawner_y = PlayerY;
+            float spawner_z = PlayerZ;
+            spawner_x = spawner_x - (ped_heading2 * 5f);
+            spawner_y = spawner_y + (ped_heading * 5f);
+            spawner_z = spawner_z + 0.5f;
+            _SG_Float(offsets.oVMCreate + 7 + 0, spawner_x);
+            _SG_Float(offsets.oVMCreate + 7 + 1, spawner_y);
+            _SG_Float(offsets.oVMCreate + 7 + 2, spawner_z);
+            _SG_Int(offsets.oVMCreate + 27 + 66, (int)JOAAT.GetHashKey(Hash));
+            _SG_Int(offsets.oVMCreate + 27 + 28, 1); // Weaponised ownerflag
+            _SG_Int(offsets.oVMCreate + 27 + 60, 1);
+            _SG_Int(offsets.oVMCreate + 27 + 95, 14); // Ownerflag
+            _SG_Int(offsets.oVMCreate + 27 + 94, 2); // Personal car ownerflag
+            _SG_Int(offsets.oVMCreate + 5, 1); // SET('i', CarSpawn + 0x1168, 1)--can spawn flag must be odd
+            _SG_Int(offsets.oVMCreate + 2, 1); // SET('i', CarSpawn + 0x1180, 1)--spawn toggle gets reset to 0 on car spawn
+            _SG_Int(offsets.oVMCreate + 3, pegasus);
+            _SG_Int(offsets.oVMCreate + 27 + 74, 1); // Red Neon Amount 1-255 100%-0%
+            _SG_Int(offsets.oVMCreate + 27 + 75, 1); // Green Neon Amount 1-255 100%-0%
+            _SG_Int(offsets.oVMCreate + 27 + 76, 0); // Blue Neon Amount 1-255 100%-0%
+            _SG_UInt(offsets.oVMCreate + 27 + 60, 4030726305); // landinggear / vehstate
+            _SG_Int(offsets.oVMCreate + 27 + 5, -1); // default paintjob primary -1 auto 120
+            _SG_Int(offsets.oVMCreate + 27 + 6, -1); // default paintjob secondary -1 auto 120
+            _SG_Int(offsets.oVMCreate + 27 + 7, -1);
+            _SG_Int(offsets.oVMCreate + 27 + 8, -1);
+            _SG_Int(offsets.oVMCreate + 27 + 19, 4);
+            _SG_Int(offsets.oVMCreate + 27 + 21, 4); // Engine(0 - 3)
+            _SG_Int(offsets.oVMCreate + 27 + 22, 3);
+            _SG_Int(offsets.oVMCreate + 27 + 23, 3); // Transmission(0 - 9)
+            _SG_Int(offsets.oVMCreate + 27 + 24, 58);
+            _SG_Int(offsets.oVMCreate + 27 + 26, 5); // Armor(0 - 18)
+            _SG_Int(offsets.oVMCreate + 27 + 27, 1); // Turbo(0 - 1)
+            _SG_Int(offsets.oVMCreate + 27 + 65, 2); // Window tint 0 - 6
+            _SG_Int(offsets.oVMCreate + 27 + 69, -1); // Wheel type
+            _SG_Int(offsets.oVMCreate + 27 + 33, -1); // Wheel Selection
+            _SG_Int(offsets.oVMCreate + 27 + 25, 8); // Suspension(0 - 13)
+            _SG_Int(offsets.oVMCreate + 27 + 19, -1);
+            Mem.writeInt(GA(offsets.oVMCreate + 27 + 77) + 1, null, 2); // 2:bulletproof 0:false
+
+            int weapon1 = 2;
+            int weapon2 = 1;
+
+            if (model == "oppressor2")
+            {
+                weapon1 = 2;
+            }
+            else if (model == "apc")
+            {
+                weapon1 = -1;
+            }
+            else if (model == "deluxo")
+            {
+                weapon1 = -1;
+            }
+            else if (model == "bombushka")
+            {
+                weapon1 = 1;
+            }
+            else if (model == "tampa3")
+            {
+                weapon1 = 3;
+            }
+            else if (model == "insurgent3")
+            {
+                weapon1 = 3;
+            }
+            else if (model == "halftrack")
+            {
+                weapon1 = 3;
+            }
+            else if (model == "barrage")
+            {
+                weapon1 = 30;
+            }
+            _SG_Int(offsets.oVMCreate + 27 + 15, weapon1); // primary weapon
+            _SG_Int(offsets.oVMCreate + 27 + 20, weapon2); // primary weapon
+            // _SG_Int(offsets.oVMCreate + 27 + 1, "FCK4FD"); // License plate
+        }
+        public static string ShowDialog(string text, string caption)
+        {
+            Form prompt = new Form()
+            {
+                Width = 500,
+                Height = 150,
+                FormBorderStyle = FormBorderStyle.FixedDialog,
+                Text = caption,
+                StartPosition = FormStartPosition.Manual,
+                Location = new Point(100, 100)
+            };
+            Label textLabel = new Label() { Left = 50, Top = 20, Width = 400, Text = text };
+            TextBox textBox = new TextBox() { Left = 50, Top = 50, Width = 400 };
+            Button confirmation = new Button() { Text = "Ok", Left = 350, Width = 100, Top = 70, DialogResult = DialogResult.OK };
+            confirmation.Click += (sender, e) => { prompt.Close(); };
+            prompt.Controls.Add(textBox);
+            prompt.Controls.Add(confirmation);
+            prompt.Controls.Add(textLabel);
+            prompt.AcceptButton = confirmation;
+            prompt.MaximizeBox = false;
+            prompt.MinimizeBox = false;
+            prompt.TopMost = true;
+
+            return prompt.ShowDialog() == DialogResult.OK ? textBox.Text : "";
+        }
 
     }
     struct Location { public float x, y, z; }

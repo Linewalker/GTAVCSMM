@@ -1333,10 +1333,10 @@
 
         #region Vehicle Menus Globals
         // Vehicle Menus Globals
-        private int _oVMCreate = 2463533; // Create any vehicle.
-        private int _oVMYCar = 2544210;  // Get my car.
-        private int _oVGETIn = 2409299;  // Spawn into vehicle.
-        private int _oVMSlots = 1323703;  // Get vehicle slots.
+        private int _oVMCreate = 2725260; // Create any vehicle.
+        private int _oVMYCar = 2810287;  // Get my car.
+        private int _oVGETIn = 2671444;  // Spawn into vehicle.
+        private int _oVMSlots = 1585844;  // Get vehicle slots.
         public int oVMCreate
         {
             get

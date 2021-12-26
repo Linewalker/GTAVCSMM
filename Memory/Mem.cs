@@ -101,6 +101,10 @@ namespace GTAVCSMM.Memory
         {
             WriteProcessMemory(Proc.Handle, BasePTR, BitConverter.GetBytes(Value), 4);
         }
+        public void writeUInt(long BasePTR, int[] offset, uint Value)
+        {
+            WriteProcessMemory(Proc.Handle, BasePTR, BitConverter.GetBytes(Value), 4);
+        }
         public void writePointer(long BasePTR, int[] offset, long Value)
         {
             WriteProcessMemory(Proc.Handle, BasePTR, BitConverter.GetBytes(Value), 8);
