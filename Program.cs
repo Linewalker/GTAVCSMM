@@ -1173,7 +1173,9 @@ namespace GTAVCSMM
                                         bgodState = false;
                                     }
                                     Activate();
-                                    teleportWaypoint();
+                                    int[] tpIdArray = new int[] { 8 };
+                                    int[] tpColArray = new int[] { };
+                                    teleportBlip(tpIdArray, tpColArray, 20);
                                     if (!bgodState)
                                     {
                                         bGodMode = false;
@@ -1191,8 +1193,8 @@ namespace GTAVCSMM
                                         bGodMode = true;
                                         bgodState = false;
                                     }
-                                    int[] tpIdArray = new int[] { 1 };
-                                    int[] tpColArray = new int[] { 5, 60, 66 };
+                                    tpIdArray = new int[] { 1 };
+                                    tpColArray = new int[] { 5, 60, 66 };
                                     teleportBlip(tpIdArray, tpColArray);
                                     if (!bgodState)
                                     {
@@ -2466,13 +2468,6 @@ namespace GTAVCSMM
                 Mem.writeInt(scriptAddr2, null, id);
             }
         }
-
-        #region Teleport part
-
-        private static void teleportWaypoint()
-        {
-            Teleport(WaypointCoords);
-        }
         public static void setRPMultipler(float m)
         {
             _SG_Float(262145 + 1, m);
@@ -2488,6 +2483,7 @@ namespace GTAVCSMM
             _SG_Float(262145 + 31284, m); // Test Track
         }
 
+        #region Teleport part
         private static void Teleport(Location l)
         {
             if (Mem.ReadInt(settings.WorldPTR, new int[] { offsets.pCPed, offsets.oInVehicle }) == 0)
@@ -2506,17 +2502,16 @@ namespace GTAVCSMM
 
         private static void teleportBlip(int[] ID, int[] color, int height = 0)
         {
-            Location tmpLoc = getBlipCoords(ID, color);
+            Location tmpLoc = getBlipCoords(ID, color, height);
             Location returnLoc = new Location
             {
                 x = tmpLoc.x,
                 y = tmpLoc.y,
-                z = tmpLoc.z + height + 3
+                z = tmpLoc.z
             };
-            Console.WriteLine("New location: " + returnLoc.x + ", " + returnLoc.y + ", " + returnLoc.z);
             if (returnLoc.x != 0 && returnLoc.y != 0)
             {
-                Teleport(tmpLoc);
+                Teleport(returnLoc);
             }
             else
             {
@@ -2524,33 +2519,10 @@ namespace GTAVCSMM
             }
         }
 
-        private static Location WaypointCoords
+        private static Location getBlipCoords(int[] id, int[] color = null, int height = 0)
         {
-            get
-            {
-                float tX = Mem.ReadFloat(settings.WorldPTR, new int[] { offsets.pCPed, offsets.oRotation, offsets.oPositionX });
-                float tY = Mem.ReadFloat(settings.WorldPTR, new int[] { offsets.pCPed, offsets.oRotation, offsets.oPositionY });
-                float tZ = Mem.ReadFloat(settings.WorldPTR, new int[] { offsets.pCPed, offsets.oRotation, offsets.oPositionZ });
-                Console.WriteLine("New location: " + tX + ", " + tY + ", " + tZ);
-                for (int i = 2000; i > 1; i--)
-                {
-                    if (Mem.ReadInt(settings.BlipPTR + (i * 8), new int[] { 0x48 }) == 84 && Mem.ReadInt(settings.BlipPTR + (i * 8), new int[] { 0x40 }) == 8)
-                    {
-                        return new Location
-                        {
-                            x = Mem.ReadFloat(settings.BlipPTR + (i * 8), new int[] { 0x10 }),
-                            y = Mem.ReadFloat(settings.BlipPTR + (i * 8), new int[] { 0x14 }),
-                            z = -210F
-                        };
-                    }
-                }
-                return new Location { x = PlayerX, y = PlayerY, z = PlayerZ };
-            }
-        }
-
-        private static Location getBlipCoords(int[] id, int[] color = null)
-        {
-            Location tempLocation = new Location { };
+            float zOffset = 0;
+            Location tempLocation = new() { };
             for (int i = 2000; i > 1; i--)
             {
                 long blip = settings.BlipPTR + (i * 8);
@@ -2558,6 +2530,7 @@ namespace GTAVCSMM
                 int blipColor = Mem.ReadInt(blip, new int[] { 0x48 });
                 if (id != null && id.Contains(blipId))
                 {
+                    zOffset = (float)(Math.Round(Math.Pow(i, -0.2), 1) * height);
                     tempLocation = new Location
                     {
                         x = Mem.ReadFloat(blip, new int[] { 0x10 }),
@@ -2576,33 +2549,42 @@ namespace GTAVCSMM
                     }
                 }
             }
+            if (tempLocation.z == 20)
+            {
+                tempLocation.z = -255;
+            }
+            tempLocation.z = tempLocation.z + zOffset;
+            if (tempLocation.x > 0) { tempLocation.x = (float)Math.Round(tempLocation.x, 3); }
+            if (tempLocation.y > 0) { tempLocation.y = (float)Math.Round(tempLocation.y, 3); }
+            if (tempLocation.z > 0) { tempLocation.y = (float)Math.Round(tempLocation.z, 3); }
+            Console.WriteLine("New location: " + tempLocation.x + ", " + tempLocation.y + ", " + tempLocation.z);
             return new Location { x = tempLocation.x, y = tempLocation.y, z = tempLocation.z };
         }
 
         public static float PlayerX
         {
-            get { return Mem.ReadFloat(settings.WorldPTR, new int[] { offsets.pCPed, offsets.oRotation, offsets.oPositionX }); }
+            get { return Mem.ReadFloat(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCNavigation, offsets.oPositionX }); }
             set
             {
-                Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.oRotation, offsets.oPositionX }, value);
+                Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCNavigation, offsets.oPositionX }, value);
                 Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.oVisualX }, value);
             }
         }
         public static float PlayerY
         {
-            get { return Mem.ReadFloat(settings.WorldPTR, new int[] { offsets.pCPed, offsets.oRotation, offsets.oPositionX }); }
+            get { return Mem.ReadFloat(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCNavigation, offsets.oPositionY }); }
             set
             {
-                Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.oRotation, offsets.oPositionY }, value);
+                Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCNavigation, offsets.oPositionY }, value);
                 Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.oVisualY }, value);
             }
         }
         public static float PlayerZ
         {
-            get { return Mem.ReadFloat(settings.WorldPTR, new int[] { offsets.pCPed, offsets.oRotation, offsets.oPositionX }); }
+            get { return Mem.ReadFloat(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCNavigation, offsets.oPositionZ }); }
             set
             {
-                Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.oRotation, offsets.oPositionZ }, value);
+                Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCNavigation, offsets.oPositionZ }, value);
                 Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.oVisualZ }, value);
             }
         }
@@ -2613,7 +2595,7 @@ namespace GTAVCSMM
             set
             {
                 Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCVehicle, offsets.pCNavigation, offsets.oPositionX }, value);
-                Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCVehicle, offsets.pCNavigation, offsets.oVPositionX }, value);
+                Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCVehicle, offsets.oVisualX }, value);
             }
         }
         public static float CarY
@@ -2622,7 +2604,7 @@ namespace GTAVCSMM
             set
             {
                 Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCVehicle, offsets.pCNavigation, offsets.oPositionY }, value);
-                Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCVehicle, offsets.pCNavigation, offsets.oVPositionY }, value);
+                Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCVehicle, offsets.oVisualY }, value);
             }
         }
         public static float CarZ
@@ -2631,7 +2613,7 @@ namespace GTAVCSMM
             set
             {
                 Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCVehicle, offsets.pCNavigation, offsets.oPositionZ }, value);
-                Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCVehicle, offsets.pCNavigation, offsets.oVPositionZ }, value);
+                Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCVehicle, offsets.oVisualZ }, value);
             }
         }
         #endregion
