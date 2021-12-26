@@ -687,6 +687,7 @@ namespace GTAVCSMM
                         case 4:
                             listBx.Items.Add("Explosive Ammo");
                             listBx.Items.Add("Long Range");
+                            listBx.Items.Add("Weapon Damage \t\t ►");
 
                             menuMainLvl = 1;
                             menuLvl = 4;
@@ -835,6 +836,33 @@ namespace GTAVCSMM
                             LastMenuMainLvl = 1;
                             LastMenuLvl = 2;
                             LastMenuItm = 11;
+                            break;
+                    }
+                    break;
+
+                case 4:
+                    switch (menulevel)
+                    {
+                        case 2:
+                            listBx.Items.Add("Damage x 1.0");
+                            listBx.Items.Add("Damage x 2.0");
+                            listBx.Items.Add("Damage x 3.0");
+                            listBx.Items.Add("Damage x 5.0");
+                            listBx.Items.Add("Damage x 10.0");
+                            listBx.Items.Add("Damage x 20.0");
+                            listBx.Items.Add("Damage x 30.0");
+                            listBx.Items.Add("Damage x 50.0");
+                            listBx.Items.Add("Damage x 100.0");
+                            listBx.Items.Add("Damage x 200.0");
+                            listBx.Items.Add("Damage x 300.0");
+                            listBx.Items.Add("Damage x 500.0");
+
+                            menuMainLvl = 4;
+                            menuLvl = 2;
+
+                            LastMenuMainLvl = 1;
+                            LastMenuLvl = 4;
+                            LastMenuItm = 2;
                             break;
                     }
                     break;
@@ -1009,6 +1037,8 @@ namespace GTAVCSMM
 
         public static void runitem(int mainMenulevel, int menulevel, int menuItem)
         {
+            int[] tpIdArray;
+            int[] tpColArray;
             Console.WriteLine("Command to run: " + mainMenulevel + " " + menulevel + " " + menuItem);
             switch (mainMenulevel)
             {
@@ -1178,6 +1208,9 @@ namespace GTAVCSMM
                                     Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPedWeaponManager, offsets.pCWeaponInfo, offsets.oRange }, 250F);
                                     Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPedWeaponManager, offsets.pCWeaponInfo, offsets.oLockRange }, 250F);
                                     break;
+                                case 2:
+                                    listboxFill(4, 2);
+                                    break;
                             }
                             break;
                         case 5:
@@ -1194,8 +1227,8 @@ namespace GTAVCSMM
                                         bgodState = false;
                                     }
                                     Activate();
-                                    int[] tpIdArray = new int[] { 8 };
-                                    int[] tpColArray = new int[] { };
+                                    tpIdArray = new int[] { 8 };
+                                    tpColArray = new int[] { 84 };
                                     teleportBlip(tpIdArray, tpColArray, 20);
                                     if (!bgodState)
                                     {
@@ -1501,38 +1534,56 @@ namespace GTAVCSMM
                 case 4:
                     switch (menulevel)
                     {
-                        case 0:
+                        case 2:
                             switch (menuItem)
                             {
                                 case 0:
                                     Activate();
-                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPedWeaponManager, offsets.pCWeaponInfo, offsets.oImpactType }, 2);
+                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPedWeaponManager, offsets.pCWeaponInfo, offsets.oDamage }, 1.0f);
                                     break;
                                 case 1:
                                     Activate();
-                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPedWeaponManager, offsets.pCWeaponInfo, offsets.oImpactType }, 3);
+                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPedWeaponManager, offsets.pCWeaponInfo, offsets.oDamage }, 2.0f);
                                     break;
                                 case 2:
                                     Activate();
-                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPedWeaponManager, offsets.pCWeaponInfo, offsets.oImpactType }, 5);
+                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPedWeaponManager, offsets.pCWeaponInfo, offsets.oDamage }, 3.0f);
                                     break;
-                            }
-                            break;
-
-                        case 1:
-                            switch (menuItem)
-                            {
-                                case 0:
+                                case 3:
                                     Activate();
-                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPedWeaponManager, offsets.pCWeaponInfo, offsets.oImpactExplosion }, -1);
+                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPedWeaponManager, offsets.pCWeaponInfo, offsets.oDamage }, 5.0f);
                                     break;
-                                case 1:
+                                case 4:
                                     Activate();
-                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPedWeaponManager, offsets.pCWeaponInfo, offsets.oImpactExplosion }, 0);
+                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPedWeaponManager, offsets.pCWeaponInfo, offsets.oDamage }, 10.0f);
                                     break;
-                                case 2:
+                                case 5:
                                     Activate();
-                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPedWeaponManager, offsets.pCWeaponInfo, offsets.oImpactExplosion }, 59);
+                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPedWeaponManager, offsets.pCWeaponInfo, offsets.oDamage }, 20.0f);
+                                    break;
+                                case 6:
+                                    Activate();
+                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPedWeaponManager, offsets.pCWeaponInfo, offsets.oDamage }, 30.0f);
+                                    break;
+                                case 7:
+                                    Activate();
+                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPedWeaponManager, offsets.pCWeaponInfo, offsets.oDamage }, 50.0f);
+                                    break;
+                                case 8:
+                                    Activate();
+                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPedWeaponManager, offsets.pCWeaponInfo, offsets.oDamage }, 100.0f);
+                                    break;
+                                case 9:
+                                    Activate();
+                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPedWeaponManager, offsets.pCWeaponInfo, offsets.oDamage }, 200.0f);
+                                    break;
+                                case 10:
+                                    Activate();
+                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPedWeaponManager, offsets.pCWeaponInfo, offsets.oDamage }, 30.0f);
+                                    break;
+                                case 11:
+                                    Activate();
+                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPedWeaponManager, offsets.pCWeaponInfo, offsets.oDamage }, 500.0f);
                                     break;
                             }
                             break;
@@ -1557,8 +1608,8 @@ namespace GTAVCSMM
                                         bGodMode = true;
                                         bgodState = false;
                                     }
-                                    int[] tpIdArray = new int[] { 614 };
-                                    int[] tpColArray = new int[] { };
+                                    tpIdArray = new int[] { 614 };
+                                    tpColArray = new int[] { };
                                     teleportBlip(tpIdArray, tpColArray);
                                     if (!bgodState)
                                     {
@@ -2499,6 +2550,13 @@ namespace GTAVCSMM
                         Quit();
                     }
                 }
+                else if ((Keys)vkCode == Keys.NumPad1)
+                {
+                    if (!isHidden)
+                    {
+                        Console.WriteLine(Mem.ReadFloat(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPedWeaponManager, offsets.pCWeaponInfo, offsets.oDamage }));
+                    }
+                }
             }
             return CallNextHookEx(_hookID, nCode, wParam, lParam);
         }
@@ -2576,15 +2634,9 @@ namespace GTAVCSMM
         private static void teleportBlip(int[] ID, int[] color, int height = 0)
         {
             Location tmpLoc = getBlipCoords(ID, color, height);
-            Location returnLoc = new Location
+            if (tmpLoc.x != 0 && tmpLoc.y != 0)
             {
-                x = tmpLoc.x,
-                y = tmpLoc.y,
-                z = tmpLoc.z
-            };
-            if (returnLoc.x != 0 && returnLoc.y != 0)
-            {
-                Teleport(returnLoc);
+                Teleport(tmpLoc);
             }
             else
             {
@@ -2624,12 +2676,12 @@ namespace GTAVCSMM
             }
             if (tempLocation.z == 20)
             {
-                tempLocation.z = -255;
+                tempLocation.z = -255F;
+            } else
+            {
+                tempLocation.z = tempLocation.z + zOffset;
             }
-            tempLocation.z = tempLocation.z + zOffset;
-            if (tempLocation.x > 0) { tempLocation.x = (float)Math.Round(tempLocation.x, 3); }
-            if (tempLocation.y > 0) { tempLocation.y = (float)Math.Round(tempLocation.y, 3); }
-            if (tempLocation.z > 0) { tempLocation.y = (float)Math.Round(tempLocation.z, 3); }
+            
             Console.WriteLine("New location: " + tempLocation.x + ", " + tempLocation.y + ", " + tempLocation.z);
             return new Location { x = tempLocation.x, y = tempLocation.y, z = tempLocation.z };
         }
@@ -2739,6 +2791,7 @@ namespace GTAVCSMM
             _SG_Int(1655444 + 4, (int)oldhash);
             _SG_Int(1020252 + 5526, (int)oldvalue);
         }
+        #endregion
         public static long GetLocalScript(string name)
         {
             int size = name.Length;
@@ -2755,7 +2808,6 @@ namespace GTAVCSMM
             }
             return 0;
         }
-        #endregion
 
         public static void carSpawn(string Hash, int pegasus = 0)
         {

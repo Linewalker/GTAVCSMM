@@ -626,7 +626,7 @@
         {
             get
             {
-                return oCurrentAmmo;
+                return _oCurrentAmmo;
             }
         }
         #endregion
@@ -1164,7 +1164,7 @@
         {
             get
             {
-                return _oSecondaryR;
+                return _oSecondaryG;
             }
         }
         public int oSecondaryB
