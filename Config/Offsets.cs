@@ -461,6 +461,8 @@
         private int _oMaxAmmo = 0x28;
         private int _pCAmmo = 0x0;
         private int _oCurrentAmmo = 0x18;
+        private int _pCWeaponInventory = 0x10D0;
+        private int _oAmmoModifier = 0x78;
         public int pCWeaponInfo
         {
             get
@@ -627,6 +629,20 @@
             get
             {
                 return _oCurrentAmmo;
+            }
+        }
+        public int pCWeaponInventory
+        {
+            get
+            {
+                return _pCWeaponInventory;
+            }
+        }
+        public int oAmmoModifier
+        {
+            get
+            {
+                return _oAmmoModifier;
             }
         }
         #endregion
@@ -1237,11 +1253,21 @@
 
         #region CReplayInterface Offsets
         // CReplayInterface Offsets and more below
+        private int _pCVehicleInterface = 0x10;
         private int _pCPedInterface = 0x18;
         private int _pVehList = 0x180;
         private int _oVehNum = 0x190;
         private int _pPedList = 0x100;
         private int _oPedNum = 0x110;
+
+        public int pCVehicleInterface
+        {
+            get
+            {
+                return _pCVehicleInterface;
+            }
+        }
+
         public int pCPedInterface
         {
             get

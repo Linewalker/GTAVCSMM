@@ -3,6 +3,7 @@ using GTAVCSMM.Helpers;
 using GTAVCSMM.Memory;
 using GTAVCSMM.Settings;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
@@ -52,6 +53,9 @@ namespace GTAVCSMM
         private static Label label1 = new Label();
         private static Label label2 = new Label();
         private static string lastNavigation = string.Empty;
+
+        private static List<long> pedList = new List<long>();
+        private static List<long> vehList = new List<long>();
 
         #region WINDOW SETUP
 
@@ -409,6 +413,16 @@ namespace GTAVCSMM
             Speeder.Resume(settings.gameProcess);
             _freezeGame.Abort();
         }
+
+        public static void setWeaponUnlimitedAmmo()
+        {
+            Console.WriteLine("Freezing game");
+            Speeder.Suspend(settings.gameProcess);
+            Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCWeaponInventory, offsets.oAmmoModifier }, 1);
+            Speeder.Resume(settings.gameProcess);
+            Activate();
+            _freezeGame.Abort();
+        }
         #endregion
 
 
@@ -687,7 +701,9 @@ namespace GTAVCSMM
                         case 4:
                             listBx.Items.Add("Explosive Ammo");
                             listBx.Items.Add("Long Range");
+                            listBx.Items.Add("Fast Reload");
                             listBx.Items.Add("Weapon Damage \t\t ►");
+                            listBx.Items.Add("Unlimited Ammo");
 
                             menuMainLvl = 1;
                             menuLvl = 4;
@@ -1209,7 +1225,16 @@ namespace GTAVCSMM
                                     Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPedWeaponManager, offsets.pCWeaponInfo, offsets.oLockRange }, 250F);
                                     break;
                                 case 2:
+                                    Activate();
+                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPedWeaponManager, offsets.pCWeaponInfo, offsets.oReloadMult }, 10);
+                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPedWeaponManager, offsets.pCWeaponInfo, offsets.oReloadVehicleMult }, 10);
+                                    break;
+                                case 3:
                                     listboxFill(4, 2);
+                                    break;
+                                case 4:
+                                    _freezeGame = new Thread(setWeaponUnlimitedAmmo) { IsBackground = true };
+                                    _freezeGame.Start();
                                     break;
                             }
                             break;
@@ -2554,7 +2579,10 @@ namespace GTAVCSMM
                 {
                     if (!isHidden)
                     {
-                        Console.WriteLine(Mem.ReadFloat(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPedWeaponManager, offsets.pCWeaponInfo, offsets.oDamage }));
+                        /*
+                         * Development
+                         */
+                        getPeds();
                     }
                 }
             }
@@ -2612,6 +2640,9 @@ namespace GTAVCSMM
             _SG_Float(262145 + 31281, m); // Head 2 Head
             _SG_Float(262145 + 31283, m); // Car Meet
             _SG_Float(262145 + 31284, m); // Test Track
+            _SG_Float(262145 + 31312, m); // Auto Shop Contract
+            _SG_Float(262145 + 31313, m); // Customer Deliveries
+            _SG_Float(262145 + 31314, m); // Exotic Exports Deliveries
         }
 
         #region Teleport part
@@ -2647,7 +2678,7 @@ namespace GTAVCSMM
         private static Location getBlipCoords(int[] id, int[] color = null, int height = 0)
         {
             float zOffset = 0;
-            Location tempLocation = new() { };
+            Location tempLocation = new Location() { };
             for (int i = 2000; i > 1; i--)
             {
                 long blip = settings.BlipPTR + (i * 8);
@@ -2681,7 +2712,7 @@ namespace GTAVCSMM
             {
                 tempLocation.z = tempLocation.z + zOffset;
             }
-            
+
             Console.WriteLine("New location: " + tempLocation.x + ", " + tempLocation.y + ", " + tempLocation.z);
             return new Location { x = tempLocation.x, y = tempLocation.y, z = tempLocation.z };
         }
@@ -2917,6 +2948,32 @@ namespace GTAVCSMM
             prompt.TopMost = true;
 
             return prompt.ShowDialog() == DialogResult.OK ? textBox.Text : "";
+        }
+
+        /*
+         * Development
+         */
+        public static void getPeds()
+        {
+            int pedListOffset = 0x10;
+            int count = Mem.ReadInt(settings.ReplayInterfacePTR, new int[] { offsets.pCPedInterface, offsets.oPedNum });
+            for (int i = 0; i <= count; i++)
+            {
+                long Ped = Mem.ReadPointer(settings.ReplayInterfacePTR, new int[] { offsets.pCPedInterface, offsets.pPedList, (i * pedListOffset) });
+                int pedType = Mem.ReadByte(settings.ReplayInterfacePTR, new int[] { offsets.pCPedInterface, offsets.pPedList, (i * pedListOffset), offsets.oEntityType });
+                if (pedType != 156) {
+                    pedList.Add(Ped);
+                }
+            }
+        }
+        public static void getVehs()
+        {
+            int count = Mem.ReadInt(settings.ReplayInterfacePTR, new int[] { offsets.pCVehicleInterface, offsets.oVehNum });
+            for (int i = 0; i <= count; i++)
+            {
+                long Veh = Mem.ReadPointer(settings.ReplayInterfacePTR, new int[] { offsets.pCVehicleInterface, offsets.pVehList, (i * 0x10) });
+                vehList.Add(Veh);
+            }
         }
 
     }
