@@ -913,6 +913,7 @@ namespace GTAVCSMM
                             listBx.Items.Add("Cayo Perico");            // 23
                             listBx.Items.Add("Flight School");          // 24
                             listBx.Items.Add("Masks (Vespucci Beach)"); // 25
+                            listBx.Items.Add("Record A Studios");       // 26
 
                             menuMainLvl = 5;
                             menuLvl = 1;
@@ -2142,6 +2143,26 @@ namespace GTAVCSMM
                                         bgodState = false;
                                     }
                                     tpIdArray = new int[] { 362 };
+                                    tpColArray = new int[] { };
+                                    teleportBlip(tpIdArray, tpColArray);
+                                    if (!bgodState)
+                                    {
+                                        bGodMode = false;
+                                    }
+                                    break;
+                                case 26:
+                                    Activate();
+
+                                    if (bGodMode)
+                                    {
+                                        bgodState = true;
+                                    }
+                                    else
+                                    {
+                                        bGodMode = true;
+                                        bgodState = false;
+                                    }
+                                    tpIdArray = new int[] { 819 };
                                     tpColArray = new int[] { };
                                     teleportBlip(tpIdArray, tpColArray);
                                     if (!bgodState)
