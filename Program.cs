@@ -546,7 +546,7 @@ namespace GTAVCSMM
             label2.Name = "label2";
             label2.Size = new System.Drawing.Size(65, 24);
             label2.TabIndex = 2;
-            label2.Text = "o1.58";
+            label2.Text = "o1.60";
             // 
             // fastTimer
             // 
@@ -2614,23 +2614,23 @@ namespace GTAVCSMM
         {
             if (id == -1)
             {
-                _SG_Int(1574587 + 2, -1);
-                _SG_Int(1574587, 1);
+                _SG_Int(1574589 + 2, -1); // 1.60 1574587 -> 1574589
+                _SG_Int(1574589, 1);
                 Thread.Sleep(200);
-                _SG_Int(1574587, 0);
+                _SG_Int(1574589, 0);
             }
             else if (id == -2)
             {
-                _SG_Int(1574587 + 2, 1);
+                _SG_Int(1574589 + 2, 1);
                 Thread.Sleep(200);
-                _SG_Int(1574587, 0);
+                _SG_Int(1574589, 0);
             }
             else
             {
-                _SG_Int(1575004, id);
-                _SG_Int(1574587, 1);
+                _SG_Int(1575012, id); // 1.60 1575004 -> 1575012
+                _SG_Int(1574589, 1);
                 Thread.Sleep(200);
-                _SG_Int(1574587, 0);
+                _SG_Int(1574589, 0);
             }
         }
 
@@ -2834,13 +2834,13 @@ namespace GTAVCSMM
 
         public static void setStat(string stat, int value)
         {
-            long oldhash = _GG_Int(1655444 + 4);
+            long oldhash = _GG_Int(1655453 + 4); // old 1655444
             long oldvalue = _GG_Int(1020252 + 5526);
-            _SG_Int(1655444 + 4, (int)JOAAT.GetHashKey(stat));
+            _SG_Int(1655453 + 4, (int)JOAAT.GetHashKey(stat)); // old 1655444
             _SG_Int(1020252 + 5526, value);
-            _SG_Int(1644209 + 1139, -1);
+            _SG_Int(1644218 + 1139, -1); // old 1644209
             Thread.Sleep(1000);
-            _SG_Int(1655444 + 4, (int)oldhash);
+            _SG_Int(1655453 + 4, (int)oldhash); // old 1655444
             _SG_Int(1020252 + 5526, (int)oldvalue);
         }
         #endregion

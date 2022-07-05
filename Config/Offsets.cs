@@ -1359,10 +1359,10 @@
 
         #region Vehicle Menus Globals
         // Vehicle Menus Globals
-        private int _oVMCreate = 2725260; // Create any vehicle.
-        private int _oVMYCar = 2810287;  // Get my car.
-        private int _oVGETIn = 2671444;  // Spawn into vehicle.
-        private int _oVMSlots = 1585844;  // Get vehicle slots.
+        private int _oVMCreate = 2725269; // Create any vehicle.
+        private int _oVMYCar = 2810701;  // Get my car.
+        private int _oVGETIn = 2671447;  // Spawn into vehicle.
+        private int _oVMSlots = 1585853;  // Get vehicle slots.
         public int oVMCreate
         {
             get
@@ -1395,9 +1395,9 @@
 
         #region Some Player / Network times associated Globals
         // Some Player / Network times associated Globals
-        private int _oPlayerGA = 2441237;
-        private int _oPlayerIDHelp = 2426865;
-        private int _oNETTimeHelp = 2441237;
+        private int _oPlayerGA = 2703660; // old value 2441237
+        private int _oPlayerIDHelp = 2689224; // old value 2426865
+        private int _oNETTimeHelp = 2703656; // old value 2441237
         public int oPlayerGA
         {
             get
