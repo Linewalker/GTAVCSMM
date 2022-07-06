@@ -7,11 +7,11 @@ namespace GTAVCSMM.Memory
 {
     class Mem
     {
+        [DllImport("ntdll.dll")]
+        public static extern int NtWriteVirtualMemory(IntPtr ProcessHandle, long BaseAddress, byte[] Buffer, int Size, int BytesWritten = 0);
 
-        [DllImport("kernel32.dll")]
-        public static extern int WriteProcessMemory(IntPtr Handle, long Address, byte[] buffer, int Size, int BytesWritten = 0);
-        [DllImport("kernel32.dll")]
-        public static extern int ReadProcessMemory(IntPtr Handle, long Address, byte[] buffer, int Size, int BytesRead = 0);
+        [DllImport("ntdll.dll")]
+        public static extern int NtReadVirtualMemory(IntPtr ProcessHandle, long Address, byte[] buffer, int Size, int BytesRead = 0);
 
         public Process Proc;
         public long BaseAddress;
@@ -35,14 +35,14 @@ namespace GTAVCSMM.Memory
         {
             byte[] Buffer = new byte[8];
 
-            ReadProcessMemory(GetProcHandle(), Pointer, Buffer, Buffer.Length);
+            NtReadVirtualMemory(GetProcHandle(), Pointer, Buffer, Buffer.Length);
 
             if (Offset != null)
             {
                 for (int x = 0; x < (Offset.Length - 1); x++)
                 {
                     Pointer = BitConverter.ToInt64(Buffer, 0) + Offset[x];
-                    ReadProcessMemory(GetProcHandle(), Pointer, Buffer, Buffer.Length);
+                    NtReadVirtualMemory(GetProcHandle(), Pointer, Buffer, Buffer.Length);
                 }
 
                 Pointer = BitConverter.ToInt64(Buffer, 0) + Offset[Offset.Length - 1];
@@ -58,7 +58,7 @@ namespace GTAVCSMM.Memory
             if (moduleSize == 0) throw new Exception($"Size of module {Proc.MainModule.ModuleName} is INVALID.");
 
             byte[] moduleBytes = new byte[moduleSize];
-            ReadProcessMemory(GetProcHandle(), BaseAddress, moduleBytes, moduleSize);
+            NtReadVirtualMemory(GetProcHandle(), BaseAddress, moduleBytes, moduleSize);
 
             for (long i = 0; i < moduleSize; i++)
             {
@@ -75,18 +75,18 @@ namespace GTAVCSMM.Memory
         public byte[] ReadBytes(long BasePTR, int[] offset, int Length)
         {
             byte[] Buffer = new byte[Length];
-            ReadProcessMemory(GetProcHandle(), GetPtrAddr(BaseAddress + BasePTR, offset), Buffer, Length);
+            NtReadVirtualMemory(GetProcHandle(), GetPtrAddr(BaseAddress + BasePTR, offset), Buffer, Length);
             return Buffer;
         }
 
         public byte[] ReadBytes_new(long BasePTR, int[] offset, int Length)
         {
             byte[] Buffer = new byte[Length];
-            ReadProcessMemory(GetProcHandle(), BasePTR, Buffer, Length);
+            NtReadVirtualMemory(GetProcHandle(), BasePTR, Buffer, Length);
             return Buffer;
         }
 
-        public void Write(long BasePTR, int[] offset, byte[] Bytes) => WriteProcessMemory(GetProcHandle(), GetPtrAddr(BaseAddress + BasePTR, offset), Bytes, Bytes.Length);
+        public void Write(long BasePTR, int[] offset, byte[] Bytes) => NtWriteVirtualMemory(GetProcHandle(), GetPtrAddr(BaseAddress + BasePTR, offset), Bytes, Bytes.Length);
 
         public void Write(long BasePTR, int[] offset, bool b) => Write(BasePTR, offset, b ? new byte[] { 0x01 } : new byte[] { 0x00 });
         public void Write(long BasePTR, int[] offset, float Value) => Write(BasePTR, offset, BitConverter.GetBytes(Value));
@@ -99,19 +99,19 @@ namespace GTAVCSMM.Memory
 
         public void writeInt(long BasePTR, int[] offset, int Value)
         {
-            WriteProcessMemory(Proc.Handle, BasePTR, BitConverter.GetBytes(Value), 4);
+            NtWriteVirtualMemory(Proc.Handle, BasePTR, BitConverter.GetBytes(Value), 4);
         }
         public void writeUInt(long BasePTR, int[] offset, uint Value)
         {
-            WriteProcessMemory(Proc.Handle, BasePTR, BitConverter.GetBytes(Value), 4);
+            NtWriteVirtualMemory(Proc.Handle, BasePTR, BitConverter.GetBytes(Value), 4);
         }
         public void writePointer(long BasePTR, int[] offset, long Value)
         {
-            WriteProcessMemory(Proc.Handle, BasePTR, BitConverter.GetBytes(Value), 8);
+            NtWriteVirtualMemory(Proc.Handle, BasePTR, BitConverter.GetBytes(Value), 8);
         }
         public void writeFloat(long BasePTR, int[] offset, float Value)
         {
-            WriteProcessMemory(Proc.Handle, BasePTR, BitConverter.GetBytes(Value), 8);
+            NtWriteVirtualMemory(Proc.Handle, BasePTR, BitConverter.GetBytes(Value), 8);
         }
 
         public bool ReadBool(long BasePTR, int[] offset) => ReadByte(BasePTR, offset) != 0x00;
