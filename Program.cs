@@ -686,6 +686,7 @@ namespace GTAVCSMM
                             listBx.Items.Add("Fast Reload");
                             listBx.Items.Add("Weapon Damage \t\t ►");
                             listBx.Items.Add("Unlimited Ammo");
+                            listBx.Items.Add("Fill All Ammo");
 
                             menuMainLvl = 1;
                             menuLvl = 4;
@@ -737,6 +738,15 @@ namespace GTAVCSMM
 
                         case 8:
                             listBx.Items.Add("Kill NPCs");
+                            listBx.Items.Add("Kill Enemies");
+                            listBx.Items.Add("Kill Cops");
+                            listBx.Items.Add("Blind Cops");
+                            listBx.Items.Add("Bribe Cops");
+                            listBx.Items.Add("Destroy Vehicles (NPCs)");
+                            listBx.Items.Add("Destroy Vehicles (Enemies)");
+                            listBx.Items.Add("Destroy Vehicles (Cops)");
+                            listBx.Items.Add("Destroy Vehicles (All)");
+                            listBx.Items.Add("Revive Vehicles");
 
                             menuMainLvl = 1;
                             menuLvl = 8;
@@ -1231,6 +1241,9 @@ namespace GTAVCSMM
                                 case 4:
                                     setWeaponUnlimitedAmmo();
                                     break;
+                                case 5:
+                                    fill_all_ammo();
+                                    break;
                             }
                             break;
                         case 5:
@@ -1328,6 +1341,33 @@ namespace GTAVCSMM
                             {
                                 case 0:
                                     kill_npcs();
+                                    break;
+                                case 1:
+                                    kill_enemies();
+                                    break;
+                                case 2:
+                                    kill_cops();
+                                    break;
+                                case 3:
+                                    blind_cops(true);
+                                    break;
+                                case 4:
+                                    bribe_cops(true);
+                                    break;
+                                case 5:
+                                    destroy_vehs_of_npcs();
+                                    break;
+                                case 6:
+                                    destroy_vehs_of_enemies();
+                                    break;
+                                case 7:
+                                    destroy_vehs_of_cops();
+                                    break;
+                                case 8:
+                                    destroy_all_vehicles();
+                                    break;
+                                case 9:
+                                    revive_all_vehicles();
                                     break;
                             }
                             break;
@@ -2752,14 +2792,19 @@ namespace GTAVCSMM
         #endregion
 
         #region Global Addresses function
-        public static long GA(long Index)
+        public static T GG<T>(int index) where T : struct { return Mem.Read<T>(GA(index)); }
+
+        public static void SG<T>(int index, T vaule) where T : struct { Mem.Write<T>(GA(index), vaule); }
+        
+        public static long GA(int Index)
         {
             long p = settings.GlobalPTR + (8 * (Index >> 0x12 & 0x3F));
             long p_ga = Mem.ReadPointer(p, null);
             long p_ga_final = p_ga + (8 * (Index & 0x3FFFF));
             return p_ga_final;
         }
-        public static long _GG_Int(int Index)
+
+        public static int _GG_Int(int Index)
         {
             return Mem.ReadInt(GA(Index), null);
         }
@@ -2938,7 +2983,7 @@ namespace GTAVCSMM
             {
                 long Ped = Mem.ReadPointer(settings.ReplayInterfacePTR, new int[] { offsets.pCPedInterface, offsets.pPedList, (i * pedListOffset) });
                 int pedType = Mem.ReadByte(settings.ReplayInterfacePTR, new int[] { offsets.pCPedInterface, offsets.pPedList, (i * pedListOffset), offsets.oEntityType });
-                if (pedType != 156 && Ped != 0) {
+                if (pedType != 156 && Mem.IsValid(Ped)) {
                     pedList.Add(Ped);
                 }
             }
@@ -2949,7 +2994,10 @@ namespace GTAVCSMM
             for (int i = 0; i <= count; i++)
             {
                 long Veh = Mem.ReadPointer(settings.ReplayInterfacePTR, new int[] { offsets.pCVehicleInterface, offsets.pVehList, (i * 0x10) });
-                vehList.Add(Veh);
+                if (Mem.IsValid(Veh))
+                {
+                    vehList.Add(Veh);
+                }
             }
         }
 
@@ -3018,6 +3066,7 @@ namespace GTAVCSMM
                 for (int i = 0; i < pedList.Count; i++)
                 {
                     long ped = pedList[i];
+                    uint pedtype = get_pedtype(ped);
                     set_health(ped, 0.0f);
                 }
             });
@@ -3025,50 +3074,191 @@ namespace GTAVCSMM
         
         public static void kill_enemies()
         {
-            getPeds();
-            for (int i = 0; i < pedList.Count; i++)
+            Task.Run(() =>
             {
-                long ped = pedList[i];
-                if (is_enemy(ped))
+                Activate();
+                getPeds();
+                for (int i = 0; i < pedList.Count; i++)
                 {
-                    set_health(ped, 0.0f);
+                    long ped = pedList[i];
+                    if (is_enemy(ped))
+                    {
+                        set_health(ped, 0.0f);
+                    }
                 }
-            }
+            });
         }
 
         public static void kill_cops()
         {
-            getPeds();
-            for (int i = 0; i < pedList.Count; i++)
+            Task.Run(() =>
             {
-                long ped = pedList[i];
-                uint pedtype = get_pedtype(ped);
-                Console.WriteLine(ped + " " + pedtype);
-                if (pedtype == (uint)EnumData.PedTypes.COP ||
-                    pedtype == (uint)EnumData.PedTypes.SWAT ||
-                    pedtype == (uint)EnumData.PedTypes.ARMY)
+                Activate();
+                getPeds();
+                for (int i = 0; i < pedList.Count; i++)
                 {
-                    set_health(ped, 0.0f);
+                    long ped = pedList[i];
+                    uint pedtype = get_pedtype(ped);
+                    if (pedtype == (uint)EnumData.PedTypes.COP ||
+                        pedtype == (uint)EnumData.PedTypes.SWAT ||
+                        pedtype == (uint)EnumData.PedTypes.ARMY)
+                    {
+                        set_health(ped, 0.0f);
+                    }
                 }
+            });
+        }
+
+        public static void blind_cops(bool toggle = true)
+        {
+            Task.Run(() =>
+            {
+                Activate();
+                _SG_Int(offsets.oVMYCar + 4625, toggle ? 1 : 0);
+                if (toggle) _SG_Int(offsets.oVMYCar + 4627, get_network_time() + 3600000);
+                _SG_Int(offsets.oVMYCar + 4624, toggle ? 5 : 0);
+            });
+        }
+
+        public static void bribe_cops(bool toggle = true)
+        {
+            Task.Run(() =>
+            {
+                Activate();
+                SG<int>(offsets.oVMYCar + 4625, toggle ? 1 : 0);
+                if (toggle) SG<int>(offsets.oVMYCar + 4627, get_network_time() + 3600000);
+                SG<int>(offsets.oVMYCar + 4624, toggle ? 21 : 0);
+            });
+        }
+
+        public static void destroy_vehicle(long vehicle)
+        {
+            Task.Run(() =>
+            {
+                Activate();
+                revive_vehicle(vehicle);
+                set_health3(vehicle, -999.9f);
+            });
+        }
+        public static void destroy_vehs_of_npcs()
+        {
+            Task.Run(() =>
+            {
+                Activate();
+                getPeds();
+                for (int i = 0; i < pedList.Count; i++)
+                {
+                    long ped = pedList[i];
+                    if (is_player(ped)) continue;
+                    destroy_vehicle(get_current_vehicle(ped));
+                }
+            });
+        }
+        public static void destroy_vehs_of_enemies()
+        {
+            Task.Run(() =>
+            {
+                Activate();
+                getPeds();
+                for (int i = 0; i < pedList.Count; i++)
+                {
+                    long ped = pedList[i];
+                    if (ped == get_local_ped()) continue;
+                    if (is_enemy(ped)) destroy_vehicle(get_current_vehicle(ped));
+                }
+            });
+        }
+        public static void destroy_vehs_of_cops()
+        {
+            Task.Run(() =>
+            {
+                Activate();
+                getPeds();
+                for (int i = 0; i < pedList.Count; i++)
+                {
+                    long ped = pedList[i];
+                    if (ped == get_local_ped()) continue;
+                    uint pedtype = get_pedtype(ped);
+                    if (pedtype == (uint)EnumData.PedTypes.COP ||
+                        pedtype == (uint)EnumData.PedTypes.SWAT ||
+                        pedtype == (uint)EnumData.PedTypes.ARMY) destroy_vehicle(get_current_vehicle(ped));
+                }
+            });
+        }
+        public static void destroy_all_vehicles()
+        {
+            Task.Run(() =>
+            {
+                Activate();
+                getVehs();
+                for (int i = 0; i < vehList.Count; i++)
+                {
+                    long vehicle = vehList[i];
+                    destroy_vehicle(vehicle);
+                }
+            });
+        }
+        public static void revive_all_vehicles()
+        {
+            Task.Run(() =>
+            {
+                Activate();
+                getVehs();
+                for (int i = 0; i < vehList.Count; i++)
+                {
+                    long vehicle = vehList[i];
+                    revive_vehicle(vehicle);
+                }
+            });
+        }
+
+        public static void fill_all_ammo()
+        {
+            long p = get_ped_inventory(get_local_ped());
+            p = Mem.Read<long>(p + 0x48);
+            int count = 0;
+            while (Mem.Read<int>(p + count * 0x08) != 0 && Mem.Read<int>(p + count * 0x08, new int[] { 0x08 }) != 0)
+            {
+                Func<int, int, int> Max = (int a, int b) => { return a > b ? a : b; };
+                int max_ammo = Max(Mem.Read<int>(p + count * 0x08, new int[] { 0x08, 0x28 }), Mem.Read<int>(p + count * 0x08, new int[] { 0x08, 0x34 }));
+                Console.WriteLine("Max: " + max_ammo);
+                Mem.Write<int>(p + count * 0x08, new int[] { 0x20 }, max_ammo);
+                count++;
             }
         }
 
-        public static int get_network_time() { return (int)_GG_Int(1574755 + 11); }
-        public static int player_id() { return (int)_GG_Int(offsets.oPlayerGA); }
-        public static byte get_type(long entity) { return Mem.ReadByte(entity, new int[] { 0x2B }); }
+        public static int get_network_time() { return GG<int>(1574755 + 11); }
+        public static int player_id() { return GG<int>(offsets.oPlayerGA); }
+        public static byte get_type(long entity) { return Mem.Read<byte>(entity + 0x2B); }
         public static bool is_player(long entity) { return ((get_type(entity) == 156) ? true : false); }
-        public static byte get_hostility(long ped) { return Mem.ReadByte(ped, new int[] { 0x18C }); }
+        public static byte get_hostility(long ped) { return Mem.Read<byte>(ped + 0x18C); }
         public static bool is_enemy(long ped) { return ((get_hostility(ped) > 1) ? true : false); }
-        public static uint get_pedtype(long ped) {
-            long paddr = Mem.GetPtrAddr(ped + 0x10B8, null);
-            Console.WriteLine(Mem.ReadUInt(paddr, null));
-            return Mem.ReadUInt(paddr, null) << 11 >> 25;
-        }
-        public static void set_health(long ped, float value) {
-            long paddr = Mem.GetPtrAddr(ped + offsets.oHealth, null);
-            Mem.writeFloat(paddr, null, value);
-        }
+        public static uint get_pedtype(long ped) { return Mem.Read<uint>(ped + 0x10B8) << 11 >> 25; }
+        public static void set_health(long ped, float value) { Mem.Write<float>(ped + 0x280, value); }
+        public static long get_local_ped() { return Mem.Read<long>(Mem.GetPtrAddr(settings.WorldPTR), new int[] { 0x8 }); }
+        public static long get_ped_inventory(long ped) { return Mem.Read<long>(ped + 0x10D0); }
 
+        public static void set_health3(long vehicle, float value) { Mem.Write<float>(vehicle + 0x844, value); }
+        public static void set_health2(long vehicle, float value) { Mem.Write<float>(vehicle + 0x840, value); }
+        public static void set_engine_health(long vehicle, float value) { Mem.Write<float>(vehicle + 0x908, value); }
+        public static byte get_state(long vehicle) { return Mem.Read<byte>(vehicle + 0xD8); }
+        public static void set_state(long vehicle, byte value) { Mem.Write<byte>(vehicle + 0xD8, value); }
+        public static long get_current_vehicle(long ped) { return Mem.Read<long>(ped + 0xD30); }
+        public static void set_state_is_destroyed(long vehicle, bool toggle)
+        {
+            byte temp = get_state(vehicle);
+            if (toggle) temp = (byte)(temp | (1 << 1) | (1 << 0));
+            else temp = (byte)(temp & ~(1 << 0));
+            set_state(vehicle, temp);
+        }
+        public static void revive_vehicle(long vehicle)
+        {
+            set_state_is_destroyed(vehicle, false);
+            set_health(vehicle, 1000.0f);
+            set_health2(vehicle, 1000.0f);
+            set_health3(vehicle, 1000.0f);
+            set_engine_health(vehicle, 1000.0f);
+        }
     }
     struct Location { public float x, y, z; }
 }
