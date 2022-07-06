@@ -11,7 +11,7 @@ New overlay menu. Navigate with Numpad: 8 Up, 2 Down, 5 Enter, 0 Back. Show/Hide
 
 Casino Lucky Wheel: set the price before pressing the spin button.
 
-+++ Online 1.58 +++
++++ Online 1.60 +++
 
 Donations: https://www.buymeacoffee.com/linewalker85
 
