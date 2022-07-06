@@ -3221,10 +3221,13 @@ namespace GTAVCSMM
             {
                 Func<int, int, int> Max = (int a, int b) => { return a > b ? a : b; };
                 int max_ammo = Max(Mem.Read<int>(p + count * 0x08, new int[] { 0x08, 0x28 }), Mem.Read<int>(p + count * 0x08, new int[] { 0x08, 0x34 }));
-                Console.WriteLine("Max: " + max_ammo);
-                Mem.Write<int>(p + count * 0x08, new int[] { 0x20 }, max_ammo);
+                if (max_ammo > 0)
+                {
+                    Mem.Write<int>(p + count * 0x08, new int[] { 0x20 }, max_ammo);
+                }
                 count++;
             }
+            Activate();
         }
 
         public static int get_network_time() { return GG<int>(1574755 + 11); }
@@ -3235,7 +3238,7 @@ namespace GTAVCSMM
         public static bool is_enemy(long ped) { return ((get_hostility(ped) > 1) ? true : false); }
         public static uint get_pedtype(long ped) { return Mem.Read<uint>(ped + 0x10B8) << 11 >> 25; }
         public static void set_health(long ped, float value) { Mem.Write<float>(ped + 0x280, value); }
-        public static long get_local_ped() { return Mem.Read<long>(Mem.GetPtrAddr(settings.WorldPTR), new int[] { 0x8 }); }
+        public static long get_local_ped() { return Mem.ReadPointer(settings.WorldPTR, new int[] { 0x8 }); }
         public static long get_ped_inventory(long ped) { return Mem.Read<long>(ped + 0x10D0); }
 
         public static void set_health3(long vehicle, float value) { Mem.Write<float>(vehicle + 0x844, value); }
