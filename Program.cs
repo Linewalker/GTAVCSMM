@@ -9,6 +9,7 @@ using System.Drawing;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace GTAVCSMM
@@ -86,7 +87,6 @@ namespace GTAVCSMM
         public static Patterns pattern = new Patterns();
         public static TSettings settings = new TSettings();
         public static Mem Mem;
-        public static Thread _freezeGame;
 
         public static System.Windows.Forms.Timer ProcessTimer = new System.Windows.Forms.Timer();
         public static System.Windows.Forms.Timer MemoryTimer = new System.Windows.Forms.Timer();
@@ -404,25 +404,6 @@ namespace GTAVCSMM
                 Quit();
             }
         }
-
-        public static void freezeGame()
-        {
-            Console.WriteLine("Freezing game");
-            Speeder.Suspend(settings.gameProcess);
-            Thread.Sleep(10000);
-            Speeder.Resume(settings.gameProcess);
-            _freezeGame.Abort();
-        }
-
-        public static void setWeaponUnlimitedAmmo()
-        {
-            Console.WriteLine("Freezing game");
-            Speeder.Suspend(settings.gameProcess);
-            Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCWeaponInventory, offsets.oAmmoModifier }, 1);
-            Speeder.Resume(settings.gameProcess);
-            Activate();
-            _freezeGame.Abort();
-        }
         #endregion
 
 
@@ -617,6 +598,7 @@ namespace GTAVCSMM
                     listBx.Items.Add("Teleport \t\t\t ►");   // 0,5
                     listBx.Items.Add("Tunables \t\t\t ►");   // 0,6
                     listBx.Items.Add("Online Services \t\t ►");   // 0,7
+                    listBx.Items.Add("World \t\t\t ►");   // 0,8
 
                     menuMainLvl = 0;
                     menuLvl = 0;
@@ -741,7 +723,7 @@ namespace GTAVCSMM
 
                         case 7:
                             listBx.Items.Add("Get Lucky Wheel Price \t ►");
-                            listBx.Items.Add("Trigger Nightclub Production \t ►");
+                            listBx.Items.Add("Faster Nightclub Production");
                             listBx.Items.Add("Quick Car Spawn \t\t ►");
                             listBx.Items.Add("Manual Car Spawn \t\t ►");
 
@@ -751,6 +733,17 @@ namespace GTAVCSMM
                             LastMenuMainLvl = 0;
                             LastMenuLvl = 1;
                             LastMenuItm = 7;
+                            break;
+
+                        case 8:
+                            listBx.Items.Add("Kill NPCs");
+
+                            menuMainLvl = 1;
+                            menuLvl = 8;
+
+                            LastMenuMainLvl = 0;
+                            LastMenuLvl = 1;
+                            LastMenuItm = 8;
                             break;
                     }
                     break;
@@ -1089,6 +1082,9 @@ namespace GTAVCSMM
                                 case 7:
                                     listboxFill(1, 7);
                                     break;
+                                case 8:
+                                    listboxFill(1, 8);
+                                    break;
                             }
                             break;
                     }
@@ -1130,8 +1126,7 @@ namespace GTAVCSMM
                                     break;
                                 case 4:
                                     Activate();
-                                    _freezeGame = new Thread(freezeGame) { IsBackground = true };
-                                    _freezeGame.Start();
+                                    empty_session();
                                     break;
                                 case 5:
                                     Activate();
@@ -1234,8 +1229,7 @@ namespace GTAVCSMM
                                     listboxFill(4, 2);
                                     break;
                                 case 4:
-                                    _freezeGame = new Thread(setWeaponUnlimitedAmmo) { IsBackground = true };
-                                    _freezeGame.Start();
+                                    setWeaponUnlimitedAmmo();
                                     break;
                             }
                             break;
@@ -1309,7 +1303,8 @@ namespace GTAVCSMM
                                     listboxFill(7, 0);
                                     break;
                                 case 1:
-                                    listboxFill(7, 1);
+                                    set_nightclub_produce_time(1, true);
+                                    Activate();
                                     break;
                                 case 2:
                                     listboxFill(7, 2);
@@ -1325,6 +1320,14 @@ namespace GTAVCSMM
                                             carSpawn(promptValue, 0);
                                         }
                                     }).Start();
+                                    break;
+                            }
+                            break;
+                        case 8:
+                            switch (menuItem)
+                            {
+                                case 0:
+                                    kill_npcs();
                                     break;
                             }
                             break;
@@ -2410,39 +2413,6 @@ namespace GTAVCSMM
                                     break;
                             }
                             break;
-                        case 1:
-                            switch (menuItem)
-                            {
-                                case 0:
-                                    Activate();
-                                    _SG_Int(262145 + 24135, 1); // South American Imports (14400000)
-                                    break;
-                                case 1:
-                                    Activate();
-                                    _SG_Int(262145 + 24136, 1); // Pharmaceutical Research (7200000)
-                                    break;
-                                case 2:
-                                    Activate();
-                                    _SG_Int(262145 + 24137, 1); // Organic Produce (2400000)
-                                    break;
-                                case 3:
-                                    Activate();
-                                    _SG_Int(262145 + 24138, 1); // Printing and Copying (1800000)
-                                    break;
-                                case 4:
-                                    Activate();
-                                    _SG_Int(262145 + 24139, 1); // Cash Creation (3600000)
-                                    break;
-                                case 5:
-                                    Activate();
-                                    _SG_Int(262145 + 24134, 1); // Sporting Goods (4800000)
-                                    break;
-                                case 6:
-                                    Activate();
-                                    _SG_Int(262145 + 24140, 1); // Cargo and Shipments (8400000)
-                                    break;
-                            }
-                            break;
                         case 2:
                             switch (menuItem)
                             {
@@ -2603,7 +2573,7 @@ namespace GTAVCSMM
                         /*
                          * Development
                          */
-                        getPeds();
+                        kill_npcs();
                     }
                 }
             }
@@ -2612,26 +2582,12 @@ namespace GTAVCSMM
 
         public static void LoadSession(int id)
         {
-            if (id == -1)
+            Task.Run(() =>
             {
-                _SG_Int(1574589 + 2, -1); // 1.60 1574587 -> 1574589
+                _SG_Int(1575012, id);
+                _SG_Int(1574589 + 2, id == -1 ? -1 : 0);
                 _SG_Int(1574589, 1);
-                Thread.Sleep(200);
-                _SG_Int(1574589, 0);
-            }
-            else if (id == -2)
-            {
-                _SG_Int(1574589 + 2, 1);
-                Thread.Sleep(200);
-                _SG_Int(1574589, 0);
-            }
-            else
-            {
-                _SG_Int(1575012, id); // 1.60 1575004 -> 1575012
-                _SG_Int(1574589, 1);
-                Thread.Sleep(200);
-                _SG_Int(1574589, 0);
-            }
+            });
         }
 
         public static void getLuckyWheelPrice(int id)
@@ -2655,15 +2611,15 @@ namespace GTAVCSMM
 
         public static void setREPMultipler(float m)
         {
-            _SG_Float(262145 + 31278, m); // Street Race
-            _SG_Float(262145 + 31279, m); // Pursuit Race
-            _SG_Float(262145 + 31280, m); // Scramble
-            _SG_Float(262145 + 31281, m); // Head 2 Head
-            _SG_Float(262145 + 31283, m); // Car Meet
-            _SG_Float(262145 + 31284, m); // Test Track
-            _SG_Float(262145 + 31312, m); // Auto Shop Contract
-            _SG_Float(262145 + 31313, m); // Customer Deliveries
-            _SG_Float(262145 + 31314, m); // Exotic Exports Deliveries
+            _SG_Float(262145 + 31294, m); // Street Race - old 31278 + 16 for 1.60
+            _SG_Float(262145 + 31295, m); // Pursuit Race
+            _SG_Float(262145 + 31296, m); // Scramble
+            _SG_Float(262145 + 31297, m); // Head 2 Head
+            _SG_Float(262145 + 31289, m); // Car Meet
+            _SG_Float(262145 + 31300, m); // Test Track
+            _SG_Float(262145 + 31328, m); // Auto Shop Contract
+            _SG_Float(262145 + 31329, m); // Customer Deliveries
+            _SG_Float(262145 + 31330, m); // Exotic Exports Deliveries
         }
 
         #region Teleport part
@@ -2982,7 +2938,7 @@ namespace GTAVCSMM
             {
                 long Ped = Mem.ReadPointer(settings.ReplayInterfacePTR, new int[] { offsets.pCPedInterface, offsets.pPedList, (i * pedListOffset) });
                 int pedType = Mem.ReadByte(settings.ReplayInterfacePTR, new int[] { offsets.pCPedInterface, offsets.pPedList, (i * pedListOffset), offsets.oEntityType });
-                if (pedType != 156) {
+                if (pedType != 156 && Ped != 0) {
                     pedList.Add(Ped);
                 }
             }
@@ -2995,6 +2951,122 @@ namespace GTAVCSMM
                 long Veh = Mem.ReadPointer(settings.ReplayInterfacePTR, new int[] { offsets.pCVehicleInterface, offsets.pVehList, (i * 0x10) });
                 vehList.Add(Veh);
             }
+        }
+
+        public static void set_nightclub_produce_time(int produce_time, bool toggle)
+        {
+            // Time to Produce
+            _SG_Int(262145 + 24135, toggle ? produce_time : 4800000);   // Sporting Goods
+            _SG_Int(262145 + 24136, toggle ? produce_time : 14400000);  // South American Imports
+            _SG_Int(262145 + 24137, toggle ? produce_time : 7200000);   // Pharmaceutical Research
+            _SG_Int(262145 + 24138, toggle ? produce_time : 2400000);   // Organic Produce
+            _SG_Int(262145 + 24139, toggle ? produce_time : 1800000);   // Printing and Copying
+            _SG_Int(262145 + 24140, toggle ? produce_time : 3600000);   // Cash Creation
+            _SG_Int(262145 + 24141, toggle ? produce_time : 8400000);   // Cargo and Shipments
+        }
+
+        public static void set_mc_produce_time(int produce_time, bool toggle)
+        {
+            // Base Time to Produce
+            _SG_Int(262145 + 17198, toggle ? produce_time : 360000);  // Weed
+            _SG_Int(262145 + 17199, toggle ? produce_time : 1800000);  // Meth
+            _SG_Int(262145 + 17200, toggle ? produce_time : 3000000);  // Cocaine
+            _SG_Int(262145 + 17201, toggle ? produce_time : 300000);  // Documents
+            _SG_Int(262145 + 17202, toggle ? produce_time : 720000);  // Cash
+
+            // Time to Produce Reductions
+            _SG_Int(262145 + 17203, toggle ? 1 : 60000);  // Documents Equipment
+            _SG_Int(262145 + 17204, toggle ? 1 : 120000);  // Cash Equipment
+            _SG_Int(262145 + 17205, toggle ? 1 : 600000);  // Cocaine Equipment
+            _SG_Int(262145 + 17206, toggle ? 1 : 360000);  // Meth Equipment
+            _SG_Int(262145 + 17207, toggle ? 1 : 60000);  // Weed Equipment
+            _SG_Int(262145 + 17208, toggle ? 1 : 60000);  // Documents Staff
+            _SG_Int(262145 + 17209, toggle ? 1 : 120000);  // Cash Staff
+            _SG_Int(262145 + 17210, toggle ? 1 : 600000);  // Cocaine Staff
+            _SG_Int(262145 + 17211, toggle ? 1 : 360000);  // Meth Staff
+            _SG_Int(262145 + 17212, toggle ? 1 : 60000);  // Weed Staff
+        }
+        public static void empty_session()
+        {
+            Task.Run(() =>
+            {
+                ProcessMgr.SuspendProcess(settings.gameProcess);
+                Task.Delay(10000).Wait();
+                ProcessMgr.ResumeProcess(settings.gameProcess);
+            });
+        }
+
+        public static void setWeaponUnlimitedAmmo()
+        {
+            Task.Run(() =>
+            {
+                ProcessMgr.SuspendProcess(settings.gameProcess);
+                Task.Delay(20).Wait();
+                Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCWeaponInventory, offsets.oAmmoModifier }, 1);
+                Task.Delay(20).Wait();
+                Activate();
+                ProcessMgr.ResumeProcess(settings.gameProcess);
+            });
+        }
+
+        public static void kill_npcs()
+        {
+            Task.Run(() =>
+            {
+                Activate();
+                getPeds();
+                for (int i = 0; i < pedList.Count; i++)
+                {
+                    long ped = pedList[i];
+                    set_health(ped, 0.0f);
+                }
+            });
+        }
+        
+        public static void kill_enemies()
+        {
+            getPeds();
+            for (int i = 0; i < pedList.Count; i++)
+            {
+                long ped = pedList[i];
+                if (is_enemy(ped))
+                {
+                    set_health(ped, 0.0f);
+                }
+            }
+        }
+
+        public static void kill_cops()
+        {
+            getPeds();
+            for (int i = 0; i < pedList.Count; i++)
+            {
+                long ped = pedList[i];
+                uint pedtype = get_pedtype(ped);
+                Console.WriteLine(ped + " " + pedtype);
+                if (pedtype == (uint)EnumData.PedTypes.COP ||
+                    pedtype == (uint)EnumData.PedTypes.SWAT ||
+                    pedtype == (uint)EnumData.PedTypes.ARMY)
+                {
+                    set_health(ped, 0.0f);
+                }
+            }
+        }
+
+        public static int get_network_time() { return (int)_GG_Int(1574755 + 11); }
+        public static int player_id() { return (int)_GG_Int(offsets.oPlayerGA); }
+        public static byte get_type(long entity) { return Mem.ReadByte(entity, new int[] { 0x2B }); }
+        public static bool is_player(long entity) { return ((get_type(entity) == 156) ? true : false); }
+        public static byte get_hostility(long ped) { return Mem.ReadByte(ped, new int[] { 0x18C }); }
+        public static bool is_enemy(long ped) { return ((get_hostility(ped) > 1) ? true : false); }
+        public static uint get_pedtype(long ped) {
+            long paddr = Mem.GetPtrAddr(ped + 0x10B8, null);
+            Console.WriteLine(Mem.ReadUInt(paddr, null));
+            return Mem.ReadUInt(paddr, null) << 11 >> 25;
+        }
+        public static void set_health(long ped, float value) {
+            long paddr = Mem.GetPtrAddr(ped + offsets.oHealth, null);
+            Mem.writeFloat(paddr, null, value);
         }
 
     }

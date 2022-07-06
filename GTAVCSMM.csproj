@@ -60,11 +60,12 @@
   <ItemGroup>
     <Compile Include="Config\Offsets.cs" />
     <Compile Include="Config\Patterns.cs" />
+    <Compile Include="Helpers\EnumData.cs" />
+    <Compile Include="Helpers\ProcessMgr.cs" />
     <Compile Include="Helpers\JOAAT.cs" />
     <Compile Include="Helpers\Key.cs" />
     <Compile Include="Helpers\KeysMgr.cs" />
     <Compile Include="Helpers\Manager.cs" />
-    <Compile Include="Helpers\Speeder.cs" />
     <Compile Include="Memory\Mem.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

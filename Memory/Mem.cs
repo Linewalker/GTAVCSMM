@@ -124,5 +124,9 @@ namespace GTAVCSMM.Memory
         public byte ReadByte(long BasePTR, int[] offset) => ReadBytes(BasePTR, offset, 1)[0];
         public string ReadStr(long BasePTR, int[] offset, int size) => new ASCIIEncoding().GetString(ReadBytes_new(BasePTR, offset, size));
 
+        public bool IsValid(long Address)
+        {
+            return Address >= 0x10000 && Address < 0x000F000000000000;
+        }
     }
 }
