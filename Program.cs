@@ -1,7 +1,5 @@
 ﻿using GTAVCSMM.Config;
 using GTAVCSMM.Helpers;
-using GTAVCSMM.Memory;
-using GTAVCSMM.Settings;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -11,12 +9,12 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using GameMath;
 
 namespace GTAVCSMM
 {
     static class Program
     {
+        #region Program Init keys
         private const int WH_KEYBOARD_LL = 13;
         private const int WM_KEYDOWN = 0x0100;
         private static LowLevelKeyboardProc _proc = HookCallback;
@@ -59,8 +57,6 @@ namespace GTAVCSMM
         private static List<long> pedList = new List<long>();
         private static List<long> vehList = new List<long>();
 
-        #region WINDOW SETUP
-
         public const string WINDOW_NAME = "Grand Theft Auto V";
         public static IntPtr handle = FindWindow(null, WINDOW_NAME);
 
@@ -84,18 +80,11 @@ namespace GTAVCSMM
         public static extern bool GetWindowRect(IntPtr hwnd, out RECT IpRect);
 
         public static Offsets offsets = new Offsets();
-        public static Addresses addresses = new Addresses();
         public static Patterns pattern = new Patterns();
-        public static TSettings settings = new TSettings();
         public static Mem Mem;
 
-        public static System.Windows.Forms.Timer ProcessTimer = new System.Windows.Forms.Timer();
         public static System.Windows.Forms.Timer MemoryTimer = new System.Windows.Forms.Timer();
         public static System.Windows.Forms.Timer fastTimer = new System.Windows.Forms.Timer();
-
-        #endregion
-
-        #region PROCESS INFO
         private static bool bGodMode = false;
         private static bool bgodState = false;
         private static bool bNeverWanted = false;
@@ -109,6 +98,7 @@ namespace GTAVCSMM
         private static int frameFlagCount = 0;
         private static bool bGetCasinoPrice = false;
         private static int casinoPrice = 0;
+        private static bool bCopKiller = false;
 
         [DllImport("user32.dll")]
         static extern short GetAsyncKeyState(System.Windows.Forms.Keys vKey);
@@ -117,281 +107,90 @@ namespace GTAVCSMM
         public static extern void mouse_event(int a, int b, int c, int d, int damnIwonderifpeopleactuallyreadsthis);
         #endregion
 
-        #region METHODS
-        public static void pGODMODE()
+        #region Timers
+
+        private static void MemoryTimer_Tick(object sender, EventArgs e)
         {
-            if (bGodMode)
-            {
-                Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.oGod }, 1);
-                if (!settings.pgodm)
-                {
-                    Activate();
-                }
-                settings.pgodm = true;
-            }
-            else
-            {
-                if (settings.pgodm)
-                {
-                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.oGod }, 0);
-                    settings.pgodm = false;
-                    Deactivate();
-                }
-            }
+            pGODMODE();
+            vGODMODE();
+            vCOPKILLER();
         }
 
-        public static void pNEVERWANTED()
+        private static void fastTimer_Tick(object sender, EventArgs e)
         {
-            if (bNeverWanted)
-            {
-                Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oWanted }, 0);
-                if (!settings.pnwanted)
-                {
-                    Activate();
-                }
-                settings.pnwanted = true;
-            }
-            else
-            {
-                if (settings.pnwanted)
-                {
-                    settings.pnwanted = false;
-                    Deactivate();
-                }
-            }
+            pNEVERWANTED();
+            pNORAGDOLL();
+            pUNDEADOFFRADAR();
+            pSEATBELT();
+            pDISABLECOLLISION();
+            pSUPERJUMP();
+            pEXPLOSIVEAMMO();
+            cPRICE();
         }
 
-        public static void pNORAGDOLL()
-        {
-            if (bNoRagdoll)
-            {
-                Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.oRagdoll }, 1);
-                if (!settings.pnragdoll)
-                {
-                    Activate();
-                }
-                settings.pnragdoll = true;
-            }
-            else
-            {
-                if (settings.pnragdoll)
-                {
-                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.oRagdoll }, 32);
-                    settings.pnragdoll = false;
-                    Deactivate();
-                }
-            }
-        }
+        #endregion
 
-        public static void pUNDEADOFFRADAR()
-        {
-            if (bUndeadOffRadar)
-            {
-                Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.oHealthMax }, 0);
-                if (!settings.puoffradar)
-                {
-                    Activate();
-                }
-                settings.puoffradar = true;
-            }
-            else
-            {
-                if (settings.puoffradar)
-                {
-                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.oHealthMax }, 328f);
-                    settings.puoffradar = false;
-                    Deactivate();
-                }
-            }
-        }
-
-        public static void pSEATBELT()
-        {
-            if (bSeatBelt)
-            {
-                Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.oSeatbelt }, -55);
-                if (!settings.psbelt)
-                {
-                    Activate();
-                }
-                settings.psbelt = true;
-            }
-            else
-            {
-                if (settings.psbelt)
-                {
-                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.oSeatbelt }, -56);
-                    settings.psbelt = false;
-                    Deactivate();
-                }
-            }
-        }
-
-        public static void pSUPERJUMP()
-        {
-            if (bSuperJump)
-            {
-                if (!settings.psjump)
-                {
-                    frameFlagCount = frameFlagCount + 64;
-                    Activate();
-                }
-                Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oFrameFlags }, frameFlagCount);
-                settings.psjump = true;
-            }
-            else
-            {
-                if (settings.psjump)
-                {
-                    frameFlagCount = frameFlagCount - 64;
-                    Deactivate();
-                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oFrameFlags }, frameFlagCount);
-                    settings.psjump = false;
-                }
-            }
-        }
-
-        public static void pEXPLOSIVEAMMO()
-        {
-            if (bExplosiveAmmo)
-            {
-                if (!settings.psexammo)
-                {
-                    frameFlagCount = frameFlagCount + 8;
-                    Activate();
-                }
-                Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oFrameFlags }, frameFlagCount);
-                settings.psexammo = true;
-            }
-            else
-            {
-                if (settings.psexammo)
-                {
-                    frameFlagCount = frameFlagCount - 8;
-                    Deactivate();
-                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oFrameFlags }, frameFlagCount);
-                    settings.psexammo = false;
-                }
-            }
-        }
-        public static void pDISABLECOLLISION()
-        {
-            long paddr = Mem.ReadPointer(settings.WorldPTR, new int[] { offsets.pCPed, 0x30, 0x10, 0x20, 0x70, 0x0 });
-            long paddr2 = Mem.GetPtrAddr(paddr + 0x2C, null);
-
-            if (bDisableCollision)
-            {
-                Mem.writeFloat(paddr2, null, -1.0f);
-                if (!settings.pdiscol)
-                {
-                    Activate();
-                }
-                settings.pdiscol = true;
-            }
-            else
-            {
-                if (settings.pdiscol)
-                {
-                    Mem.writeFloat(paddr2, null, 0.25f);
-                    settings.pdiscol = false;
-                    Deactivate();
-                }
-            }
-        }
-        public static void vGODMODE()
-        {
-            long paddr = Mem.ReadPointer(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCVehicle });
-            if (paddr > 0)
-            {
-                long paddr2 = Mem.GetPtrAddr(paddr + offsets.oGod, null);
-                if (bVehicleGodMode)
-                {
-                    Mem.writeInt(paddr2, null, 1);
-                    if (!settings.vgodm)
-                    {
-                        Activate();
-                    }
-                    settings.vgodm = true;
-                }
-                else
-                {
-                    if (settings.vgodm)
-                    {
-                        Mem.writeInt(paddr2, null, 0);
-                        settings.vgodm = false;
-                        Deactivate();
-                    }
-                }
-            }
-        }
-        public static void cPRICE()
-        {
-            if (bGetCasinoPrice)
-            {
-                getLuckyWheelPrice(casinoPrice);
-            }
-        }
-
+        #region System/Main
         public static void getPointer()
         {
             try
             {
-                Mem = new Mem(settings.gameName);
+                Mem = new Mem(Settings.gameName);
 
-                var processes = Process.GetProcessesByName(settings.gameName);
+                var processes = Process.GetProcessesByName(Settings.gameName);
                 foreach (var p in processes)
                 {
                     if (p.Id > 0)
                     {
-                        settings.gameProcess = p.Id;
+                        Settings.gameProcess = p.Id;
                     }
                 }
 
-                if (settings.gameProcess > 0)
+                if (Settings.gameProcess > 0)
                 {
                     // GlobalPTR
                     long addr = Mem.FindPattern(pattern.GlobalPTR, pattern.GlobalPTR_Mask);
-                    settings.GlobalPTR = addr + Mem.ReadInt(addr + 3, null) + 7;
+                    Settings.GlobalPTR = addr + Mem.ReadInt(addr + 3, null) + 7;
 
                     // WorldPTR
                     long addr2 = Mem.FindPattern(pattern.WorldPTR, pattern.WorldPTR_Mask);
-                    settings.WorldPTR = addr2 + Mem.ReadInt(addr2 + 3, null) + 7;
+                    Settings.WorldPTR = addr2 + Mem.ReadInt(addr2 + 3, null) + 7;
 
                     // BlipPTR
                     long addr3 = Mem.FindPattern(pattern.BlipPTR, pattern.BlipPTR_Mask);
-                    settings.BlipPTR = addr3 + Mem.ReadInt(addr3 + 3, null) + 7;
+                    Settings.BlipPTR = addr3 + Mem.ReadInt(addr3 + 3, null) + 7;
 
                     // ReplayInterfacePTR
                     long addr4 = Mem.FindPattern(pattern.ReplayInterfacePTR, pattern.ReplayInterfacePTR_Mask);
-                    settings.ReplayInterfacePTR = addr4 + Mem.ReadInt(addr4 + 3, null) + 7;
+                    Settings.ReplayInterfacePTR = addr4 + Mem.ReadInt(addr4 + 3, null) + 7;
 
                     // LocalScriptsPTR
                     long addr5 = Mem.FindPattern(pattern.LocalScriptsPTR, pattern.LocalScriptsPTR_Mask);
-                    settings.LocalScriptsPTR = addr5 + Mem.ReadInt(addr5 + 3, null) + 7;
+                    Settings.LocalScriptsPTR = addr5 + Mem.ReadInt(addr5 + 3, null) + 7;
 
                     // PlayerCountPTR
                     long addr6 = Mem.FindPattern(pattern.PlayerCountPTR, pattern.PlayerCountPTR_Mask);
-                    settings.PlayerCountPTR = addr6 + Mem.ReadInt(addr6 + 3, null) + 7;
+                    Settings.PlayerCountPTR = addr6 + Mem.ReadInt(addr6 + 3, null) + 7;
 
                     // PickupDataPTR
                     long addr7 = Mem.FindPattern(pattern.PickupDataPTR, pattern.PickupDataPTR_Mask);
-                    settings.PickupDataPTR = addr7 + Mem.ReadInt(addr7 + 3, null) + 7;
+                    Settings.PickupDataPTR = addr7 + Mem.ReadInt(addr7 + 3, null) + 7;
 
                     // WeatherADDR
                     long addr8 = Mem.FindPattern(pattern.WeatherADDR, pattern.WeatherADDR_Mask);
-                    settings.WeatherADDR = addr8 + Mem.ReadInt(addr8 + 6, null) + 10;
+                    Settings.WeatherADDR = addr8 + Mem.ReadInt(addr8 + 6, null) + 10;
 
                     // SettingsPTR
                     long addr9 = Mem.FindPattern(pattern.SettingsPTR, pattern.SettingsPTR_Mask);
-                    settings.SettingsPTR = addr9 + Mem.ReadInt(addr9 + 3, null) - Convert.ToInt64("0x89", 16);
+                    Settings.SettingsPTR = addr9 + Mem.ReadInt(addr9 + 3, null) - Convert.ToInt64("0x89", 16);
 
                     // AimCPedPTR
                     long addr10 = Mem.FindPattern(pattern.AimCPedPTR, pattern.AimCPedPTR_Mask);
-                    settings.AimCPedPTR = addr10 + Mem.ReadInt(addr10 + 3, null) + 7;
+                    Settings.AimCPedPTR = addr10 + Mem.ReadInt(addr10 + 3, null) + 7;
 
                     // FriendlistPTR
                     long addr11 = Mem.FindPattern(pattern.FriendlistPTR, pattern.FriendlistPTR_Mask);
-                    settings.FriendlistPTR = addr11 + Mem.ReadInt(addr11 + 3, null) + 7;
+                    Settings.FriendlistPTR = addr11 + Mem.ReadInt(addr11 + 3, null) + 7;
                 }
                 else
                 {
@@ -405,36 +204,31 @@ namespace GTAVCSMM
                 Quit();
             }
         }
-        #endregion
-
-
-        #region TIMERS
-
-        private static void ProcessTimer_Tick(object sender, EventArgs e)
+        public static string ShowDialog(string text, string caption)
         {
+            Form prompt = new Form()
+            {
+                Width = 500,
+                Height = 150,
+                FormBorderStyle = FormBorderStyle.FixedDialog,
+                Text = caption,
+                StartPosition = FormStartPosition.Manual,
+                Location = new Point(100, 100)
+            };
+            Label textLabel = new Label() { Left = 50, Top = 20, Width = 400, Text = text };
+            TextBox textBox = new TextBox() { Left = 50, Top = 50, Width = 400 };
+            Button confirmation = new Button() { Text = "Ok", Left = 350, Width = 100, Top = 70, DialogResult = DialogResult.OK };
+            confirmation.Click += (sender, e) => { prompt.Close(); };
+            prompt.Controls.Add(textBox);
+            prompt.Controls.Add(confirmation);
+            prompt.Controls.Add(textLabel);
+            prompt.AcceptButton = confirmation;
+            prompt.MaximizeBox = false;
+            prompt.MinimizeBox = false;
+            prompt.TopMost = true;
 
+            return prompt.ShowDialog() == DialogResult.OK ? textBox.Text : "";
         }
-
-        private static void MemoryTimer_Tick(object sender, EventArgs e)
-        {
-            pGODMODE();
-            pNEVERWANTED();
-            pNORAGDOLL();
-            pUNDEADOFFRADAR();
-            pSEATBELT();
-            pDISABLECOLLISION();
-            vGODMODE();
-        }
-
-        private static void fastTimer_Tick(object sender, EventArgs e)
-        {
-            pSUPERJUMP();
-            pEXPLOSIVEAMMO();
-            cPRICE();
-        }
-
-        #endregion
-
         private static void Quit()
         {
             Environment.Exit(0);
@@ -482,7 +276,6 @@ namespace GTAVCSMM
                     listboxStyle();
                     listboxFill(0, 0);
                     fastTimer.Enabled = true;
-                    ProcessTimer.Enabled = true;
                     MemoryTimer.Enabled = true;
                     listBx.Enabled = true;
 
@@ -532,13 +325,8 @@ namespace GTAVCSMM
             // 
             // fastTimer
             // 
-            fastTimer.Interval = 1;
+            fastTimer.Interval = 10;
             fastTimer.Tick += new System.EventHandler(fastTimer_Tick);
-            // 
-            // ProcessTimer
-            // 
-            ProcessTimer.Interval = 100;
-            ProcessTimer.Tick += new System.EventHandler(ProcessTimer_Tick);
             // 
             // MemoryTimer
             // 
@@ -577,7 +365,9 @@ namespace GTAVCSMM
 
             mainForm.Show();
         }
+        #endregion
 
+        #region List strings
         public static void listboxStyle()
         {
         }
@@ -748,6 +538,7 @@ namespace GTAVCSMM
                             listBx.Items.Add("Destroy Vehicles (Cops)");
                             listBx.Items.Add("Destroy Vehicles (All)");
                             listBx.Items.Add("Revive Vehicles");
+                            listBx.Items.Add("Cop Killer");
 
                             menuMainLvl = 1;
                             menuLvl = 8;
@@ -1055,7 +846,9 @@ namespace GTAVCSMM
             listBx.SelectedIndex = 0;
             mainForm.TopMost = true;
         }
+        #endregion
 
+        #region List functions
         public static void runitem(int mainMenulevel, int menulevel, int menuItem)
         {
             int[] tpIdArray;
@@ -1228,13 +1021,13 @@ namespace GTAVCSMM
                                     break;
                                 case 1:
                                     Activate();
-                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPedWeaponManager, offsets.pCWeaponInfo, offsets.oRange }, 250F);
-                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPedWeaponManager, offsets.pCWeaponInfo, offsets.oLockRange }, 250F);
+                                    Mem.Write(Settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPedWeaponManager, offsets.pCWeaponInfo, offsets.oRange }, 250F);
+                                    Mem.Write(Settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPedWeaponManager, offsets.pCWeaponInfo, offsets.oLockRange }, 250F);
                                     break;
                                 case 2:
                                     Activate();
-                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPedWeaponManager, offsets.pCWeaponInfo, offsets.oReloadMult }, 10F);
-                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPedWeaponManager, offsets.pCWeaponInfo, offsets.oReloadVehicleMult }, 10F);
+                                    Mem.Write(Settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPedWeaponManager, offsets.pCWeaponInfo, offsets.oReloadMult }, 10F);
+                                    Mem.Write(Settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPedWeaponManager, offsets.pCWeaponInfo, offsets.oReloadVehicleMult }, 10F);
                                     break;
                                 case 3:
                                     listboxFill(4, 2);
@@ -1341,34 +1134,47 @@ namespace GTAVCSMM
                             switch (menuItem)
                             {
                                 case 0:
+                                    Activate();
                                     kill_npcs();
                                     break;
                                 case 1:
+                                    Activate();
                                     kill_enemies();
                                     break;
                                 case 2:
+                                    Activate();
                                     kill_cops();
                                     break;
                                 case 3:
+                                    Activate();
                                     blind_cops(true);
                                     break;
                                 case 4:
+                                    Activate();
                                     bribe_cops(true);
                                     break;
                                 case 5:
+                                    Activate();
                                     destroy_vehs_of_npcs();
                                     break;
                                 case 6:
+                                    Activate();
                                     destroy_vehs_of_enemies();
                                     break;
                                 case 7:
+                                    Activate();
                                     destroy_vehs_of_cops();
                                     break;
                                 case 8:
+                                    Activate();
                                     destroy_all_vehicles();
                                     break;
                                 case 9:
+                                    Activate();
                                     revive_all_vehicles();
+                                    break;
+                                case 10:
+                                    bCopKiller = !bCopKiller;
                                     break;
                             }
                             break;
@@ -1424,47 +1230,47 @@ namespace GTAVCSMM
                             {
                                 case 0:
                                     Activate();
-                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oSwimSpeed }, 0.0f);
+                                    Mem.Write(Settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oSwimSpeed }, 0.0f);
                                     break;
                                 case 1:
                                     Activate();
-                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oSwimSpeed }, 0.5f);
+                                    Mem.Write(Settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oSwimSpeed }, 0.5f);
                                     break;
                                 case 2:
                                     Activate();
-                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oSwimSpeed }, 1.0f);
+                                    Mem.Write(Settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oSwimSpeed }, 1.0f);
                                     break;
                                 case 3:
                                     Activate();
-                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oSwimSpeed }, 1.5f);
+                                    Mem.Write(Settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oSwimSpeed }, 1.5f);
                                     break;
                                 case 4:
                                     Activate();
-                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oSwimSpeed }, 2.0f);
+                                    Mem.Write(Settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oSwimSpeed }, 2.0f);
                                     break;
                                 case 5:
                                     Activate();
-                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oSwimSpeed }, 2.5f);
+                                    Mem.Write(Settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oSwimSpeed }, 2.5f);
                                     break;
                                 case 6:
                                     Activate();
-                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oSwimSpeed }, 3.0f);
+                                    Mem.Write(Settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oSwimSpeed }, 3.0f);
                                     break;
                                 case 7:
                                     Activate();
-                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oSwimSpeed }, 3.5f);
+                                    Mem.Write(Settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oSwimSpeed }, 3.5f);
                                     break;
                                 case 8:
                                     Activate();
-                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oSwimSpeed }, 4.0f);
+                                    Mem.Write(Settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oSwimSpeed }, 4.0f);
                                     break;
                                 case 9:
                                     Activate();
-                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oSwimSpeed }, 4.5f);
+                                    Mem.Write(Settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oSwimSpeed }, 4.5f);
                                     break;
                                 case 10:
                                     Activate();
-                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oSwimSpeed }, 5.0f);
+                                    Mem.Write(Settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oSwimSpeed }, 5.0f);
                                     break;
                             }
                             break;
@@ -1474,47 +1280,47 @@ namespace GTAVCSMM
                             {
                                 case 0:
                                     Activate();
-                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oWalkSpeed }, 0.0f);
+                                    Mem.Write(Settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oWalkSpeed }, 0.0f);
                                     break;
                                 case 1:
                                     Activate();
-                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oWalkSpeed }, 0.5f);
+                                    Mem.Write(Settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oWalkSpeed }, 0.5f);
                                     break;
                                 case 2:
                                     Activate();
-                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oWalkSpeed }, 1.0f);
+                                    Mem.Write(Settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oWalkSpeed }, 1.0f);
                                     break;
                                 case 3:
                                     Activate();
-                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oWalkSpeed }, 1.5f);
+                                    Mem.Write(Settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oWalkSpeed }, 1.5f);
                                     break;
                                 case 4:
                                     Activate();
-                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oWalkSpeed }, 2.0f);
+                                    Mem.Write(Settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oWalkSpeed }, 2.0f);
                                     break;
                                 case 5:
                                     Activate();
-                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oWalkSpeed }, 2.5f);
+                                    Mem.Write(Settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oWalkSpeed }, 2.5f);
                                     break;
                                 case 6:
                                     Activate();
-                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oWalkSpeed }, 3.0f);
+                                    Mem.Write(Settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oWalkSpeed }, 3.0f);
                                     break;
                                 case 7:
                                     Activate();
-                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oWalkSpeed }, 3.5f);
+                                    Mem.Write(Settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oWalkSpeed }, 3.5f);
                                     break;
                                 case 8:
                                     Activate();
-                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oWalkSpeed }, 4.0f);
+                                    Mem.Write(Settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oWalkSpeed }, 4.0f);
                                     break;
                                 case 9:
                                     Activate();
-                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oWalkSpeed }, 4.5f);
+                                    Mem.Write(Settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oWalkSpeed }, 4.5f);
                                     break;
                                 case 10:
                                     Activate();
-                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oWalkSpeed }, 5.0f);
+                                    Mem.Write(Settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oWalkSpeed }, 5.0f);
                                     break;
                             }
                             break;
@@ -1524,47 +1330,47 @@ namespace GTAVCSMM
                             {
                                 case 0:
                                     Activate();
-                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oRunSpeed }, 0.0f);
+                                    Mem.Write(Settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oRunSpeed }, 0.0f);
                                     break;
                                 case 1:
                                     Activate();
-                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oRunSpeed }, 0.5f);
+                                    Mem.Write(Settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oRunSpeed }, 0.5f);
                                     break;
                                 case 2:
                                     Activate();
-                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oRunSpeed }, 1.0f);
+                                    Mem.Write(Settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oRunSpeed }, 1.0f);
                                     break;
                                 case 3:
                                     Activate();
-                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oRunSpeed }, 1.5f);
+                                    Mem.Write(Settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oRunSpeed }, 1.5f);
                                     break;
                                 case 4:
                                     Activate();
-                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oRunSpeed }, 2.0f);
+                                    Mem.Write(Settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oRunSpeed }, 2.0f);
                                     break;
                                 case 5:
                                     Activate();
-                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oRunSpeed }, 2.5f);
+                                    Mem.Write(Settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oRunSpeed }, 2.5f);
                                     break;
                                 case 6:
                                     Activate();
-                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oRunSpeed }, 3.0f);
+                                    Mem.Write(Settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oRunSpeed }, 3.0f);
                                     break;
                                 case 7:
                                     Activate();
-                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oRunSpeed }, 3.5f);
+                                    Mem.Write(Settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oRunSpeed }, 3.5f);
                                     break;
                                 case 8:
                                     Activate();
-                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oRunSpeed }, 4.0f);
+                                    Mem.Write(Settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oRunSpeed }, 4.0f);
                                     break;
                                 case 9:
                                     Activate();
-                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oRunSpeed }, 4.5f);
+                                    Mem.Write(Settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oRunSpeed }, 4.5f);
                                     break;
                                 case 10:
                                     Activate();
-                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oRunSpeed }, 5.0f);
+                                    Mem.Write(Settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oRunSpeed }, 5.0f);
                                     break;
                             }
                             break;
@@ -1574,27 +1380,27 @@ namespace GTAVCSMM
                             {
                                 case 0:
                                     Activate();
-                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oWanted }, 0);
+                                    Mem.Write(Settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oWanted }, 0);
                                     break;
                                 case 1:
                                     Activate();
-                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oWanted }, 1);
+                                    Mem.Write(Settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oWanted }, 1);
                                     break;
                                 case 2:
                                     Activate();
-                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oWanted }, 2);
+                                    Mem.Write(Settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oWanted }, 2);
                                     break;
                                 case 3:
                                     Activate();
-                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oWanted }, 3);
+                                    Mem.Write(Settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oWanted }, 3);
                                     break;
                                 case 4:
                                     Activate();
-                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oWanted }, 4);
+                                    Mem.Write(Settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oWanted }, 4);
                                     break;
                                 case 5:
                                     Activate();
-                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oWanted }, 5);
+                                    Mem.Write(Settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oWanted }, 5);
                                     break;
                             }
                             break;
@@ -1609,51 +1415,51 @@ namespace GTAVCSMM
                             {
                                 case 0:
                                     Activate();
-                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPedWeaponManager, offsets.pCWeaponInfo, offsets.oDamage }, 1.0f);
+                                    Mem.Write(Settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPedWeaponManager, offsets.pCWeaponInfo, offsets.oDamage }, 1.0f);
                                     break;
                                 case 1:
                                     Activate();
-                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPedWeaponManager, offsets.pCWeaponInfo, offsets.oDamage }, 2.0f);
+                                    Mem.Write(Settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPedWeaponManager, offsets.pCWeaponInfo, offsets.oDamage }, 2.0f);
                                     break;
                                 case 2:
                                     Activate();
-                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPedWeaponManager, offsets.pCWeaponInfo, offsets.oDamage }, 3.0f);
+                                    Mem.Write(Settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPedWeaponManager, offsets.pCWeaponInfo, offsets.oDamage }, 3.0f);
                                     break;
                                 case 3:
                                     Activate();
-                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPedWeaponManager, offsets.pCWeaponInfo, offsets.oDamage }, 5.0f);
+                                    Mem.Write(Settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPedWeaponManager, offsets.pCWeaponInfo, offsets.oDamage }, 5.0f);
                                     break;
                                 case 4:
                                     Activate();
-                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPedWeaponManager, offsets.pCWeaponInfo, offsets.oDamage }, 10.0f);
+                                    Mem.Write(Settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPedWeaponManager, offsets.pCWeaponInfo, offsets.oDamage }, 10.0f);
                                     break;
                                 case 5:
                                     Activate();
-                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPedWeaponManager, offsets.pCWeaponInfo, offsets.oDamage }, 20.0f);
+                                    Mem.Write(Settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPedWeaponManager, offsets.pCWeaponInfo, offsets.oDamage }, 20.0f);
                                     break;
                                 case 6:
                                     Activate();
-                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPedWeaponManager, offsets.pCWeaponInfo, offsets.oDamage }, 30.0f);
+                                    Mem.Write(Settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPedWeaponManager, offsets.pCWeaponInfo, offsets.oDamage }, 30.0f);
                                     break;
                                 case 7:
                                     Activate();
-                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPedWeaponManager, offsets.pCWeaponInfo, offsets.oDamage }, 50.0f);
+                                    Mem.Write(Settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPedWeaponManager, offsets.pCWeaponInfo, offsets.oDamage }, 50.0f);
                                     break;
                                 case 8:
                                     Activate();
-                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPedWeaponManager, offsets.pCWeaponInfo, offsets.oDamage }, 100.0f);
+                                    Mem.Write(Settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPedWeaponManager, offsets.pCWeaponInfo, offsets.oDamage }, 100.0f);
                                     break;
                                 case 9:
                                     Activate();
-                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPedWeaponManager, offsets.pCWeaponInfo, offsets.oDamage }, 200.0f);
+                                    Mem.Write(Settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPedWeaponManager, offsets.pCWeaponInfo, offsets.oDamage }, 200.0f);
                                     break;
                                 case 10:
                                     Activate();
-                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPedWeaponManager, offsets.pCWeaponInfo, offsets.oDamage }, 30.0f);
+                                    Mem.Write(Settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPedWeaponManager, offsets.pCWeaponInfo, offsets.oDamage }, 30.0f);
                                     break;
                                 case 11:
                                     Activate();
-                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPedWeaponManager, offsets.pCWeaponInfo, offsets.oDamage }, 500.0f);
+                                    Mem.Write(Settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPedWeaponManager, offsets.pCWeaponInfo, offsets.oDamage }, 500.0f);
                                     break;
                             }
                             break;
@@ -2496,7 +2302,9 @@ namespace GTAVCSMM
             }
 
         }
+        #endregion
 
+        #region Keyboard hooks
         public static void runSingleItem()
         {
             Console.WriteLine("Command to run backward: " + LastMenuMainLvl + " " + LastMenuLvl + " " + LastMenuItm);
@@ -2614,247 +2422,252 @@ namespace GTAVCSMM
                         /*
                          * Development
                          */
-                        to_blip(new int[] { 819 });
                     }
                 }
             }
             return CallNextHookEx(_hookID, nCode, wParam, lParam);
         }
+        #endregion
 
-        public static void LoadSession(int id)
+        #region Methods
+        public static void pGODMODE()
         {
-            Task.Run(() =>
+            if (bGodMode)
             {
-                SG<int>(1575012, id);
-                SG<int>(1574589 + 2, id == -1 ? -1 : 0);
-                SG<int>(1574589, 1);
-            });
-        }
-
-        public static void getLuckyWheelPrice(int id)
-        {
-            string script = "casino_lucky_wheel";
-            int Index = 274 + 14;
-            long scriptAddr = GetLocalScript(script);
-            if (scriptAddr > 0 && id > 0)
-            {
-                long scriptAddr2 = scriptAddr + (8 * Index);
-                Console.WriteLine(scriptAddr2);
-                int scriptInt = Mem.ReadInt(scriptAddr2, null);
-                Console.WriteLine(scriptInt);
-                Mem.writeInt(scriptAddr2, null, id);
-            }
-        }
-        public static void setRPMultipler(float m)
-        {
-            SG<float>(262145 + 1, m);
-        }
-
-        public static void setREPMultipler(float m)
-        {
-            SG<float>(262145 + 31294, m); // Street Race - old 31278 + 16 for 1.60
-            SG<float>(262145 + 31295, m); // Pursuit Race
-            SG<float>(262145 + 31296, m); // Scramble
-            SG<float>(262145 + 31297, m); // Head 2 Head
-            SG<float>(262145 + 31289, m); // Car Meet
-            SG<float>(262145 + 31300, m); // Test Track
-            SG<float>(262145 + 31328, m); // Auto Shop Contract
-            SG<float>(262145 + 31329, m); // Customer Deliveries
-            SG<float>(262145 + 31330, m); // Exotic Exports Deliveries
-        }
-
-        #region Teleport part
-        private static void Teleport(Location l)
-        {
-            if (Mem.ReadInt(settings.WorldPTR, new int[] { offsets.pCPed, offsets.oInVehicle }) == 0)
-            {
-                CarX = l.x;
-                CarY = l.y;
-                CarZ = l.z;
-            }
-            else
-            {
-                PlayerX = l.x;
-                PlayerY = l.y;
-                PlayerZ = l.z;
-            }
-        }
-
-        private static void teleportBlip(int[] ID, int[] color, int height = 0)
-        {
-            Location tmpLoc = getBlipCoords(ID, color, height);
-            if (tmpLoc.x != 0 && tmpLoc.y != 0)
-            {
-                Teleport(tmpLoc);
-            }
-            else
-            {
-                Console.WriteLine("No TP, wrong coords (x, y).");
-            }
-        }
-
-        private static Location getBlipCoords(int[] id, int[] color = null, int height = 0)
-        {
-            float zOffset = 0;
-            Location tempLocation = new Location() { };
-            for (int i = 2000; i > 1; i--)
-            {
-                long blip = settings.BlipPTR + (i * 8);
-                int blipId = Mem.ReadInt(blip, new int[] { 0x40 });
-                int blipColor = Mem.ReadInt(blip, new int[] { 0x48 });
-                if (id != null && id.Contains(blipId))
+                Mem.Write(Settings.WorldPTR, new int[] { offsets.pCPed, offsets.oGod }, 1);
+                if (!Settings.pgodm)
                 {
-                    zOffset = (float)(Math.Round(Math.Pow(i, -0.2), 1) * height);
-                    tempLocation = new Location
-                    {
-                        x = Mem.ReadFloat(blip, new int[] { 0x10 }),
-                        y = Mem.ReadFloat(blip, new int[] { 0x14 }),
-                        z = Mem.ReadFloat(blip, new int[] { 0x18 })
-                    };
+                    Activate();
+                }
+                Settings.pgodm = true;
+            }
+            else
+            {
+                if (Settings.pgodm)
+                {
+                    Mem.Write(Settings.WorldPTR, new int[] { offsets.pCPed, offsets.oGod }, 0);
+                    Settings.pgodm = false;
+                    Deactivate();
+                }
+            }
+        }
 
-                    if (color != null && color.Contains(blipColor))
+        public static void pNEVERWANTED()
+        {
+            if (bNeverWanted)
+            {
+                Mem.Write(Settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oWanted }, 0);
+                if (!Settings.pnwanted)
+                {
+                    Activate();
+                }
+                Settings.pnwanted = true;
+            }
+            else
+            {
+                if (Settings.pnwanted)
+                {
+                    Settings.pnwanted = false;
+                    Deactivate();
+                }
+            }
+        }
+
+        public static void pNORAGDOLL()
+        {
+            if (bNoRagdoll)
+            {
+                Mem.Write(Settings.WorldPTR, new int[] { offsets.pCPed, offsets.oRagdoll }, 1);
+                if (!Settings.pnragdoll)
+                {
+                    Activate();
+                }
+                Settings.pnragdoll = true;
+            }
+            else
+            {
+                if (Settings.pnragdoll)
+                {
+                    Mem.Write(Settings.WorldPTR, new int[] { offsets.pCPed, offsets.oRagdoll }, 32);
+                    Settings.pnragdoll = false;
+                    Deactivate();
+                }
+            }
+        }
+
+        public static void pUNDEADOFFRADAR()
+        {
+            if (bUndeadOffRadar)
+            {
+                Mem.Write(Settings.WorldPTR, new int[] { offsets.pCPed, offsets.oHealthMax }, 0);
+                if (!Settings.puoffradar)
+                {
+                    Activate();
+                }
+                Settings.puoffradar = true;
+            }
+            else
+            {
+                if (Settings.puoffradar)
+                {
+                    Mem.Write(Settings.WorldPTR, new int[] { offsets.pCPed, offsets.oHealthMax }, 328f);
+                    Settings.puoffradar = false;
+                    Deactivate();
+                }
+            }
+        }
+
+        public static void pSEATBELT()
+        {
+            if (bSeatBelt)
+            {
+                Mem.Write(Settings.WorldPTR, new int[] { offsets.pCPed, offsets.oSeatbelt }, -55);
+                if (!Settings.psbelt)
+                {
+                    Activate();
+                }
+                Settings.psbelt = true;
+            }
+            else
+            {
+                if (Settings.psbelt)
+                {
+                    Mem.Write(Settings.WorldPTR, new int[] { offsets.pCPed, offsets.oSeatbelt }, -56);
+                    Settings.psbelt = false;
+                    Deactivate();
+                }
+            }
+        }
+
+        public static void pSUPERJUMP()
+        {
+            if (bSuperJump)
+            {
+                if (!Settings.psjump)
+                {
+                    frameFlagCount = frameFlagCount + 64;
+                    Activate();
+                }
+                Mem.Write(Settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oFrameFlags }, frameFlagCount);
+                Settings.psjump = true;
+            }
+            else
+            {
+                if (Settings.psjump)
+                {
+                    frameFlagCount = frameFlagCount - 64;
+                    Deactivate();
+                    Mem.Write(Settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oFrameFlags }, frameFlagCount);
+                    Settings.psjump = false;
+                }
+            }
+        }
+
+        public static void pEXPLOSIVEAMMO()
+        {
+            if (bExplosiveAmmo)
+            {
+                if (!Settings.psexammo)
+                {
+                    frameFlagCount = frameFlagCount + 8;
+                    Activate();
+                }
+                Mem.Write(Settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oFrameFlags }, frameFlagCount);
+                Settings.psexammo = true;
+            }
+            else
+            {
+                if (Settings.psexammo)
+                {
+                    frameFlagCount = frameFlagCount - 8;
+                    Deactivate();
+                    Mem.Write(Settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oFrameFlags }, frameFlagCount);
+                    Settings.psexammo = false;
+                }
+            }
+        }
+        public static void pDISABLECOLLISION()
+        {
+            long paddr = Mem.ReadPointer(Settings.WorldPTR, new int[] { offsets.pCPed, 0x30, 0x10, 0x20, 0x70, 0x0 });
+            long paddr2 = Mem.GetPtrAddr(paddr + 0x2C, null);
+
+            if (bDisableCollision)
+            {
+                Mem.writeFloat(paddr2, null, -1.0f);
+                if (!Settings.pdiscol)
+                {
+                    Activate();
+                }
+                Settings.pdiscol = true;
+            }
+            else
+            {
+                if (Settings.pdiscol)
+                {
+                    Mem.writeFloat(paddr2, null, 0.25f);
+                    Settings.pdiscol = false;
+                    Deactivate();
+                }
+            }
+        }
+        public static void vGODMODE()
+        {
+            long paddr = Mem.ReadPointer(Settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCVehicle });
+            if (paddr > 0)
+            {
+                long paddr2 = Mem.GetPtrAddr(paddr + offsets.oGod, null);
+                if (bVehicleGodMode)
+                {
+                    Mem.writeInt(paddr2, null, 1);
+                    if (!Settings.vgodm)
                     {
-                        tempLocation = new Location
-                        {
-                            x = Mem.ReadFloat(blip, new int[] { 0x10 }),
-                            y = Mem.ReadFloat(blip, new int[] { 0x14 }),
-                            z = Mem.ReadFloat(blip, new int[] { 0x18 })
-                        };
+                        Activate();
+                    }
+                    Settings.vgodm = true;
+                }
+                else
+                {
+                    if (Settings.vgodm)
+                    {
+                        Mem.writeInt(paddr2, null, 0);
+                        Settings.vgodm = false;
+                        Deactivate();
                     }
                 }
             }
-            if (tempLocation.z == 20)
-            {
-                tempLocation.z = -255F;
-            } else
-            {
-                tempLocation.z = tempLocation.z + zOffset;
-            }
-
-            Console.WriteLine("New location: " + tempLocation.x + ", " + tempLocation.y + ", " + tempLocation.z);
-            return new Location { x = tempLocation.x, y = tempLocation.y, z = tempLocation.z };
         }
-
-        public static float PlayerX
+        public static void vCOPKILLER()
         {
-            get { return Mem.ReadFloat(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCNavigation, offsets.oPositionX }); }
-            set
+            if (bCopKiller)
             {
-                Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCNavigation, offsets.oPositionX }, value);
-                Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.oVisualX }, value);
-            }
-        }
-        public static float PlayerY
-        {
-            get { return Mem.ReadFloat(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCNavigation, offsets.oPositionY }); }
-            set
-            {
-                Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCNavigation, offsets.oPositionY }, value);
-                Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.oVisualY }, value);
-            }
-        }
-        public static float PlayerZ
-        {
-            get { return Mem.ReadFloat(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCNavigation, offsets.oPositionZ }); }
-            set
-            {
-                Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCNavigation, offsets.oPositionZ }, value);
-                Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.oVisualZ }, value);
-            }
-        }
-
-        public static float CarX
-        {
-            get { return Mem.ReadFloat(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCVehicle, offsets.pCNavigation, offsets.oPositionX }); }
-            set
-            {
-                Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCVehicle, offsets.pCNavigation, offsets.oPositionX }, value);
-                Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCVehicle, offsets.oVisualX }, value);
-            }
-        }
-        public static float CarY
-        {
-            get { return Mem.ReadFloat(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCVehicle, offsets.pCNavigation, offsets.oPositionY }); }
-            set
-            {
-                Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCVehicle, offsets.pCNavigation, offsets.oPositionY }, value);
-                Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCVehicle, offsets.oVisualY }, value);
-            }
-        }
-        public static float CarZ
-        {
-            get { return Mem.ReadFloat(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCVehicle, offsets.pCNavigation, offsets.oPositionZ }); }
-            set
-            {
-                Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCVehicle, offsets.pCNavigation, offsets.oPositionZ }, value);
-                Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCVehicle, offsets.oVisualZ }, value);
-            }
-        }
-        #endregion
-
-        #region Global Addresses function
-        public static T GG<T>(int index) where T : struct { return Mem.Read<T>(GA(index)); }
-
-        public static void SG<T>(int index, T vaule) where T : struct { Mem.Write<T>(GA(index), vaule); }
-        
-        public static long GA(int Index)
-        {
-            long p = settings.GlobalPTR + (8 * (Index >> 0x12 & 0x3F));
-            long p_ga = Mem.ReadPointer(p, null);
-            long p_ga_final = p_ga + (8 * (Index & 0x3FFFF));
-            return p_ga_final;
-        }
-
-        public static void setStat(string stat, int value)
-        {
-            uint Stat_ResotreHash = GG<uint>(1655453 + 4);
-            int Stat_ResotreValue = GG<int>(1020252 + 5526);
-            Console.WriteLine(Stat_ResotreHash + " " + Stat_ResotreValue);
-            SG<uint>(1655453 + 4, Joaat(stat));
-            SG<int>(1020252 + 5526, value);
-            SG<int>(1644218 + 1139, -1);
-            Thread.Sleep(1000);
-            SG<uint>(1655453 + 4, Stat_ResotreHash);
-            SG<int>(1020252 + 5526, Stat_ResotreValue);
-        }
-        public static uint Joaat(string input)
-        {
-            uint num1 = 0U;
-            input = input.ToLower();
-            foreach (char c in input)
-            {
-                uint num2 = num1 + c;
-                uint num3 = num2 + (num2 << 10);
-                num1 = num3 ^ num3 >> 6;
-            }
-            uint num4 = num1 + (num1 << 3);
-            uint num5 = num4 ^ num4 >> 11;
-
-            return num5 + (num5 << 15);
-        }
-        #endregion
-        public static long GetLocalScript(string name)
-        {
-            int size = name.Length;
-            for (int i = 0; i <= 52; i++)
-            {
-                long lc_p = Mem.ReadPointer(settings.LocalScriptsPTR, new int[] { (i * 8), 0xB0 });
-                string lc_n = Mem.ReadString(settings.LocalScriptsPTR, new int[] { (i * 8), 0xD0 }, size);
-                if (lc_n == name)
+                if (!Settings.cKiller)
                 {
-                    i = 53;
-                    Console.WriteLine(lc_p);
-                    return (lc_p);
+                    Settings.cKiller = true;
+                    Activate();
+                }
+                kill_cops();
+            }
+            else
+            {
+                if (Settings.cKiller)
+                {
+                    Settings.cKiller = false;
+                    Deactivate();
                 }
             }
-            return 0;
         }
-
+        public static void cPRICE()
+        {
+            if (bGetCasinoPrice)
+            {
+                getLuckyWheelPrice(casinoPrice);
+            }
+        }
         public static void carSpawn(string Hash, int pegasus = 0)
         {
             string model = Hash.ToLower();
-            float ped_heading = Mem.ReadFloat(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCNavigation, offsets.oHeading });
-            float ped_heading2 = Mem.ReadFloat(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCNavigation, offsets.oHeading2 });
+            float ped_heading = Mem.ReadFloat(Settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCNavigation, offsets.oHeading });
+            float ped_heading2 = Mem.ReadFloat(Settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCNavigation, offsets.oHeading2 });
             Console.WriteLine(ped_heading + " " + ped_heading2);
             float spawner_x = PlayerX;
             float spawner_y = PlayerY;
@@ -2934,54 +2747,77 @@ namespace GTAVCSMM
             SG<int>(offsets.oVMCreate + 27 + 20, weapon2); // primary weapon
             // _SG_Int(offsets.oVMCreate + 27 + 1, "FCK4FD"); // License plate
         }
-        public static string ShowDialog(string text, string caption)
-        {
-            Form prompt = new Form()
-            {
-                Width = 500,
-                Height = 150,
-                FormBorderStyle = FormBorderStyle.FixedDialog,
-                Text = caption,
-                StartPosition = FormStartPosition.Manual,
-                Location = new Point(100, 100)
-            };
-            Label textLabel = new Label() { Left = 50, Top = 20, Width = 400, Text = text };
-            TextBox textBox = new TextBox() { Left = 50, Top = 50, Width = 400 };
-            Button confirmation = new Button() { Text = "Ok", Left = 350, Width = 100, Top = 70, DialogResult = DialogResult.OK };
-            confirmation.Click += (sender, e) => { prompt.Close(); };
-            prompt.Controls.Add(textBox);
-            prompt.Controls.Add(confirmation);
-            prompt.Controls.Add(textLabel);
-            prompt.AcceptButton = confirmation;
-            prompt.MaximizeBox = false;
-            prompt.MinimizeBox = false;
-            prompt.TopMost = true;
 
-            return prompt.ShowDialog() == DialogResult.OK ? textBox.Text : "";
+        public static void LoadSession(int id)
+        {
+            Task.Run(() =>
+            {
+                SG<int>(1575012, id);
+                SG<int>(1574589 + 2, id == -1 ? -1 : 0);
+                SG<int>(1574589, 1);
+            });
+        }
+        public static void empty_session()
+        {
+            Task.Run(() =>
+            {
+                ProcessMgr.SuspendProcess(Settings.gameProcess);
+                Task.Delay(10000).Wait();
+                ProcessMgr.ResumeProcess(Settings.gameProcess);
+            });
         }
 
-        /*
-         * Development
-         */
+        public static void getLuckyWheelPrice(int id)
+        {
+            string script = "casino_lucky_wheel";
+            int Index = 274 + 14;
+            long scriptAddr = GetLocalScript(script);
+            if (scriptAddr > 0 && id > 0)
+            {
+                long scriptAddr2 = scriptAddr + (8 * Index);
+                Console.WriteLine(scriptAddr2);
+                int scriptInt = Mem.ReadInt(scriptAddr2, null);
+                Console.WriteLine(scriptInt);
+                Mem.writeInt(scriptAddr2, null, id);
+            }
+        }
+        public static void setRPMultipler(float m)
+        {
+            SG<float>(262145 + 1, m);
+        }
+
+        public static void setREPMultipler(float m)
+        {
+            SG<float>(262145 + 31294, m); // Street Race - old 31278 + 16 for 1.60
+            SG<float>(262145 + 31295, m); // Pursuit Race
+            SG<float>(262145 + 31296, m); // Scramble
+            SG<float>(262145 + 31297, m); // Head 2 Head
+            SG<float>(262145 + 31289, m); // Car Meet
+            SG<float>(262145 + 31300, m); // Test Track
+            SG<float>(262145 + 31328, m); // Auto Shop Contract
+            SG<float>(262145 + 31329, m); // Customer Deliveries
+            SG<float>(262145 + 31330, m); // Exotic Exports Deliveries
+        }
         public static void getPeds()
         {
             int pedListOffset = 0x10;
-            int count = Mem.ReadInt(settings.ReplayInterfacePTR, new int[] { offsets.pCPedInterface, offsets.oPedNum });
+            int count = Mem.ReadInt(Settings.ReplayInterfacePTR, new int[] { offsets.pCPedInterface, offsets.oPedNum });
             for (int i = 0; i <= count; i++)
             {
-                long Ped = Mem.ReadPointer(settings.ReplayInterfacePTR, new int[] { offsets.pCPedInterface, offsets.pPedList, (i * pedListOffset) });
-                int pedType = Mem.ReadByte(settings.ReplayInterfacePTR, new int[] { offsets.pCPedInterface, offsets.pPedList, (i * pedListOffset), offsets.oEntityType });
-                if (pedType != 156 && Mem.IsValid(Ped)) {
+                long Ped = Mem.ReadPointer(Settings.ReplayInterfacePTR, new int[] { offsets.pCPedInterface, offsets.pPedList, (i * pedListOffset) });
+                int pedType = Mem.ReadByte(Settings.ReplayInterfacePTR, new int[] { offsets.pCPedInterface, offsets.pPedList, (i * pedListOffset), offsets.oEntityType });
+                if (pedType != 156 && Mem.IsValid(Ped))
+                {
                     pedList.Add(Ped);
                 }
             }
         }
         public static void getVehs()
         {
-            int count = Mem.ReadInt(settings.ReplayInterfacePTR, new int[] { offsets.pCVehicleInterface, offsets.oVehNum });
+            int count = Mem.ReadInt(Settings.ReplayInterfacePTR, new int[] { offsets.pCVehicleInterface, offsets.oVehNum });
             for (int i = 0; i <= count; i++)
             {
-                long Veh = Mem.ReadPointer(settings.ReplayInterfacePTR, new int[] { offsets.pCVehicleInterface, offsets.pVehList, (i * 0x10) });
+                long Veh = Mem.ReadPointer(Settings.ReplayInterfacePTR, new int[] { offsets.pCVehicleInterface, offsets.pVehList, (i * 0x10) });
                 if (Mem.IsValid(Veh))
                 {
                     vehList.Add(Veh);
@@ -3022,26 +2858,17 @@ namespace GTAVCSMM
             SG<int>(262145 + 17211, toggle ? 1 : 360000);  // Meth Staff
             SG<int>(262145 + 17212, toggle ? 1 : 60000);  // Weed Staff
         }
-        public static void empty_session()
-        {
-            Task.Run(() =>
-            {
-                ProcessMgr.SuspendProcess(settings.gameProcess);
-                Task.Delay(10000).Wait();
-                ProcessMgr.ResumeProcess(settings.gameProcess);
-            });
-        }
 
         public static void setWeaponUnlimitedAmmo()
         {
             Task.Run(() =>
             {
-                ProcessMgr.SuspendProcess(settings.gameProcess);
+                ProcessMgr.SuspendProcess(Settings.gameProcess);
                 Task.Delay(20).Wait();
-                Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCWeaponInventory, offsets.oAmmoModifier }, 1);
+                Mem.Write(Settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCWeaponInventory, offsets.oAmmoModifier }, 1);
                 Task.Delay(20).Wait();
                 Activate();
-                ProcessMgr.ResumeProcess(settings.gameProcess);
+                ProcessMgr.ResumeProcess(Settings.gameProcess);
             });
         }
 
@@ -3049,7 +2876,6 @@ namespace GTAVCSMM
         {
             Task.Run(() =>
             {
-                Activate();
                 getPeds();
                 for (int i = 0; i < pedList.Count; i++)
                 {
@@ -3059,12 +2885,11 @@ namespace GTAVCSMM
                 }
             });
         }
-        
+
         public static void kill_enemies()
         {
             Task.Run(() =>
             {
-                Activate();
                 getPeds();
                 for (int i = 0; i < pedList.Count; i++)
                 {
@@ -3081,7 +2906,6 @@ namespace GTAVCSMM
         {
             Task.Run(() =>
             {
-                Activate();
                 getPeds();
                 for (int i = 0; i < pedList.Count; i++)
                 {
@@ -3101,7 +2925,6 @@ namespace GTAVCSMM
         {
             Task.Run(() =>
             {
-                Activate();
                 SG<int>(offsets.oVMYCar + 4625, toggle ? 1 : 0);
                 if (toggle) SG<int>(offsets.oVMYCar + 4627, get_network_time() + 3600000);
                 SG<int>(offsets.oVMYCar + 4624, toggle ? 5 : 0);
@@ -3112,7 +2935,6 @@ namespace GTAVCSMM
         {
             Task.Run(() =>
             {
-                Activate();
                 SG<int>(offsets.oVMYCar + 4625, toggle ? 1 : 0);
                 if (toggle) SG<int>(offsets.oVMYCar + 4627, get_network_time() + 3600000);
                 SG<int>(offsets.oVMYCar + 4624, toggle ? 21 : 0);
@@ -3123,7 +2945,6 @@ namespace GTAVCSMM
         {
             Task.Run(() =>
             {
-                Activate();
                 revive_vehicle(vehicle);
                 set_health3(vehicle, -999.9f);
             });
@@ -3132,7 +2953,6 @@ namespace GTAVCSMM
         {
             Task.Run(() =>
             {
-                Activate();
                 getPeds();
                 for (int i = 0; i < pedList.Count; i++)
                 {
@@ -3146,7 +2966,6 @@ namespace GTAVCSMM
         {
             Task.Run(() =>
             {
-                Activate();
                 getPeds();
                 for (int i = 0; i < pedList.Count; i++)
                 {
@@ -3160,7 +2979,6 @@ namespace GTAVCSMM
         {
             Task.Run(() =>
             {
-                Activate();
                 getPeds();
                 for (int i = 0; i < pedList.Count; i++)
                 {
@@ -3177,7 +2995,6 @@ namespace GTAVCSMM
         {
             Task.Run(() =>
             {
-                Activate();
                 getVehs();
                 for (int i = 0; i < vehList.Count; i++)
                 {
@@ -3190,7 +3007,6 @@ namespace GTAVCSMM
         {
             Task.Run(() =>
             {
-                Activate();
                 getVehs();
                 for (int i = 0; i < vehList.Count; i++)
                 {
@@ -3226,7 +3042,7 @@ namespace GTAVCSMM
         public static bool is_enemy(long ped) { return ((get_hostility(ped) > 1) ? true : false); }
         public static uint get_pedtype(long ped) { return Mem.Read<uint>(ped + 0x10B8) << 11 >> 25; }
         public static void set_health(long ped, float value) { Mem.Write<float>(ped + 0x280, value); }
-        public static long get_local_ped() { return Mem.ReadPointer(settings.WorldPTR, new int[] { 0x8 }); }
+        public static long get_local_ped() { return Mem.ReadPointer(Settings.WorldPTR, new int[] { 0x8 }); }
         public static long get_ped_inventory(long ped) { return Mem.Read<long>(ped + 0x10D0); }
         public static bool is_in_vehicle(long ped) { return ((Mem.Read<byte>(ped + 0xE52) == 1) ? true : false); }
 
@@ -3252,71 +3068,198 @@ namespace GTAVCSMM
             set_health3(vehicle, 1000.0f);
             set_engine_health(vehicle, 1000.0f);
         }
-        public static void set_position(long entity, Vector3 pos)
-        {
-            set_real_position(entity, pos);
-            set_visual_position(entity, pos);
-        }
-        public static void set_real_position(long entity, Vector3 pos) { nav_set_real_position(get_navigation(entity), pos); }
-        public static void set_visual_position(long entity, Vector3 pos) { Mem.Write<Vector3>(entity + 0x90, pos); }
-        public static void nav_set_real_position(long navigation, Vector3 pos) { Mem.Write<Vector3>(navigation + 0x50, pos); }
+        #endregion
 
-        #region Vector3
-        public static long get_blip(int[] icons, int[] colors = null)
+        #region Teleport part
+        private static void Teleport(Location l)
         {
-            for (int i = 1; i < 2001; i++)
+            if (Mem.ReadInt(Settings.WorldPTR, new int[] { offsets.pCPed, offsets.oInVehicle }) == 0)
             {
-                long p = Mem.ReadPointer(settings.BlipPTR + i * 0x8, null);
-                if (p == 0) continue;
-                int icon = Mem.Read<int>(p + 0x40);
-                int color = Mem.Read<int>(p + 0x48);
-                if (Array.IndexOf(icons, icon) == -1) continue;
-                if (colors != null && Array.IndexOf(colors, color) == -1) continue;
-                return p;
+                CarX = l.x;
+                CarY = l.y;
+                CarZ = l.z;
+            }
+            else
+            {
+                PlayerX = l.x;
+                PlayerY = l.y;
+                PlayerZ = l.z;
+            }
+        }
+
+        private static void teleportBlip(int[] ID, int[] color, int height = 0)
+        {
+            Location tmpLoc = getBlipCoords(ID, color, height);
+            if (tmpLoc.x != 0 && tmpLoc.y != 0)
+            {
+                Teleport(tmpLoc);
+            }
+            else
+            {
+                Console.WriteLine("No TP, wrong coords (x, y).");
+            }
+        }
+
+        private static Location getBlipCoords(int[] id, int[] color = null, int height = 0)
+        {
+            float zOffset = 0;
+            Location tempLocation = new Location() { };
+            for (int i = 2000; i > 1; i--)
+            {
+                long blip = Settings.BlipPTR + (i * 8);
+                int blipId = Mem.ReadInt(blip, new int[] { 0x40 });
+                int blipColor = Mem.ReadInt(blip, new int[] { 0x48 });
+                if (id != null && id.Contains(blipId))
+                {
+                    zOffset = (float)(Math.Round(Math.Pow(i, -0.2), 1) * height);
+                    tempLocation = new Location
+                    {
+                        x = Mem.ReadFloat(blip, new int[] { 0x10 }),
+                        y = Mem.ReadFloat(blip, new int[] { 0x14 }),
+                        z = Mem.ReadFloat(blip, new int[] { 0x18 })
+                    };
+
+                    if (color != null && color.Contains(blipColor))
+                    {
+                        tempLocation = new Location
+                        {
+                            x = Mem.ReadFloat(blip, new int[] { 0x10 }),
+                            y = Mem.ReadFloat(blip, new int[] { 0x14 }),
+                            z = Mem.ReadFloat(blip, new int[] { 0x18 })
+                        };
+                    }
+                }
+            }
+            if (tempLocation.z == 20)
+            {
+                tempLocation.z = -255F;
+            } else
+            {
+                tempLocation.z = tempLocation.z + zOffset;
+            }
+
+            Console.WriteLine("New location: " + tempLocation.x + ", " + tempLocation.y + ", " + tempLocation.z);
+            return new Location { x = tempLocation.x, y = tempLocation.y, z = tempLocation.z };
+        }
+
+        public static float PlayerX
+        {
+            get { return Mem.ReadFloat(Settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCNavigation, offsets.oPositionX }); }
+            set
+            {
+                Mem.Write(Settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCNavigation, offsets.oPositionX }, value);
+                Mem.Write(Settings.WorldPTR, new int[] { offsets.pCPed, offsets.oVisualX }, value);
+            }
+        }
+        public static float PlayerY
+        {
+            get { return Mem.ReadFloat(Settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCNavigation, offsets.oPositionY }); }
+            set
+            {
+                Mem.Write(Settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCNavigation, offsets.oPositionY }, value);
+                Mem.Write(Settings.WorldPTR, new int[] { offsets.pCPed, offsets.oVisualY }, value);
+            }
+        }
+        public static float PlayerZ
+        {
+            get { return Mem.ReadFloat(Settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCNavigation, offsets.oPositionZ }); }
+            set
+            {
+                Mem.Write(Settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCNavigation, offsets.oPositionZ }, value);
+                Mem.Write(Settings.WorldPTR, new int[] { offsets.pCPed, offsets.oVisualZ }, value);
+            }
+        }
+
+        public static float CarX
+        {
+            get { return Mem.ReadFloat(Settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCVehicle, offsets.pCNavigation, offsets.oPositionX }); }
+            set
+            {
+                Mem.Write(Settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCVehicle, offsets.pCNavigation, offsets.oPositionX }, value);
+                Mem.Write(Settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCVehicle, offsets.oVisualX }, value);
+            }
+        }
+        public static float CarY
+        {
+            get { return Mem.ReadFloat(Settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCVehicle, offsets.pCNavigation, offsets.oPositionY }); }
+            set
+            {
+                Mem.Write(Settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCVehicle, offsets.pCNavigation, offsets.oPositionY }, value);
+                Mem.Write(Settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCVehicle, offsets.oVisualY }, value);
+            }
+        }
+        public static float CarZ
+        {
+            get { return Mem.ReadFloat(Settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCVehicle, offsets.pCNavigation, offsets.oPositionZ }); }
+            set
+            {
+                Mem.Write(Settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCVehicle, offsets.pCNavigation, offsets.oPositionZ }, value);
+                Mem.Write(Settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCVehicle, offsets.oVisualZ }, value);
+            }
+        }
+        #endregion
+
+        #region Global Addresses function
+        public static T GG<T>(int index) where T : struct { return Mem.Read<T>(GA(index)); }
+
+        public static void SG<T>(int index, T vaule) where T : struct { Mem.Write<T>(GA(index), vaule); }
+        
+        public static long GA(int Index)
+        {
+            long p = Settings.GlobalPTR + (8 * (Index >> 0x12 & 0x3F));
+            long p_ga = Mem.ReadPointer(p, null);
+            long p_ga_final = p_ga + (8 * (Index & 0x3FFFF));
+            return p_ga_final;
+        }
+        #endregion
+
+        #region Stat function
+        public static void setStat(string stat, int value)
+        {
+            uint Stat_ResotreHash = GG<uint>(1655453 + 4);
+            int Stat_ResotreValue = GG<int>(1020252 + 5526);
+            Console.WriteLine(Stat_ResotreHash + " " + Stat_ResotreValue);
+            SG<uint>(1655453 + 4, Joaat(stat));
+            SG<int>(1020252 + 5526, value);
+            SG<int>(1644218 + 1139, -1);
+            Thread.Sleep(1000);
+            SG<uint>(1655453 + 4, Stat_ResotreHash);
+            SG<int>(1020252 + 5526, Stat_ResotreValue);
+        }
+        public static uint Joaat(string input)
+        {
+            uint num1 = 0U;
+            input = input.ToLower();
+            foreach (char c in input)
+            {
+                uint num2 = num1 + c;
+                uint num3 = num2 + (num2 << 10);
+                num1 = num3 ^ num3 >> 6;
+            }
+            uint num4 = num1 + (num1 << 3);
+            uint num5 = num4 ^ num4 >> 11;
+
+            return num5 + (num5 << 15);
+        }
+        #endregion
+
+        #region Local Script function
+        public static long GetLocalScript(string name)
+        {
+            int size = name.Length;
+            for (int i = 0; i <= 52; i++)
+            {
+                long lc_p = Mem.ReadPointer(Settings.LocalScriptsPTR, new int[] { (i * 8), 0xB0 });
+                string lc_n = Mem.ReadString(Settings.LocalScriptsPTR, new int[] { (i * 8), 0xD0 }, size);
+                if (lc_n == name)
+                {
+                    i = 53;
+                    Console.WriteLine(lc_p);
+                    return (lc_p);
+                }
             }
             return 0;
         }
-
-        public static Vector3 get_blip_pos(int[] icons, int[] colors = null)
-        {
-            long blip = get_blip(icons, colors);
-            return ((blip == 0) ? new Vector3() : Mem.Read<Vector3>(blip + 0x10));
-        }
-
-        public static void to_waypoint()
-        {
-            Vector3 pos = get_blip_pos(new int[] { 8 }, new int[] { 84 });
-            if (pos.X == 0.0f && pos.Y == 0.0f && pos.Z == 0.0f) return;
-            pos.Z = pos.Z == 20.0f ? -255.0f : pos.Z + 1.0f;
-            to_coords(get_local_ped(), pos);
-        }
-
-        public static void to_objective()
-        {
-            Vector3 pos = get_blip_pos(new int[] { 1 }, new int[] { 5, 60, 66 });
-            if (pos.X == 0.0f && pos.Y == 0.0f && pos.Z == 0.0f) pos = get_blip_pos(new int[] { 1, 225, 427, 478, 501, 523, 556 }, new int[] { 1, 2, 3, 54, 78 });
-            if (pos.X == 0.0f && pos.Y == 0.0f && pos.Z == 0.0f) pos = get_blip_pos(new int[] { 432, 443 }, new int[] { 59 });
-            to_coords_with_check(get_local_ped(), pos);
-        }
-
-        public static void to_blip(int[] icons, int[] colors = null)
-        {
-            Vector3 pos = get_blip_pos(icons, colors);
-            to_coords_with_check(get_local_ped(), pos);
-        }
-
-        public static void to_coords(long ped, Vector3 pos)
-        {
-            long entity = (is_in_vehicle(ped) ? get_current_vehicle(ped) : ped);
-            set_position(entity, pos);
-        }
-
-        public static void to_coords_with_check(long ped, Vector3 pos)
-        {
-            if (pos.X == 0.0f && pos.Y == 0.0f && pos.Z == 0.0f) return;
-            to_coords(ped, pos);
-        }
-
         #endregion
     }
     struct Location { public float x, y, z; }
