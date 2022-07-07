@@ -62,10 +62,17 @@
     <Compile Include="Config\Patterns.cs" />
     <Compile Include="Helpers\EnumData.cs" />
     <Compile Include="Helpers\ProcessMgr.cs" />
-    <Compile Include="Helpers\JOAAT.cs" />
     <Compile Include="Helpers\Key.cs" />
     <Compile Include="Helpers\KeysMgr.cs" />
     <Compile Include="Helpers\Manager.cs" />
+    <Compile Include="Math\Library.cs" />
+    <Compile Include="Math\Math2.cs" />
+    <Compile Include="Math\Math3.cs" />
+    <Compile Include="Math\MathF.cs" />
+    <Compile Include="Math\Matrix3x4.cs" />
+    <Compile Include="Math\Matrix4x4.cs" />
+    <Compile Include="Math\Vector2.cs" />
+    <Compile Include="Math\Vector3.cs" />
     <Compile Include="Memory\Mem.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -98,5 +105,6 @@
   <ItemGroup>
     <Content Include="gtavcsmm.ico" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

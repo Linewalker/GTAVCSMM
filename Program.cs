@@ -11,6 +11,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using GameMath;
 
 namespace GTAVCSMM
 {
@@ -1232,8 +1233,8 @@ namespace GTAVCSMM
                                     break;
                                 case 2:
                                     Activate();
-                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPedWeaponManager, offsets.pCWeaponInfo, offsets.oReloadMult }, 10);
-                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPedWeaponManager, offsets.pCWeaponInfo, offsets.oReloadVehicleMult }, 10);
+                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPedWeaponManager, offsets.pCWeaponInfo, offsets.oReloadMult }, 10F);
+                                    Mem.Write(settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPedWeaponManager, offsets.pCWeaponInfo, offsets.oReloadVehicleMult }, 10F);
                                     break;
                                 case 3:
                                     listboxFill(4, 2);
@@ -2613,7 +2614,7 @@ namespace GTAVCSMM
                         /*
                          * Development
                          */
-                        kill_npcs();
+                        to_blip(new int[] { 819 });
                     }
                 }
             }
@@ -2624,9 +2625,9 @@ namespace GTAVCSMM
         {
             Task.Run(() =>
             {
-                _SG_Int(1575012, id);
-                _SG_Int(1574589 + 2, id == -1 ? -1 : 0);
-                _SG_Int(1574589, 1);
+                SG<int>(1575012, id);
+                SG<int>(1574589 + 2, id == -1 ? -1 : 0);
+                SG<int>(1574589, 1);
             });
         }
 
@@ -2646,20 +2647,20 @@ namespace GTAVCSMM
         }
         public static void setRPMultipler(float m)
         {
-            _SG_Float(262145 + 1, m);
+            SG<float>(262145 + 1, m);
         }
 
         public static void setREPMultipler(float m)
         {
-            _SG_Float(262145 + 31294, m); // Street Race - old 31278 + 16 for 1.60
-            _SG_Float(262145 + 31295, m); // Pursuit Race
-            _SG_Float(262145 + 31296, m); // Scramble
-            _SG_Float(262145 + 31297, m); // Head 2 Head
-            _SG_Float(262145 + 31289, m); // Car Meet
-            _SG_Float(262145 + 31300, m); // Test Track
-            _SG_Float(262145 + 31328, m); // Auto Shop Contract
-            _SG_Float(262145 + 31329, m); // Customer Deliveries
-            _SG_Float(262145 + 31330, m); // Exotic Exports Deliveries
+            SG<float>(262145 + 31294, m); // Street Race - old 31278 + 16 for 1.60
+            SG<float>(262145 + 31295, m); // Pursuit Race
+            SG<float>(262145 + 31296, m); // Scramble
+            SG<float>(262145 + 31297, m); // Head 2 Head
+            SG<float>(262145 + 31289, m); // Car Meet
+            SG<float>(262145 + 31300, m); // Test Track
+            SG<float>(262145 + 31328, m); // Auto Shop Contract
+            SG<float>(262145 + 31329, m); // Customer Deliveries
+            SG<float>(262145 + 31330, m); // Exotic Exports Deliveries
         }
 
         #region Teleport part
@@ -2804,45 +2805,32 @@ namespace GTAVCSMM
             return p_ga_final;
         }
 
-        public static int _GG_Int(int Index)
-        {
-            return Mem.ReadInt(GA(Index), null);
-        }
-        public static float _GG_Float(int Index)
-        {
-            return Mem.ReadFloat(GA(Index), null);
-        }
-        public static string _GG_String(int Index, int size)
-        {
-            return Mem.ReadString(GA(Index), null, size);
-        }
-        public static void _SG_Int(int Index, int value)
-        {
-            Mem.writeInt(GA(Index), null, value);
-        }
-        public static void _SG_UInt(int Index, uint value)
-        {
-            Mem.writeUInt(GA(Index), null, value);
-        }
-        public static void _SG_Float(int Index, float value)
-        {
-            Mem.writeFloat(GA(Index), null, value);
-        }
-        public static void _SG_String(int Index, string value)
-        {
-            Mem.Write(GA(Index), null, value);
-        }
-
         public static void setStat(string stat, int value)
         {
-            long oldhash = _GG_Int(1655453 + 4); // old 1655444
-            long oldvalue = _GG_Int(1020252 + 5526);
-            _SG_Int(1655453 + 4, (int)JOAAT.GetHashKey(stat)); // old 1655444
-            _SG_Int(1020252 + 5526, value);
-            _SG_Int(1644218 + 1139, -1); // old 1644209
+            uint Stat_ResotreHash = GG<uint>(1655453 + 4);
+            int Stat_ResotreValue = GG<int>(1020252 + 5526);
+            Console.WriteLine(Stat_ResotreHash + " " + Stat_ResotreValue);
+            SG<uint>(1655453 + 4, Joaat(stat));
+            SG<int>(1020252 + 5526, value);
+            SG<int>(1644218 + 1139, -1);
             Thread.Sleep(1000);
-            _SG_Int(1655453 + 4, (int)oldhash); // old 1655444
-            _SG_Int(1020252 + 5526, (int)oldvalue);
+            SG<uint>(1655453 + 4, Stat_ResotreHash);
+            SG<int>(1020252 + 5526, Stat_ResotreValue);
+        }
+        public static uint Joaat(string input)
+        {
+            uint num1 = 0U;
+            input = input.ToLower();
+            foreach (char c in input)
+            {
+                uint num2 = num1 + c;
+                uint num3 = num2 + (num2 << 10);
+                num1 = num3 ^ num3 >> 6;
+            }
+            uint num4 = num1 + (num1 << 3);
+            uint num5 = num4 ^ num4 >> 11;
+
+            return num5 + (num5 << 15);
         }
         #endregion
         public static long GetLocalScript(string name)
@@ -2874,38 +2862,38 @@ namespace GTAVCSMM
             spawner_x = spawner_x - (ped_heading2 * 5f);
             spawner_y = spawner_y + (ped_heading * 5f);
             spawner_z = spawner_z + 0.5f;
-            _SG_Float(offsets.oVMCreate + 7 + 0, spawner_x);
-            _SG_Float(offsets.oVMCreate + 7 + 1, spawner_y);
-            _SG_Float(offsets.oVMCreate + 7 + 2, spawner_z);
-            _SG_Int(offsets.oVMCreate + 27 + 66, (int)JOAAT.GetHashKey(Hash));
-            _SG_Int(offsets.oVMCreate + 27 + 28, 1); // Weaponised ownerflag
-            _SG_Int(offsets.oVMCreate + 27 + 60, 1);
-            _SG_Int(offsets.oVMCreate + 27 + 95, 14); // Ownerflag
-            _SG_Int(offsets.oVMCreate + 27 + 94, 2); // Personal car ownerflag
-            _SG_Int(offsets.oVMCreate + 5, 1); // SET('i', CarSpawn + 0x1168, 1)--can spawn flag must be odd
-            _SG_Int(offsets.oVMCreate + 2, 1); // SET('i', CarSpawn + 0x1180, 1)--spawn toggle gets reset to 0 on car spawn
-            _SG_Int(offsets.oVMCreate + 3, pegasus);
-            _SG_Int(offsets.oVMCreate + 27 + 74, 1); // Red Neon Amount 1-255 100%-0%
-            _SG_Int(offsets.oVMCreate + 27 + 75, 1); // Green Neon Amount 1-255 100%-0%
-            _SG_Int(offsets.oVMCreate + 27 + 76, 0); // Blue Neon Amount 1-255 100%-0%
-            _SG_UInt(offsets.oVMCreate + 27 + 60, 4030726305); // landinggear / vehstate
-            _SG_Int(offsets.oVMCreate + 27 + 5, -1); // default paintjob primary -1 auto 120
-            _SG_Int(offsets.oVMCreate + 27 + 6, -1); // default paintjob secondary -1 auto 120
-            _SG_Int(offsets.oVMCreate + 27 + 7, -1);
-            _SG_Int(offsets.oVMCreate + 27 + 8, -1);
-            _SG_Int(offsets.oVMCreate + 27 + 19, 4);
-            _SG_Int(offsets.oVMCreate + 27 + 21, 4); // Engine(0 - 3)
-            _SG_Int(offsets.oVMCreate + 27 + 22, 3);
-            _SG_Int(offsets.oVMCreate + 27 + 23, 3); // Transmission(0 - 9)
-            _SG_Int(offsets.oVMCreate + 27 + 24, 58);
-            _SG_Int(offsets.oVMCreate + 27 + 26, 5); // Armor(0 - 18)
-            _SG_Int(offsets.oVMCreate + 27 + 27, 1); // Turbo(0 - 1)
-            _SG_Int(offsets.oVMCreate + 27 + 65, 2); // Window tint 0 - 6
-            _SG_Int(offsets.oVMCreate + 27 + 69, -1); // Wheel type
-            _SG_Int(offsets.oVMCreate + 27 + 33, -1); // Wheel Selection
-            _SG_Int(offsets.oVMCreate + 27 + 25, 8); // Suspension(0 - 13)
-            _SG_Int(offsets.oVMCreate + 27 + 19, -1);
-            Mem.writeInt(GA(offsets.oVMCreate + 27 + 77) + 1, null, 2); // 2:bulletproof 0:false
+            SG<float>(offsets.oVMCreate + 7 + 0, spawner_x);
+            SG<float>(offsets.oVMCreate + 7 + 1, spawner_y);
+            SG<float>(offsets.oVMCreate + 7 + 2, spawner_z);
+            SG<uint>(offsets.oVMCreate + 27 + 66, Joaat(Hash));
+            SG<int>(offsets.oVMCreate + 27 + 28, 1); // Weaponised ownerflag
+            SG<int>(offsets.oVMCreate + 27 + 60, 1);
+            SG<int>(offsets.oVMCreate + 27 + 95, 14); // Ownerflag
+            SG<int>(offsets.oVMCreate + 27 + 94, 2); // Personal car ownerflag
+            SG<int>(offsets.oVMCreate + 5, 1); // SET('i', CarSpawn + 0x1168, 1)--can spawn flag must be odd
+            SG<int>(offsets.oVMCreate + 2, 1); // SET('i', CarSpawn + 0x1180, 1)--spawn toggle gets reset to 0 on car spawn
+            SG<int>(offsets.oVMCreate + 3, pegasus);
+            SG<int>(offsets.oVMCreate + 27 + 74, 1); // Red Neon Amount 1-255 100%-0%
+            SG<int>(offsets.oVMCreate + 27 + 75, 1); // Green Neon Amount 1-255 100%-0%
+            SG<int>(offsets.oVMCreate + 27 + 76, 0); // Blue Neon Amount 1-255 100%-0%
+            SG<uint>(offsets.oVMCreate + 27 + 60, 4030726305); // landinggear / vehstate
+            SG<int>(offsets.oVMCreate + 27 + 5, -1); // default paintjob primary -1 auto 120
+            SG<int>(offsets.oVMCreate + 27 + 6, -1); // default paintjob secondary -1 auto 120
+            SG<int>(offsets.oVMCreate + 27 + 7, -1);
+            SG<int>(offsets.oVMCreate + 27 + 8, -1);
+            SG<int>(offsets.oVMCreate + 27 + 19, 4);
+            SG<int>(offsets.oVMCreate + 27 + 21, 4); // Engine(0 - 3)
+            SG<int>(offsets.oVMCreate + 27 + 22, 3);
+            SG<int>(offsets.oVMCreate + 27 + 23, 3); // Transmission(0 - 9)
+            SG<int>(offsets.oVMCreate + 27 + 24, 58);
+            SG<int>(offsets.oVMCreate + 27 + 26, 5); // Armor(0 - 18)
+            SG<int>(offsets.oVMCreate + 27 + 27, 1); // Turbo(0 - 1)
+            SG<int>(offsets.oVMCreate + 27 + 65, 2); // Window tint 0 - 6
+            SG<int>(offsets.oVMCreate + 27 + 69, -1); // Wheel type
+            SG<int>(offsets.oVMCreate + 27 + 33, -1); // Wheel Selection
+            SG<int>(offsets.oVMCreate + 27 + 25, 8); // Suspension(0 - 13)
+            SG<int>(offsets.oVMCreate + 27 + 19, -1);
+            Mem.Write(GA(offsets.oVMCreate + 27 + 77) + 1, null, 2); // 2:bulletproof 0:false
 
             int weapon1 = 2;
             int weapon2 = 1;
@@ -2942,8 +2930,8 @@ namespace GTAVCSMM
             {
                 weapon1 = 30;
             }
-            _SG_Int(offsets.oVMCreate + 27 + 15, weapon1); // primary weapon
-            _SG_Int(offsets.oVMCreate + 27 + 20, weapon2); // primary weapon
+            SG<int>(offsets.oVMCreate + 27 + 15, weapon1); // primary weapon
+            SG<int>(offsets.oVMCreate + 27 + 20, weapon2); // primary weapon
             // _SG_Int(offsets.oVMCreate + 27 + 1, "FCK4FD"); // License plate
         }
         public static string ShowDialog(string text, string caption)
@@ -3004,35 +2992,35 @@ namespace GTAVCSMM
         public static void set_nightclub_produce_time(int produce_time, bool toggle)
         {
             // Time to Produce
-            _SG_Int(262145 + 24135, toggle ? produce_time : 4800000);   // Sporting Goods
-            _SG_Int(262145 + 24136, toggle ? produce_time : 14400000);  // South American Imports
-            _SG_Int(262145 + 24137, toggle ? produce_time : 7200000);   // Pharmaceutical Research
-            _SG_Int(262145 + 24138, toggle ? produce_time : 2400000);   // Organic Produce
-            _SG_Int(262145 + 24139, toggle ? produce_time : 1800000);   // Printing and Copying
-            _SG_Int(262145 + 24140, toggle ? produce_time : 3600000);   // Cash Creation
-            _SG_Int(262145 + 24141, toggle ? produce_time : 8400000);   // Cargo and Shipments
+            SG<int>(262145 + 24135, toggle ? produce_time : 4800000);   // Sporting Goods
+            SG<int>(262145 + 24136, toggle ? produce_time : 14400000);  // South American Imports
+            SG<int>(262145 + 24137, toggle ? produce_time : 7200000);   // Pharmaceutical Research
+            SG<int>(262145 + 24138, toggle ? produce_time : 2400000);   // Organic Produce
+            SG<int>(262145 + 24139, toggle ? produce_time : 1800000);   // Printing and Copying
+            SG<int>(262145 + 24140, toggle ? produce_time : 3600000);   // Cash Creation
+            SG<int>(262145 + 24141, toggle ? produce_time : 8400000);   // Cargo and Shipments
         }
 
         public static void set_mc_produce_time(int produce_time, bool toggle)
         {
             // Base Time to Produce
-            _SG_Int(262145 + 17198, toggle ? produce_time : 360000);  // Weed
-            _SG_Int(262145 + 17199, toggle ? produce_time : 1800000);  // Meth
-            _SG_Int(262145 + 17200, toggle ? produce_time : 3000000);  // Cocaine
-            _SG_Int(262145 + 17201, toggle ? produce_time : 300000);  // Documents
-            _SG_Int(262145 + 17202, toggle ? produce_time : 720000);  // Cash
+            SG<int>(262145 + 17198, toggle ? produce_time : 360000);  // Weed
+            SG<int>(262145 + 17199, toggle ? produce_time : 1800000);  // Meth
+            SG<int>(262145 + 17200, toggle ? produce_time : 3000000);  // Cocaine
+            SG<int>(262145 + 17201, toggle ? produce_time : 300000);  // Documents
+            SG<int>(262145 + 17202, toggle ? produce_time : 720000);  // Cash
 
             // Time to Produce Reductions
-            _SG_Int(262145 + 17203, toggle ? 1 : 60000);  // Documents Equipment
-            _SG_Int(262145 + 17204, toggle ? 1 : 120000);  // Cash Equipment
-            _SG_Int(262145 + 17205, toggle ? 1 : 600000);  // Cocaine Equipment
-            _SG_Int(262145 + 17206, toggle ? 1 : 360000);  // Meth Equipment
-            _SG_Int(262145 + 17207, toggle ? 1 : 60000);  // Weed Equipment
-            _SG_Int(262145 + 17208, toggle ? 1 : 60000);  // Documents Staff
-            _SG_Int(262145 + 17209, toggle ? 1 : 120000);  // Cash Staff
-            _SG_Int(262145 + 17210, toggle ? 1 : 600000);  // Cocaine Staff
-            _SG_Int(262145 + 17211, toggle ? 1 : 360000);  // Meth Staff
-            _SG_Int(262145 + 17212, toggle ? 1 : 60000);  // Weed Staff
+            SG<int>(262145 + 17203, toggle ? 1 : 60000);  // Documents Equipment
+            SG<int>(262145 + 17204, toggle ? 1 : 120000);  // Cash Equipment
+            SG<int>(262145 + 17205, toggle ? 1 : 600000);  // Cocaine Equipment
+            SG<int>(262145 + 17206, toggle ? 1 : 360000);  // Meth Equipment
+            SG<int>(262145 + 17207, toggle ? 1 : 60000);  // Weed Equipment
+            SG<int>(262145 + 17208, toggle ? 1 : 60000);  // Documents Staff
+            SG<int>(262145 + 17209, toggle ? 1 : 120000);  // Cash Staff
+            SG<int>(262145 + 17210, toggle ? 1 : 600000);  // Cocaine Staff
+            SG<int>(262145 + 17211, toggle ? 1 : 360000);  // Meth Staff
+            SG<int>(262145 + 17212, toggle ? 1 : 60000);  // Weed Staff
         }
         public static void empty_session()
         {
@@ -3114,9 +3102,9 @@ namespace GTAVCSMM
             Task.Run(() =>
             {
                 Activate();
-                _SG_Int(offsets.oVMYCar + 4625, toggle ? 1 : 0);
-                if (toggle) _SG_Int(offsets.oVMYCar + 4627, get_network_time() + 3600000);
-                _SG_Int(offsets.oVMYCar + 4624, toggle ? 5 : 0);
+                SG<int>(offsets.oVMYCar + 4625, toggle ? 1 : 0);
+                if (toggle) SG<int>(offsets.oVMYCar + 4627, get_network_time() + 3600000);
+                SG<int>(offsets.oVMYCar + 4624, toggle ? 5 : 0);
             });
         }
 
@@ -3240,6 +3228,7 @@ namespace GTAVCSMM
         public static void set_health(long ped, float value) { Mem.Write<float>(ped + 0x280, value); }
         public static long get_local_ped() { return Mem.ReadPointer(settings.WorldPTR, new int[] { 0x8 }); }
         public static long get_ped_inventory(long ped) { return Mem.Read<long>(ped + 0x10D0); }
+        public static bool is_in_vehicle(long ped) { return ((Mem.Read<byte>(ped + 0xE52) == 1) ? true : false); }
 
         public static void set_health3(long vehicle, float value) { Mem.Write<float>(vehicle + 0x844, value); }
         public static void set_health2(long vehicle, float value) { Mem.Write<float>(vehicle + 0x840, value); }
@@ -3247,6 +3236,7 @@ namespace GTAVCSMM
         public static byte get_state(long vehicle) { return Mem.Read<byte>(vehicle + 0xD8); }
         public static void set_state(long vehicle, byte value) { Mem.Write<byte>(vehicle + 0xD8, value); }
         public static long get_current_vehicle(long ped) { return Mem.Read<long>(ped + 0xD30); }
+        public static long get_navigation(long entity) { return Mem.Read<long>(entity + 0x30); }
         public static void set_state_is_destroyed(long vehicle, bool toggle)
         {
             byte temp = get_state(vehicle);
@@ -3262,6 +3252,72 @@ namespace GTAVCSMM
             set_health3(vehicle, 1000.0f);
             set_engine_health(vehicle, 1000.0f);
         }
+        public static void set_position(long entity, Vector3 pos)
+        {
+            set_real_position(entity, pos);
+            set_visual_position(entity, pos);
+        }
+        public static void set_real_position(long entity, Vector3 pos) { nav_set_real_position(get_navigation(entity), pos); }
+        public static void set_visual_position(long entity, Vector3 pos) { Mem.Write<Vector3>(entity + 0x90, pos); }
+        public static void nav_set_real_position(long navigation, Vector3 pos) { Mem.Write<Vector3>(navigation + 0x50, pos); }
+
+        #region Vector3
+        public static long get_blip(int[] icons, int[] colors = null)
+        {
+            for (int i = 1; i < 2001; i++)
+            {
+                long p = Mem.ReadPointer(settings.BlipPTR + i * 0x8, null);
+                if (p == 0) continue;
+                int icon = Mem.Read<int>(p + 0x40);
+                int color = Mem.Read<int>(p + 0x48);
+                if (Array.IndexOf(icons, icon) == -1) continue;
+                if (colors != null && Array.IndexOf(colors, color) == -1) continue;
+                return p;
+            }
+            return 0;
+        }
+
+        public static Vector3 get_blip_pos(int[] icons, int[] colors = null)
+        {
+            long blip = get_blip(icons, colors);
+            return ((blip == 0) ? new Vector3() : Mem.Read<Vector3>(blip + 0x10));
+        }
+
+        public static void to_waypoint()
+        {
+            Vector3 pos = get_blip_pos(new int[] { 8 }, new int[] { 84 });
+            if (pos.X == 0.0f && pos.Y == 0.0f && pos.Z == 0.0f) return;
+            pos.Z = pos.Z == 20.0f ? -255.0f : pos.Z + 1.0f;
+            to_coords(get_local_ped(), pos);
+        }
+
+        public static void to_objective()
+        {
+            Vector3 pos = get_blip_pos(new int[] { 1 }, new int[] { 5, 60, 66 });
+            if (pos.X == 0.0f && pos.Y == 0.0f && pos.Z == 0.0f) pos = get_blip_pos(new int[] { 1, 225, 427, 478, 501, 523, 556 }, new int[] { 1, 2, 3, 54, 78 });
+            if (pos.X == 0.0f && pos.Y == 0.0f && pos.Z == 0.0f) pos = get_blip_pos(new int[] { 432, 443 }, new int[] { 59 });
+            to_coords_with_check(get_local_ped(), pos);
+        }
+
+        public static void to_blip(int[] icons, int[] colors = null)
+        {
+            Vector3 pos = get_blip_pos(icons, colors);
+            to_coords_with_check(get_local_ped(), pos);
+        }
+
+        public static void to_coords(long ped, Vector3 pos)
+        {
+            long entity = (is_in_vehicle(ped) ? get_current_vehicle(ped) : ped);
+            set_position(entity, pos);
+        }
+
+        public static void to_coords_with_check(long ped, Vector3 pos)
+        {
+            if (pos.X == 0.0f && pos.Y == 0.0f && pos.Z == 0.0f) return;
+            to_coords(ped, pos);
+        }
+
+        #endregion
     }
     struct Location { public float x, y, z; }
 }
