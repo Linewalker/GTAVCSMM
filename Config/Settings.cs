@@ -52,6 +52,5 @@
         public static bool pdiscol = false;
         public static bool vgodm = false;
         public static bool cKiller = false;
-
     }
 }

@@ -83,8 +83,6 @@ namespace GTAVCSMM
         public static Patterns pattern = new Patterns();
         public static Mem Mem;
 
-        public static System.Windows.Forms.Timer MemoryTimer = new System.Windows.Forms.Timer();
-        public static System.Windows.Forms.Timer fastTimer = new System.Windows.Forms.Timer();
         private static bool bGodMode = false;
         private static bool bgodState = false;
         private static bool bNeverWanted = false;
@@ -111,21 +109,11 @@ namespace GTAVCSMM
 
         private static void MemoryTimer_Tick(object sender, EventArgs e)
         {
-            pGODMODE();
-            vGODMODE();
             vCOPKILLER();
         }
 
         private static void fastTimer_Tick(object sender, EventArgs e)
         {
-            pNEVERWANTED();
-            pNORAGDOLL();
-            pUNDEADOFFRADAR();
-            pSEATBELT();
-            pDISABLECOLLISION();
-            pSUPERJUMP();
-            pEXPLOSIVEAMMO();
-            cPRICE();
         }
 
         #endregion
@@ -275,13 +263,57 @@ namespace GTAVCSMM
 
                     listboxStyle();
                     listboxFill(0, 0);
-                    fastTimer.Enabled = true;
-                    MemoryTimer.Enabled = true;
                     listBx.Enabled = true;
 
-                    Application.Run();
+                    Task.Run(() =>
+                    {
+                        HiPrecisionTimer();
+                    });
 
+                    Task.Run(() =>
+                    {
+                        StdPrecisionTimer();
+                    });
+
+                    Task.Run(() =>
+                    {
+                        LoPrecisionTimer();
+                    });
+
+                    Application.Run();
                 }
+        }
+        public static void HiPrecisionTimer()
+        {
+            while (true)
+            {
+                cPRICE();
+                Thread.Sleep(0);
+            }
+        }
+        public static void StdPrecisionTimer()
+        {
+            while (true)
+            {
+                pGODMODE();
+                vGODMODE();
+                pNEVERWANTED();
+                pNORAGDOLL();
+                pUNDEADOFFRADAR();
+                pSEATBELT();
+                pDISABLECOLLISION();
+                pSUPERJUMP();
+                pEXPLOSIVEAMMO();
+                Thread.Sleep(10);
+            }
+        }
+        public static void LoPrecisionTimer()
+        {
+            while (true)
+            {
+                vCOPKILLER();
+                Thread.Sleep(750);
+            }
         }
 
         public static void createMainForm()
@@ -322,16 +354,6 @@ namespace GTAVCSMM
             label2.Size = new System.Drawing.Size(65, 24);
             label2.TabIndex = 2;
             label2.Text = "o1.60";
-            // 
-            // fastTimer
-            // 
-            fastTimer.Interval = 10;
-            fastTimer.Tick += new System.EventHandler(fastTimer_Tick);
-            // 
-            // MemoryTimer
-            // 
-            MemoryTimer.Interval = 100;
-            MemoryTimer.Tick += new System.EventHandler(MemoryTimer_Tick);
             // 
             // Form1
             // 
@@ -2547,9 +2569,9 @@ namespace GTAVCSMM
                 {
                     frameFlagCount = frameFlagCount + 64;
                     Activate();
+                    Settings.psjump = true;
                 }
                 Mem.Write(Settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oFrameFlags }, frameFlagCount);
-                Settings.psjump = true;
             }
             else
             {
@@ -2571,9 +2593,9 @@ namespace GTAVCSMM
                 {
                     frameFlagCount = frameFlagCount + 8;
                     Activate();
+                    Settings.psexammo = true;
                 }
                 Mem.Write(Settings.WorldPTR, new int[] { offsets.pCPed, offsets.pCPlayerInfo, offsets.oFrameFlags }, frameFlagCount);
-                Settings.psexammo = true;
             }
             else
             {
@@ -3034,6 +3056,8 @@ namespace GTAVCSMM
             Activate();
         }
 
+        public static long get_local_ped() { return Mem.ReadPointer(Settings.WorldPTR, new int[] { 0x8 }); }
+        public static long get_playerinfo(long ped) { return Mem.Read<long>(ped + offsets.pCPlayerInfo); }
         public static int get_network_time() { return GG<int>(1574755 + 11); }
         public static int player_id() { return GG<int>(offsets.oPlayerGA); }
         public static byte get_type(long entity) { return Mem.Read<byte>(entity + 0x2B); }
@@ -3042,7 +3066,6 @@ namespace GTAVCSMM
         public static bool is_enemy(long ped) { return ((get_hostility(ped) > 1) ? true : false); }
         public static uint get_pedtype(long ped) { return Mem.Read<uint>(ped + 0x10B8) << 11 >> 25; }
         public static void set_health(long ped, float value) { Mem.Write<float>(ped + 0x280, value); }
-        public static long get_local_ped() { return Mem.ReadPointer(Settings.WorldPTR, new int[] { 0x8 }); }
         public static long get_ped_inventory(long ped) { return Mem.Read<long>(ped + 0x10D0); }
         public static bool is_in_vehicle(long ped) { return ((Mem.Read<byte>(ped + 0xE52) == 1) ? true : false); }
 
@@ -3254,7 +3277,6 @@ namespace GTAVCSMM
                 if (lc_n == name)
                 {
                     i = 53;
-                    Console.WriteLine(lc_p);
                     return (lc_p);
                 }
             }
